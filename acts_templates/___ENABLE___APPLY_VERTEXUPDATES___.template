@@ -1,0 +1,52 @@
+uint512_vec_dt updates_vecs[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable=updates_vecs complete
+max_limit = 0; for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ limits[inst] = updatesptrs[0][p_v].size; } for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ if(max_limit < limits[inst]){ max_limit = limits[inst]; }}
+
+#ifdef _DEBUGMODE_KERNELPRINTS//4 
+if(en == true){ cout<<"### applying vertex updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; } 
+#endif 
+
+APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){				
+#pragma HLS PIPELINE II={{context['II_APPLY_UPDATES_LOOP1']}}	
+// #pragma HLS dependence variable=URAM_vprop type=inter false	
+	dretrievemany_udatesdram(globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][p_v].offset, p_v, t, updates_vecs, {% include '___HBM___ARGS___.template' %}); // NEW
+	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
+	#pragma HLS UNROLL
+		uint512_vec_dt updates_vec = updates_vecs[inst];
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){		
+		#pragma HLS UNROLL
+			keyvalue_t update = updates_vec.data[v];
+			unsigned int dstvid_lp = update.key; 
+			if(update.key >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
+			unsigned int dstvid_lpv = dstvid_lp / EDGE_PACK_SIZE;	
+			
+			#ifdef _DEBUGMODE_CHECKS3
+			if(t < limits[inst]){ checkoutofbounds("acts_kernel::ERROR 727a::", dstvid_lp, MAX_APPLYPARTITION_SIZE, NAp, inst, update.key); checkoutofbounds("acts_kernel::ERROR 727b::", dstvid_lpv, MAX_APPLYPARTITION_VECSIZE, NAp, inst, update.key); }					
+			#endif
+			vprop_t vprop = URAM_vprop[inst][v][dstvid_lpv];
+			// vprop_t vprop; vprop.prop = dstvid_lpv; // FIXME.
+			vprop_t newprop; newprop.prop = INVALIDDATA; newprop.degree = INVALIDDATA;
+			unsigned int new_vprop = reduce_funcG(vprop, update.value, globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM]);
+			if(t < limits[inst]){ 
+				#ifdef _DEBUGMODE_KERNELPRINTS_TRACE3
+				std::cout<<"APPLY (ACT-PACK) UPDATE SEEN @: t: "<<t<<", inst: ["<<inst<<"]: dstvid_lp: "<<dstvid_lp<<", dstvid_lpv: "<<dstvid_lpv<<", new_vprop: "<<new_vprop<<", vid: "<<update.key<<std::endl;
+				#endif
+				newprop.prop = new_vprop; newprop.degree = MASK_CODE_AU;
+			}
+			URAM_vprop[inst][v][dstvid_lpv] = newprop; 
+			#ifdef _DEBUGMODE_CHECKS3
+			if(inst==0 && v==0){ update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___APPLYUPDATES___, 1); }
+			#endif 
+		}
+	}
+	
+	#ifdef ___ENABLE___IMPORT_EXPORT___
+	hidden_import_and_export_function(t, import_offset, export_offset, action.size_import_export, HBM_centerA, HBM_centerB, HBM_import, HBM_export, action);
+	#endif 
+}		
+
+
+
+
+
+

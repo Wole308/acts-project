@@ -1,0 +1,7 @@
+{%for i in context['NUM_VALID_PEs_seq']%}	
+#ifndef ___RUNNING_FPGA_SYNTHESIS___
+cout<<"### gathering dst vertex properties for vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; 
+#endif 
+gather_frontiers({{i}}, p_v, cfrontier_dram___size, nfrontier_dram___size[{{i}}], upartition_vertices, HBM_channelA{{i}}, HBM_channelB{{i}}, HBM_centerA, HBM_centerB, globalparams, _NUMCLOCKCYCLES_);
+{%endfor%}
+		

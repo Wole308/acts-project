@@ -1,0 +1,208 @@
+//////////////////////////////////////////////////////////////////
+void insert_edgeupdatesbuffer(unsigned int v, unsigned int index, edge_update_type data, MY_IFDEF_EDGEUPDATESBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 992::", index, EDGE_UPDATES_DRAMBUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	URAM_edges[v][index] = data;
+}
+edge_update_type retrieve_edgeupdatesbuffer(unsigned int v, unsigned int index, MY_IFDEF_EDGEUPDATESBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 993::", index, EDGE_UPDATES_DRAMBUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	return URAM_edges[v][index];
+}
+
+void insert_vdatabuffer(unsigned int v, unsigned int index, vprop_t data, MY_IFDEF_VDATABUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 102::", index, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+	#endif
+	URAM_vprop[v][index >> POW_VALID_VDATA] = data; 
+}
+vprop_t retrieve_vdatabuffer(unsigned int v, unsigned int index, MY_IFDEF_VDATABUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 103::", index, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+	#endif
+	return URAM_vprop[v][index >> POW_VALID_VDATA];
+}
+void insertvec_vdatabuffer(unsigned int index, vprop_t data[EDGE_PACK_SIZE], MY_IFDEF_VDATABUFFER()){
+	#pragma HLS INLINE
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+	#pragma HLS UNROLL
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 104::", index, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+		#endif 
+		URAM_vprop[v][index >> POW_VALID_VDATA] = data[v];
+	}
+}
+void retrievevec_vdatabuffer(unsigned int index, vprop_t data[EDGE_PACK_SIZE], MY_IFDEF_VDATABUFFER()){
+	#pragma HLS INLINE
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+	#pragma HLS UNROLL
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 105::", index, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+		#endif 
+		data[v] = URAM_vprop[v][index >> POW_VALID_VDATA];
+	}
+}
+void retrieveandresetvec_vdatabuffer(unsigned int index, vprop_t data[EDGE_PACK_SIZE], MY_IFDEF_VDATABUFFER()){
+	#pragma HLS INLINE
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+	#pragma HLS UNROLL
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 105::", index, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+		#endif 
+		data[v].prop = URAM_vprop[v][index >> POW_VALID_VDATA].prop; 
+		data[v].degree = INVALIDMASK;  
+	}
+}
+
+void insert_edgesbuffer(unsigned int v, unsigned int index, edge3_type data, MY_IFDEF_EDGESBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 192::", index, EDGE_BUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	edges_buffer[v][index] = data;
+}
+edge3_type retrieve_edgesbuffer(unsigned int v, unsigned int index, MY_IFDEF_EDGESBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 193::", index, EDGE_BUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	return edges_buffer[v][index];
+}
+
+void insert_updatestmpbuffer(unsigned int v, unsigned int index, keyvalue_t data, MY_IFDEF_UPDATESTMPBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 107::", index, UPDATES_BUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	updates_buffer2[v][index] = data;
+}
+keyvalue_t retrieve_updatestmpbuffer(unsigned int v, unsigned int index, MY_IFDEF_UPDATESTMPBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 108::", index, UPDATES_BUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	return updates_buffer2[v][index];
+}
+
+void insert_vptrbuffer(unsigned int t, vtr_t data, MY_IFDEF_VPTRBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 129::", t, VPTR_BUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	vptr_buffer[t] = data;
+}
+vtr_t retrieve_vptrbuffer(unsigned int t, MY_IFDEF_VPTRBUFFER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 130::", t, VPTR_BUFFER_SIZE, NAp, NAp, NAp);
+	#endif 
+	return vptr_buffer[t];
+}
+
+void insert_nfrontierbuffer(unsigned int v, unsigned int t, frontier_t data, MY_IFDEF_NFRONTIER()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 113::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+	#endif 
+	nfrontier_buffer[v][t] = data;
+}
+frontier_t retrieve_cfrontierbuffer_tmp(unsigned int v, unsigned int t, MY_IFDEF_CFRONTIER_TMP()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 114::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+	#endif 
+	return URAM_frontiers[v][t];
+}
+void insertvec_cfrontierbuffer_tmp(unsigned int t, frontier_t data[EDGE_PACK_SIZE], MY_IFDEF_CFRONTIER_TMP()){
+	#pragma HLS INLINE
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+	#pragma HLS UNROLL
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 115::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+		#endif 
+		URAM_frontiers[v][t] = data[v];
+	}
+}
+void retrievevec_nfrontierbuffer(unsigned int t, frontier_t data[EDGE_PACK_SIZE], MY_IFDEF_NFRONTIER()){
+	#pragma HLS INLINE
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+	#pragma HLS UNROLL
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 116::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+		#endif 
+		data[v] = nfrontier_buffer[v][t];
+	}
+	return; 
+}
+
+void insert_statstmpbuffer(unsigned int t, unsigned int v, unsigned int data, MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 121::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+	#endif 
+	statsbuffer_maskbased_tmp[v][t] = data;
+}
+unsigned int retrieve_statstmpbuffer(unsigned int t, unsigned int v, MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 1242::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+	#endif 
+	return statsbuffer_maskbased_tmp[v][t]; 
+}
+void insertvec_statstmpbuffer(unsigned int t, unsigned int data[EDGE_PACK_SIZE], MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
+	#pragma HLS INLINE
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+	#pragma HLS UNROLL
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 123::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+		#endif 
+		statsbuffer_maskbased_tmp[v][t] = data[v];
+	}
+}
+void retrievevec_statstmpbuffer(unsigned int t, unsigned int data[EDGE_PACK_SIZE], MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
+	#pragma HLS INLINE
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+	#pragma HLS UNROLL
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 124::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+		#endif 
+		data[v] = statsbuffer_maskbased_tmp[v][t];
+	}
+	return; 
+}
+
+void insert_statsbuffer(unsigned int t, unsigned int v, unsigned int data, MY_IFDEF_STATSBUFFERMASKBASED()){	
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 125::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
+	#endif 
+	statsbuffer_maskbased[v][t] = data;
+}
+unsigned int retrieve_statsbuffer(unsigned int t, unsigned int v, MY_IFDEF_STATSBUFFERMASKBASED()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 126::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
+	#endif 
+	return statsbuffer_maskbased[v][t]; 
+}
+
+void insert_stats2buffer(unsigned int t, unsigned int v, unsigned int data, MY_IFDEF_STATSBUFFERIDBASED()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 127::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
+	#endif 
+	statsbuffer_idbased[v][t] = data;
+}
+unsigned int retrieve_stats2buffer(unsigned int t, unsigned int v, MY_IFDEF_STATSBUFFERIDBASED()){
+	#pragma HLS INLINE
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 128::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
+	#endif 
+	return statsbuffer_idbased[v][t]; 
+}

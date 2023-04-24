@@ -1,0 +1,125 @@
+unsigned int offsets[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = offsets complete
+map_t edge_maps[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable=edge_maps complete	
+
+#ifdef _DEBUGMODE_KERNELPRINTS4 
+cout<<"### processing edges in upartition "<<p_u<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; 
+#endif 
+
+unsigned int import_offset = id_import * action.size_import_export;
+unsigned int export_offset = id_export * action.size_import_export;
+
+EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<__NUM_ACTIVE_LLPSETS; llp_set++){	// __NUM_APPLYPARTITIONS
+	
+	// load edges map
+	load_edgemaps((p_u * MAX_NUM_LLPSETS) + llp_set, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], edge_maps, {% include '___HBM___ARGS___.template' %});
+	
+	
+	EC_PROCESS_EDGES_LOOP1B: for(unsigned int llp_id=0; llp_id<1; llp_id++){ // NUM_LLP_PER_LLPSET
+		#ifdef _DEBUGMODE_KERNELPRINTS//4
+		cout<<"------------------- process edges: ["<<p_u<<", "<<llp_set<<", "<<llp_id<<"] [importing and exporting "<<action.size_import_export<<" 32bit-integers] -------------------"<<endl; 
+		#endif 
+		
+		// load edges map
+		// load_edgemaps((p_u * MAX_NUM_LLP_PER_UPARTITION) + (llp_set * NUM_LLP_PER_LLPSET) + llp_id, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS2], edge_maps, {% include '___HBM___ARGS___.template' %});
+		
+		for(unsigned int n=0; n<NUM_VALID_PEs; n++){ edge_maps[n].size = ((__PERCENTAGE_ACTIVE_EDGES * edge_maps[n].size) + (100-1)) / 100; } // FIXME.
+		#ifdef _DEBUGMODE_KERNELPRINTS//4
+		for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"process-edges: edge_maps["<<n<<"]["<<llp_id<<"].size: "<<edge_maps[n].size<<endl; }
+		#endif 
+		
+		// prepare maps, offsets, variables 
+		max_sz = 0; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ limits[n] = edge_maps[n].size; } for(unsigned int n=0; n<NUM_VALID_PEs; n++){ if(max_sz < limits[n]){ max_sz = limits[n]; }}			
+		for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = edge_maps[n].offset; }	
+		#ifdef _DEBUGMODE_KERNELPRINTS//4
+		for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"process-edges: edges map offsets: "; cout<<offsets[n]<<", max_sz: "<<max_sz<<", updatesptrs[0]["<<llp_set<<"].offset: "<<updatesptrs[0][llp_set].offset<<", updatesptrs[0]["<<llp_set<<"].size: "<<updatesptrs[0][llp_set].size<<endl; }
+		#endif 	
+			
+		// process edges
+		PROCESS_EDGES_MAINLOOP1D: for(unsigned int t=0; t<max_sz; t++){ 
+		#pragma HLS PIPELINE II={{context['II_PROCESS_EDGES_MAINLOOP1D']}}
+			dretrievemanyfromA_actpackedges(globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES], offsets, t, edge3_vecs, {% include '___HBM___ARGS___.template' %});
+			
+			keyvalue_t update_in[NUM_VALID_PEs][EDGE_PACK_SIZE];
+			#pragma HLS ARRAY_PARTITION variable = update_in complete dim=0
+			keyvalue_t update_out[NUM_VALID_PEs][EDGE_PACK_SIZE];
+			#pragma HLS ARRAY_PARTITION variable = update_out complete dim=0
+			
+			EC_PROCESS_EDGES_LOOP1F: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+			#pragma HLS UNROLL
+				bool en = true; if(t >= limits[inst]){ en = false; } else { en = true; } 
+				edge3_vec_dt edge_vec = edge3_vecs[inst];
+				unsigned int rotateby = llp_id;
+				
+				#ifdef _DEBUGMODE_CHECKS3
+				checkoutofbounds("acts_kernel::ERROR 213::", rotateby, EDGE_PACK_SIZE, NAp, NAp, NAp);
+				#endif
+				
+				// read source properties and process edge to form vertex-updates 
+				for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+				#pragma HLS UNROLL
+					edge3_type edge = edge_vec.data[v];
+					unsigned int srcvid_lpv = edge.srcvid; 
+					vprop_t uprop; if(edge.srcvid != INVALIDDATA && edge.srcvid < MAX_UPARTITION_VECSIZE){ uprop = retrieve_vdatabuffer(v, srcvid_lpv, URAM_vprop[inst]); }
+					if(edge.srcvid != INVALIDDATA && edge.srcvid < MAX_UPARTITION_VECSIZE){ // && (uprop.degree == MASK_CODE_PE) // FIXME.
+						unsigned int res = process_funcG(uprop, 1, globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM]);
+						update_in[inst][v].key = edge.dstvid; update_in[inst][v].value = res;
+						#ifdef _DEBUGMODE_CHECKS3
+						checkoutofbounds("acts_kernel::ERROR 1213c::", edge.srcvid, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+						checkoutofbounds("acts_kernel::ERROR 1213d::", edge.dstvid, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+						#endif
+						#ifdef _DEBUGMODE_KERNELPRINTS_TRACE3
+						std::cout<<"EC - PROCESS EDGE SEEN @: inst: ["<<inst<<"], [srcvid_lpv: "<<srcvid_lpv<<", dstvid: "<<edge.dstvid % MAX_APPLYPARTITION_SIZE<<"], [edge.srcvid: "<<edge.srcvid<<", dstvid: "<<edge.dstvid<<"]"<<std::endl; 
+						#endif 
+					} else {
+						update_in[inst][v].key = INVALIDDATA; update_in[inst][v].value = INVALIDDATA; 
+					}
+				}
+				
+				// activate enables 
+				ens[inst][0] = true;	
+			}
+			
+			// collect stats
+			for(unsigned int n=0; n<NUM_VALID_PEs; n++){ vpartition_vertices[n][llp_set].count += max_sz; }
+			
+			for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 	
+			#pragma HLS UNROLL
+				offsets3[n] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][llp_set].offset + updatesptrs[0][llp_set].size + max_sz;	
+			}		
+				
+			#ifdef _DEBUGMODE_CHECKS3	
+			checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offsets3[0], globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][llp_set].offset, updatesptrs[0][llp_set].size, NAp); 
+			#endif	
+			dinsertmany_updatesdram(offsets3, update_out, ens, {% include '___HBM___ARGS___.template' %});	
+			update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___ECPROCESSEDGES___, 1);
+			
+			// import (Host -> FPGA)
+			if(action.id_import != INVALIDDATA && t<action.size_import_export){	
+				{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
+				HBM_centerA[import_offset + t].data[{{v}}] = HBM_import[t].data[{{v}}];
+				{%endfor%}	
+			}		
+			
+			// export (FPGA -> Host)
+			if(action.id_export != INVALIDDATA && t<action.size_import_export){	
+				{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
+				HBM_export[t].data[{{v}}] = HBM_centerB[export_offset + t].data[{{v}}];
+				{%endfor%}
+			}	
+		}
+		
+		// update variables 
+		MY_LOOP161: for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
+		#pragma HLS UNROLL
+			updatesptrs[0][llp_set].size += max_sz;
+		}
+		// exit(EXIT_SUCCESS);
+	}
+	// exit(EXIT_SUCCESS); 
+}
+// exit(EXIT_SUCCESS); 
+
+
+						

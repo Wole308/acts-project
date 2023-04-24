@@ -1,0 +1,213 @@
+// declaration of BRAM variables
+#ifdef ___RUNNING_FPGA_SYNTHESIS___ // FPGA_IMPL
+	keyvalue_t nfrontier_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE][VDATA_SUBPARTITION_VECSIZE]; 
+	#pragma HLS ARRAY_PARTITION variable=nfrontier_buffer complete dim=1
+	#pragma HLS ARRAY_PARTITION variable=nfrontier_buffer complete dim=2
+	unsigned int statsbuffer_maskbased_tmp[NUM_VALID_PEs][EDGE_PACK_SIZE][BLOCKRAM_SIZE];
+	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased_tmp complete dim=1
+	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased_tmp complete dim=2
+	unsigned int statsbuffer_maskbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS][BLOCKRAM_SIZE];
+	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased complete dim=1
+	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased complete dim=2
+	unsigned int statsbuffer_idbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS][BLOCKRAM_SIZE];
+	#pragma HLS ARRAY_PARTITION variable=statsbuffer_idbased complete dim=1 
+	#pragma HLS ARRAY_PARTITION variable=statsbuffer_idbased complete dim=2
+	vtr_t vptr_buffer[NUM_VALID_PEs][VPTR_BUFFER_SIZE];
+	#pragma HLS ARRAY_PARTITION variable=vptr_buffer complete dim=1
+	edge3_type edges_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_BUFFER_SIZE];	
+	#pragma HLS ARRAY_PARTITION variable=edges_buffer complete dim=1	
+	#pragma HLS ARRAY_PARTITION variable=edges_buffer complete dim=2	
+	keyvalue_t updates_buffer2[NUM_VALID_PEs][UPDATES_BUFFER_PACK_SIZE][UPDATES_BUFFER_SIZE];		
+	#pragma HLS ARRAY_PARTITION variable=updates_buffer2 complete dim=1
+	#pragma HLS ARRAY_PARTITION variable=updates_buffer2 complete dim=2
+
+	keyvalue_t URAM_frontiers[EDGE_PACK_SIZE][MAXVALID_APPLYPARTITION_VECSIZE]; 
+	#pragma HLS resource variable=URAM_frontiers core=XPM_MEMORY uram
+	#pragma HLS ARRAY_PARTITION variable=URAM_frontiers complete dim=1
+
+	vprop_t URAM_vprop[NUM_VALID_PEs][EDGE_PACK_SIZE][MAXVALID_APPLYPARTITION_VECSIZE];
+	#pragma HLS resource variable=URAM_vprop core=XPM_MEMORY uram 
+	#pragma HLS ARRAY_PARTITION variable=URAM_vprop complete dim=1
+	#pragma HLS ARRAY_PARTITION variable=URAM_vprop complete dim=2 
+	// #pragma HLS aggregate variable=URAM_vprop 
+
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	edge_update_type URAM_edgeupdates[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE];	
+	#pragma HLS resource variable=URAM_edgeupdates core=XPM_MEMORY uram 
+	#pragma HLS ARRAY_PARTITION variable=URAM_edgeupdates complete dim=1	
+	#pragma HLS ARRAY_PARTITION variable=URAM_edgeupdates complete dim=2	
+	#endif 
+	
+	map_t URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE];
+	#pragma HLS resource variable=URAM_map core=XPM_MEMORY uram 
+	#pragma HLS ARRAY_PARTITION variable=URAM_map complete dim=1	
+	#pragma HLS ARRAY_PARTITION variable=URAM_map complete dim=2	
+	
+	keyvalue_t URAM_updates[NUM_VALID_PEs][EDGE_PACK_SIZE][VERTEXUPDATES_BUFFER_SIZE];
+	#pragma HLS resource variable=URAM_updates core=XPM_MEMORY uram 
+	#pragma HLS ARRAY_PARTITION variable=URAM_updates complete dim=1	
+	#pragma HLS ARRAY_PARTITION variable=URAM_updates complete dim=2		
+	
+#else 
+	keyvalue_t * nfrontier_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
+	keyvalue_t * URAM_frontiers[EDGE_PACK_SIZE]; 
+	unsigned int * statsbuffer_maskbased_tmp[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
+	unsigned int * statsbuffer_maskbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
+	unsigned int * statsbuffer_idbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
+	vtr_t * vptr_buffer[NUM_VALID_PEs]; 
+	edge3_type * edges_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE];
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	edge_update_type * URAM_edgeupdates[NUM_VALID_PEs][EDGE_PACK_SIZE];
+	#endif 
+	map_t * URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE];
+	keyvalue_t * updates_buffer2[NUM_VALID_PEs][UPDATES_BUFFER_PACK_SIZE]; 
+	vprop_t * URAM_vprop[NUM_VALID_PEs][EDGE_PACK_SIZE];
+	keyvalue_t * URAM_updates[NUM_VALID_PEs][EDGE_PACK_SIZE];	
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ nfrontier_buffer[i][v] = new keyvalue_t[VDATA_SUBPARTITION_VECSIZE]; }}
+	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_frontiers[v] = new keyvalue_t[MAX_APPLYPARTITION_VECSIZE]; }	
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ statsbuffer_maskbased_tmp[i][v] = new unsigned int[BLOCKRAM_SIZE]; }}
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<MAX_NUM_APPLYPARTITIONS; v++){ statsbuffer_maskbased[i][v] = new unsigned int[BLOCKRAM_SIZE]; }}
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<MAX_NUM_APPLYPARTITIONS; v++){ statsbuffer_idbased[i][v] = new unsigned int[BLOCKRAM_SIZE]; }}
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ vptr_buffer[i] = new vtr_t[VPTR_BUFFER_SIZE]; }
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ edges_buffer[i][v] = new edge3_type[EDGE_BUFFER_SIZE]; }}
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_edgeupdates[i][v] = new edge_update_type[EDGE_UPDATES_DRAMBUFFER_SIZE]; }}
+	#endif 
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_map[i][v] = new map_t[EDGE_UPDATES_DRAMBUFFER_SIZE]; }}
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<UPDATES_BUFFER_PACK_SIZE; v++){ updates_buffer2[i][v] = new keyvalue_t[UPDATES_BUFFER_SIZE]; }}
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_vprop[i][v] = new vprop_t[MAXVALID_APPLYPARTITION_VECSIZE]; }}
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_updates[i][v] = new keyvalue_t[8192]; }}
+#endif 
+
+#ifdef FPGA_IMPL	
+unsigned int cfrontier_dram___size[MAX_NUM_UPARTITIONS]; 
+unsigned int nfrontier_dram___size[NUM_VALID_PEs][MAX_NUM_UPARTITIONS];
+#pragma HLS ARRAY_PARTITION variable = nfrontier_dram___size complete dim=1
+unsigned int nfrontier_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE][NUM_SUBPARTITION_PER_PARTITION]; 
+#pragma HLS ARRAY_PARTITION variable = nfrontier_buffer___size complete dim=1
+#pragma HLS ARRAY_PARTITION variable = nfrontier_buffer___size complete dim=2
+unsigned int updates_tmpbuffer___size[NUM_VALID_PEs][NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable = updates_tmpbuffer___size complete dim=1
+unsigned int updates_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE][MAX_NUM_APPLYPARTITIONS]; 
+#pragma HLS ARRAY_PARTITION variable = updates_buffer___size complete dim=1
+#pragma HLS ARRAY_PARTITION variable = updates_buffer___size complete dim=2
+unsigned int stats_buffer___size[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
+#pragma HLS ARRAY_PARTITION variable = stats_buffer___size complete dim=1
+unsigned int statsbuffer_idbased___size[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
+#pragma HLS ARRAY_PARTITION variable = statsbuffer_idbased___size complete dim=1
+offset_t upartition_vertices[MAX_NUM_UPARTITIONS]; 
+offset_t vpartition_vertices[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
+#pragma HLS ARRAY_PARTITION variable = vpartition_vertices complete dim=1
+unsigned int vptrbuffer___size[NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable = vptrbuffer___size complete // dim=1
+unsigned int edges_buffer___size[NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable = edges_buffer___size complete // dim=1
+unsigned int cfrontier_bufferREAL___size[NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable = cfrontier_bufferREAL___size complete
+#pragma HLS ARRAY_MAP variable=nfrontier_dram___size instance=array1 horizontal
+#pragma HLS ARRAY_MAP variable=stats_buffer___size instance=array1 horizontal
+#pragma HLS ARRAY_MAP variable=statsbuffer_idbased___size instance=array1 horizontal
+#pragma HLS ARRAY_MAP variable=vpartition_vertices instance=array1 horizontal
+#pragma HLS ARRAY_MAP variable=vptrbuffer___size instance=array2 horizontal
+#pragma HLS ARRAY_MAP variable=edges_buffer___size instance=array2 horizontal
+#ifndef HW
+unsigned int hybrid_map[MAXNUMGRAPHITERATIONS][MAX_NUM_UPARTITIONS]; 
+#endif 
+#else 
+unsigned int * cfrontier_dram___size = new unsigned int[MAX_NUM_UPARTITIONS]; 
+unsigned int * nfrontier_dram___size[NUM_VALID_PEs]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ nfrontier_dram___size[i] = new unsigned int[MAX_NUM_UPARTITIONS]; }
+unsigned int * nfrontier_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ nfrontier_buffer___size[i][v] = new unsigned int[NUM_SUBPARTITION_PER_PARTITION]; }}
+unsigned int updates_tmpbuffer___size[NUM_VALID_PEs][NUM_VALID_PEs]; 
+unsigned int * updates_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ updates_buffer___size[i][v] = new unsigned int[MAX_NUM_APPLYPARTITIONS]; }}
+unsigned int stats_buffer___size[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
+unsigned int statsbuffer_idbased___size[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
+offset_t * upartition_vertices = new offset_t[MAX_NUM_UPARTITIONS]; 
+offset_t * vpartition_vertices[NUM_VALID_PEs]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ vpartition_vertices[i] = new offset_t[MAX_NUM_APPLYPARTITIONS];  }
+unsigned int vptrbuffer___size[NUM_VALID_PEs]; 
+unsigned int edges_buffer___size[NUM_VALID_PEs]; 
+unsigned int cfrontier_bufferREAL___size[NUM_VALID_PEs]; 
+unsigned int * hybrid_map[MAXNUMGRAPHITERATIONS]; for(unsigned int i=0; i<MAXNUMGRAPHITERATIONS; i++){ hybrid_map[i] = new unsigned int[MAX_NUM_UPARTITIONS]; }
+#endif 
+
+edge3_type edges[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = edges complete dim=0
+unsigned int res[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = res complete dim=0
+unsigned int vtemp_in[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = vtemp_in complete dim=0
+unsigned int vtemp_out[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = vtemp_out complete dim=0
+vprop_t uprop[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = uprop complete dim=0
+keyvalue_t update_in[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = update_in complete dim=0
+keyvalue_t update_out[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = update_out complete dim=0
+bool ens[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
+#pragma HLS ARRAY_PARTITION variable = ens complete dim=0
+vprop_t data[EDGE_PACK_SIZE]; 
+#pragma HLS ARRAY_PARTITION variable = data complete
+vprop_t datas[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
+#pragma HLS ARRAY_PARTITION variable = datas complete dim=0
+keyvalue_t kvdata[EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = kvdata complete
+keyvalue_t kvdatas[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = kvdatas complete dim=0
+unsigned int offsets0[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = offsets0 complete
+unsigned int offsets[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = offsets complete
+unsigned int offsets2[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = offsets2 complete
+unsigned int counts[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = counts complete
+keyvalue_t actvvs[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = actvvs complete dim=0
+unsigned int vid_first0[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = vid_first0 complete
+unsigned int vid_first1[NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable = vid_first1 complete
+unsigned int globalparams[GLOBALBUFFER_SIZE];
+map_t updatesptrs[MAX_NUM_FPGAS][MAX_NUM_LLPSETS];
+#pragma HLS ARRAY_PARTITION variable = updatesptrs complete dim=1
+unsigned int limits[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = limits complete
+unsigned int max_limits[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = max_limits complete
+uint512_vec_dt updates_vecs[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = updates_vecs complete
+uint512_vec_dt edges_vecs[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = edges_vecs complete
+unsigned int stats_count[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable=stats_count complete
+unsigned int stats_counts[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable=stats_counts complete dim=0
+unsigned int edge_counts[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable=edge_counts complete dim=0
+unsigned int cummtv2[NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable = cummtv2 complete
+unsigned int masks[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable=masks complete dim=0
+edge3_vec_dt edge3_vecs[NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable=edge3_vecs complete
+map_t maps[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable=maps complete	
+unsigned int offsets3[NUM_VALID_PEs]; 
+#pragma HLS ARRAY_PARTITION variable = offsets3 complete
+map_t edgeupdate_map[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable=edgeupdate_map complete
+map_t edge_map[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable=edge_map complete
+unsigned int offsets_eu[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = offsets_eu complete
+unsigned int limits_eu[NUM_VALID_PEs];
+#pragma HLS ARRAY_PARTITION variable = limits_eu complete
+unsigned int max_sz = 0; 
+
+#ifdef FPGA_IMPL
+unsigned int _NUMCLOCKCYCLES_[2][32]; 
+#else 
+unsigned int _NUMCLOCKCYCLES_[2][32]; 
+#endif 
+
+

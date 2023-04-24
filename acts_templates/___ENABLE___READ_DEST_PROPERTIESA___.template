@@ -1,0 +1,24 @@
+for(unsigned int remote_fpga=0; remote_fpga<action.numfpgas; remote_fpga++){
+	READ_DEST_PROPERTIES_LOOP4B: for(unsigned int t=0; t<MAX_APPLYPARTITION_VECSIZE; t++){
+	#pragma HLS PIPELINE II={{context['II_READ_DEST_PROPERTIES_LOOP2B']}}
+		dretrievemany_vdatadram(voffset, offsets, t, datas, {% include '___HBM___ARGS___.template' %});
+		READ_DEST_PROPERTIES_LOOP4C: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
+		#pragma HLS UNROLL
+			insertvec_vdatabuffer(t, datas[inst], URAM_vprop[inst]);
+		}
+		
+		#ifdef ___ENABLE___IMPORT_EXPORT___
+		hidden_import_and_export_function(t, import_offset, export_offset, action.size_import_export, HBM_centerA, HBM_centerB, HBM_import, HBM_export, action);
+		#endif 
+			
+		update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___READ_FRONTIER_PROPERTIES___, 1);
+	}
+}
+
+
+
+
+
+
+
+				

@@ -1,0 +1,13 @@
+// clear counters
+CLEAR_COUNTERS_LOOP1: for(unsigned int p_v=0; p_v<__NUM_APPLYPARTITIONS; p_v++){ 
+#pragma HLS PIPELINE II=1
+	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
+	#pragma HLS UNROLL
+		stats_buffer___size[inst][p_v] = 0; statsbuffer_idbased___size[inst][p_v] = 0;
+		vpartition_vertices[inst][p_v].offset = 0; vpartition_vertices[inst][p_v].size = 0; vpartition_vertices[inst][p_v].count = 0;
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+		#pragma HLS UNROLL
+			updates_buffer___size[inst][v][p_v] = 0; 
+		}
+	}
+}	

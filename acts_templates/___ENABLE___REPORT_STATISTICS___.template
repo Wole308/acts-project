@@ -1,0 +1,100 @@
+#ifdef _DEBUGMODE_CHECKS3 
+
+#ifdef _DEBUGMODE_KERNELPRINTS4
+if(action.status == 1 && action.fpga < num_prints){ 
+	cout<<"[acts: READ_FRONTIERS, ";
+	cout<<"PROCESSEDGES, "; 
+	cout<<"READ_DESTS, "; 
+	cout<<"APPLYUPDATES, "; 
+	cout<<"COLLECT_FRONTIERS, "; 
+	cout<<"SAVE_DEST, "; 
+	cout<<"GATHER_FRONTIERS] "; 
+	// cout<<"[IMPORT_FRONTIERS, "; 
+	// cout<<"EXPORT_FRONTIERS] "; 
+	cout<<endl;
+}																										
+
+if(action.fpga < num_prints){ 
+cout<<">>> [Per FPGA][";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___ECPROCESSEDGES___] * EDGE_PACK_SIZE<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___READ_DEST_PROPERTIES___] * EDGE_PACK_SIZE * NUM_PEs<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___APPLYUPDATES___] * EDGE_PACK_SIZE<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE * NUM_PEs<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___SAVE_DEST_PROPERTIES___] * EDGE_PACK_SIZE * NUM_PEs<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___GATHER_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___IMPORT_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___EXPORT_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
+cout<<"]";
+cout<<endl;
+}
+
+// cout<<">>> [";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___RESETBUFFERSATSTART___]<<", ";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___ECPROCESSEDGES___] * EDGE_PACK_SIZE<<", ";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___READ_DEST_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___APPLYUPDATES___] * EDGE_PACK_SIZE<<", ";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___SAVE_DEST_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
+// cout<<_NUMCLOCKCYCLES_[0][___CODE___GATHER_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
+// cout<<"]";
+// cout<<endl;
+
+#ifdef _DEBUGMODE_KERNELPRINTS//4
+if(action.status == 1){ 
+	cout<<"[# EDGEUPDATES_LOADED, "; 
+	cout<<"# EDGEUPDATES_APPLIED, "; 
+	cout<<"# NEW_EDGEUPDATES_ADDED]";
+	cout<<endl;
+}	
+
+cout<<" [";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGEUPDATES_LOADED___] * EDGE_PACK_SIZE<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGEUPDATES_APPLIED___] * EDGE_PACK_SIZE<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_NEW_EDGEUPDATES_ADDED___] * EDGE_PACK_SIZE<<"";
+cout<<"]";
+cout<<endl;
+#endif 
+
+if(action.fpga==0){
+	report_statistics[___CODE___RESETBUFFERSATSTART___] += _NUMCLOCKCYCLES_[0][___CODE___RESETBUFFERSATSTART___];
+	report_statistics[___CODE___READ_FRONTIER_PROPERTIES___] += _NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___];
+	report_statistics[___CODE___ECPROCESSEDGES___] += _NUMCLOCKCYCLES_[0][___CODE___ECPROCESSEDGES___];
+	report_statistics[___CODE___READ_DEST_PROPERTIES___] += _NUMCLOCKCYCLES_[0][___CODE___READ_DEST_PROPERTIES___];
+	report_statistics[___CODE___APPLYUPDATES___] += _NUMCLOCKCYCLES_[0][___CODE___APPLYUPDATES___];
+	report_statistics[___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___] += _NUMCLOCKCYCLES_[0][___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___];
+	report_statistics[___CODE___SAVE_DEST_PROPERTIES___] += _NUMCLOCKCYCLES_[0][___CODE___SAVE_DEST_PROPERTIES___];
+	report_statistics[___CODE___GATHER_FRONTIERINFOS___] += _NUMCLOCKCYCLES_[0][___CODE___GATHER_FRONTIERINFOS___];
+}
+// cout<<"~~~~~~~~~~~~~~ report_statistics[___CODE___READ_FRONTIER_PROPERTIES___]: "<<report_statistics[___CODE___READ_FRONTIER_PROPERTIES___]<<", _NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___]: "<<_NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___]<<endl;				
+#endif 
+
+#ifdef _DEBUGMODE_KERNELPRINTS//4
+if(action.status == 1){
+	float total_cycles_iter = 
+	+ _NUMCLOCKCYCLES_[0][___CODE___RESETBUFFERSATSTART___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___PROCESSEDGES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___VCPROCESSEDGES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___ECPROCESSEDGES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___SAVEVCUPDATES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___COLLECTACTIVEDSTVIDS___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___APPLYUPDATESMODULE___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___READ_DEST_PROPERTIES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___APPLYUPDATES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___SAVE_DEST_PROPERTIES___]
+	+ _NUMCLOCKCYCLES_[0][___CODE___GATHER_FRONTIERINFOS___];
+	float time_lapse = (total_cycles_iter * _NUMNANOSECONDS_PER_CLOCKCYCLE_) / 1000000;
+	cout<<"acts_kernel SUMMARY:: number of clock cycles seen: "<<total_cycles_iter<<" ("<<time_lapse<<" milliseconds)"<<endl;
+	float time_lapse1 = (total_cycles_iter / 1000000) * _NUMNANOSECONDS_PER_CLOCKCYCLE_;
+	float time_lapse2 = (float)((total_cycles_iter * EDGE_PACK_SIZE) / 1000) / (float)ACTS_AVERAGE_MEMACCESSTHROUGHPUT_SINGLEHBMCHANNEL_MILIONEDGESPERSEC;
+	float million_edges_per_sec = ((globalparams[GLOBALPARAMSCODE__PARAM__NUM_EDGES] / 1000000) / time_lapse) * 1000;
+	float billion_edges_per_sec = million_edges_per_sec / 1000;
+	cout<<"acts_kernel SUMMARY:: time elapsed for iteration "<<GraphIter<<": "<<time_lapse<<" milliseconds)"<<endl;
+}
+for(unsigned int t=0; t<16; t++){ total_cycles += _NUMCLOCKCYCLES_[0][t]; }
+for(unsigned int t=0; t<16; t++){ _NUMCLOCKCYCLES_[0][t] = 0; }
+#endif 
+#endif

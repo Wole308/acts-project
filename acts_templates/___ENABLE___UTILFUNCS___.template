@@ -1,0 +1,240 @@
+/////////////////////////////////////////
+unsigned int get_H(unsigned int vid){
+	return (vid % (FOLD_SIZE * EDGE_PACK_SIZE * NUM_PEs)) / (FOLD_SIZE * EDGE_PACK_SIZE);
+}
+unsigned int get_local(unsigned int vid){
+	unsigned int W = (FOLD_SIZE * EDGE_PACK_SIZE) * NUM_PEs;
+	unsigned int y = vid / W; 
+	unsigned int x = vid % (FOLD_SIZE * EDGE_PACK_SIZE);
+	unsigned int lvid = (y * (FOLD_SIZE * EDGE_PACK_SIZE)) + x;
+	return lvid;
+}
+unsigned int get_global(unsigned int lvid, unsigned int H){
+	unsigned int W = (FOLD_SIZE * EDGE_PACK_SIZE) * NUM_PEs;
+	unsigned int y2 = lvid / (FOLD_SIZE * EDGE_PACK_SIZE);
+	unsigned int x2 = lvid % (FOLD_SIZE * EDGE_PACK_SIZE);		
+	unsigned int vid = (y2 * W) + (H * (FOLD_SIZE * EDGE_PACK_SIZE)) + x2;
+	return vid;
+}
+unsigned int get_local_to_upartition(unsigned int lvid){
+	return lvid % MAX_UPARTITION_SIZE;
+}
+unsigned int get_local_to_vpartition(unsigned int lvid){
+	return lvid % MAX_APPLYPARTITION_SIZE;
+}
+#ifndef FPGA_IMPL
+void checkoutofbounds(string message, unsigned int data, unsigned int upper_bound, unsigned int msgdata1, unsigned int msgdata2, unsigned int msgdata3){
+	#ifdef _DEBUGMODE_CHECKS3
+	if(data >= upper_bound){ std::cout<<"utility::checkoutofbounds: ERROR. out of bounds. message: "<<message<<", data: "<<data<<", upper_bound: "<<upper_bound<<", msgdata1: "<<msgdata1<<", msgdata2: "<<msgdata2<<", msgdata3: "<<msgdata3<<std::endl; exit(EXIT_FAILURE); }			
+	#endif 
+}
+void check_if_contiguous(keyvalue_t keyvalue[EDGE_PACK_SIZE], keyvalue_t msg1[EDGE_PACK_SIZE], keyvalue_t msg2[EDGE_PACK_SIZE], unsigned int msg1_str, unsigned int msg2_str, unsigned int msg3_str){
+	#ifdef _DEBUGMODE_CHECKS3
+	for(int v = 0; v < EDGE_PACK_SIZE; v++){ 
+		unsigned int local_dstvid = get_local(keyvalue[v].key);
+		if(keyvalue[v].key != INVALIDDATA){ 
+			if(local_dstvid % EDGE_PACK_SIZE != v){ 
+				cout<<"check_if_contiguous(1). ERROR 314. v["<<v<<"].key("<<local_dstvid<<") % EDGE_PACK_SIZE("<<EDGE_PACK_SIZE<<")(="<<local_dstvid % EDGE_PACK_SIZE<<") != v("<<v<<"). [msg1_str: "<<msg1_str<<", msg2_str: "<<msg2_str<<", msg3_str: "<<msg3_str<<"] EXITING..."<<endl; 
+				for(int v = 0; v < EDGE_PACK_SIZE; v++){ cout<<"+++ keyvalue["<<v<<"].key: "<<get_local(keyvalue[v].key)<<"("<<get_local(keyvalue[v].key)%EDGE_PACK_SIZE<<"), keyvalue["<<v<<"].value: "<<keyvalue[v].value<<"("<<keyvalue[v].value%EDGE_PACK_SIZE<<")"<<endl; }
+				for(int v = 0; v < EDGE_PACK_SIZE; v++){ cout<<"+++ msg1["<<v<<"].key: "<<msg1[v].key<<"("<<msg1[v].key%EDGE_PACK_SIZE<<"), msg1["<<v<<"].value: "<<msg1[v].value<<"("<<msg1[v].value%EDGE_PACK_SIZE<<")"<<endl; }
+				for(int v = 0; v < EDGE_PACK_SIZE; v++){ cout<<"+++ msg2["<<v<<"].key: "<<msg2[v].key<<"("<<msg2[v].key%EDGE_PACK_SIZE<<"), msg2["<<v<<"].value: "<<msg2[v].value<<"("<<msg2[v].value%EDGE_PACK_SIZE<<")"<<endl; }
+				exit(EXIT_FAILURE); 
+			}
+		}
+	}
+	#endif
+}
+#endif 
+
+unsigned int hash_edge(unsigned int srcvid, unsigned int dstvid, unsigned int index, unsigned int motion){
+	// return ((srcvid % EDGE_UPDATES_DRAMBUFFER_SIZE) + (dstvid % EDGE_UPDATES_DRAMBUFFER_SIZE)) / 2;
+	// return index; // REMOVEME.
+	
+	unsigned int edge_hashid = ((srcvid / 16) * 14) + (((dstvid / 16) % 16) + (dstvid % 16));
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("utility::ERROR 25133::", edge_hashid, EDGE_UPDATES_DRAMBUFFER_SIZE, srcvid, dstvid, NAp);
+	#endif
+	
+	return edge_hashid; // ((srcvid / 16) * 14) + (((dstvid / 16) % 16) + (dstvid % 16)); // original
+	// return ((srcvid / 16) * (12 + motion)) + (((dstvid / 16) % 16) + (dstvid % 16));
+	
+	// return (srcvid + dstvid) % (EDGE_UPDATES_DRAMBUFFER_SIZE;
+	// return ((srcvid % (EDGE_UPDATES_DRAMBUFFER_SIZE / 16)) * 16) + (dstvid % 16);	
+	// return ((dstvid % (EDGE_UPDATES_DRAMBUFFER_SIZE / 16)) * 16) + (srcvid % 16);
+	// return srcvid; //*
+	// return dstvid;
+}
+
+unsigned int hash2_edge(map_t URAM_map, unsigned int srcvid, unsigned int dstvid, unsigned int padding_factor){
+#pragma HLS INLINE
+	unsigned int allotted_hashspace = URAM_map.size * padding_factor; 
+	#ifdef _DEBUGMODE_CHECKS3
+	if(URAM_map.size == 0){ cout<<"-------------------------------- hash2_edge: URAM_map.size == 0. EXITING..."<<endl; exit(EXIT_FAILURE); }
+	if(padding_factor == 0){ cout<<"-------------------------------- hash2_edge: padding_factor == 0. EXITING..."<<endl; exit(EXIT_FAILURE); }
+	// if(dstvid == 0){ cout<<"-------------------------------- hash2_edge: srcvid = 0. dstvid == 0. EXITING..."<<endl; exit(EXIT_FAILURE); }
+	#endif 
+	unsigned int edge_hashid = URAM_map.offset + (dstvid % allotted_hashspace); 
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("utility::ERROR 779911::", edge_hashid, EDGE_UPDATES_DRAMBUFFER_SIZE, dstvid, URAM_map.offset, URAM_map.size); 
+	#endif
+	return edge_hashid;							
+}
+
+void {{context['classname__acts']}}rearrangeLayoutVx16B(unsigned int s, keyvalue_t in[EDGE_PACK_SIZE], keyvalue_t out[EDGE_PACK_SIZE]){
+	#ifndef FPGA_IMPL
+	// checkoutofbounds("acts_kernel::rearrangeLayoutVx16B::ERROR 2925::", s, EDGE_PACK_SIZE, NAp, NAp, NAp);
+	#endif 
+	{%for v in context['EDGE_PACK_SIZE_seq']%}
+	{%if(v>0)%}else{%endif%} {%if(v<context['EDGE_PACK_SIZE']-1)%}if(s=={{v}}){%endif%}{ 
+		{%for v2 in context['EDGE_PACK_SIZE_seq']%}
+		out[{{    (v+v2) %  (context['EDGE_PACK_SIZE'])  }}] = in[{{v2}}]; 
+		{%endfor%}
+	}
+	{%endfor%}
+	return;
+}
+
+void {{context['classname__acts']}}rearrangeLayoutVx16(unsigned int s, edge2_type in[EDGE_PACK_SIZE], edge2_type out[EDGE_PACK_SIZE]){
+	#ifndef FPGA_IMPL
+	// checkoutofbounds("acts_kernel::rearrangeLayoutVx16::ERROR 2125::", s, EDGE_PACK_SIZE, NAp, NAp, NAp);
+	#endif 
+	{%for v in context['EDGE_PACK_SIZE_seq']%}
+	{%if(v>0)%}else{%endif%} {%if(v<context['EDGE_PACK_SIZE']-1)%}if(s=={{v}}){%endif%}{ 
+		{%for v2 in context['EDGE_PACK_SIZE_seq']%}
+		out[{{    (v+v2) %  (context['EDGE_PACK_SIZE'])  }}] = in[{{v2}}]; 
+		{%endfor%}
+	}
+	{%endfor%}
+	return;
+}
+
+unsigned int min_(unsigned int val1, unsigned int val2){
+	#pragma HLS INLINE
+	if(val1 < val2){ return val1; }
+	else { return val2; }
+}
+void update_dramnumclockcycles(unsigned int _NUMCLOCKCYCLES_[2][32], unsigned int x, unsigned int clock_cycles){
+	#ifdef _DEBUGMODE_CHECKS3
+	_NUMCLOCKCYCLES_[0][x] += clock_cycles;
+	#endif
+}
+void update_bramnumclockcycles(unsigned int _NUMCLOCKCYCLES_[2][32], unsigned int x, unsigned int clock_cycles){
+	#ifdef _DEBUGMODE_CHECKS3
+	_NUMCLOCKCYCLES_[0][x] += clock_cycles;
+	// _NUMCLOCKCYCLES_[1][x] += clock_cycles;
+	#endif
+}
+
+/////////////////////////////////////////
+
+value_t process_func_pr(vprop_t uprop, value_t edgew){
+	#pragma HLS INLINE 
+	value_t res = uprop.prop; 
+	return res;
+}
+value_t reduce_func_pr(vprop_t vprop, value_t res){
+	#pragma HLS INLINE 
+	float alpha = 0.5;
+	return alpha; // FIXME.
+	// return (alpha + ((1 - alpha) * (vprop.prop + res))) / (vprop.degree + 1);
+}
+
+value_t process_func_spmv(vprop_t uprop, value_t edgew){ // see graphlily slides
+	#pragma HLS INLINE 
+	return uprop.prop * edgew;
+}
+value_t reduce_func_spmv(vprop_t vprop, value_t res){
+	#pragma HLS INLINE 
+	return vprop.prop + res;
+}
+
+value_t process_func_hits(vprop_t uprop, value_t edgew){
+	#pragma HLS INLINE 
+	return uprop.prop;
+}
+value_t reduce_func_hits(vprop_t vprop, value_t res){
+	#pragma HLS INLINE 
+	return vprop.prop + res;
+}
+
+value_t process_func_sssp(value_t udata, value_t edgew){
+	#pragma HLS INLINE 
+	value_t res = udata + edgew;
+	return res;
+}
+value_t reduce_func_sssp(value_t vtemp, value_t vdata, value_t res){
+	#pragma HLS INLINE 
+	if(res < vtemp){ return res; } else { return vtemp; }
+}
+
+value_t process_funcG(vprop_t uprop, value_t edgew, unsigned int algo){
+	#pragma HLS INLINE 
+	// if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == PAGERANK){ return process_func_pr(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == CF){ return process_func_cf(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == HITS){ return process_func_hits(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == BFS){ return process_func_bfs(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == SSSP){ return process_func_sssp(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == CC){ return process_func_cc(udata, edgew); }
+
+	#ifdef BAKE_PAGERANK_ALGORITHM_FUNCS
+	return process_func_pr(uprop, edgew);	
+	#endif 
+	#ifdef BAKE_SPMV_ALGORITHM_FUNCS
+	return process_func_spmv(uprop, edgew);
+	#endif 
+	#ifdef BAKE_HITS_ALGORITHM_FUNCS
+	return process_func_hits(uprop, edgew);
+	#endif 
+	// return reduce_func_sssp(udata, edgew);
+}
+value_t reduce_funcG(vprop_t vprop, value_t res, unsigned int algo){
+	#pragma HLS INLINE 
+	// if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == PAGERANK){ return reduce_func_pr(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == CF){ return reduce_func_cf(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == HITS){ return reduce_func_hits(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == BFS){ return reduce_func_bfs(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == SSSP){ return reduce_func_sssp(udata, edgew); }
+	// else if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == CC){ return reduce_func_cc(udata, edgew); }
+	
+	#ifdef BAKE_PAGERANK_ALGORITHM_FUNCS
+	return reduce_func_pr(vprop, res);	
+	#endif 
+	#ifdef BAKE_SPMV_ALGORITHM_FUNCS
+	return reduce_func_spmv(vprop, res);
+	#endif 
+	#ifdef BAKE_HITS_ALGORITHM_FUNCS	
+	return reduce_func_hits(vprop, res);	
+	#endif 
+	// return reduce_func_sssp(vprop, res);
+}
+
+#ifdef ___NOT_YET_IMPLEMENTED___
+value_t process_func(vprop_t uprop, value_t edgew, unsigned int algo){
+	#pragma HLS INLINE 
+	if(GraphAlgo == PAGERANK){
+		return process_func_pr(vprop, edgew);
+	} else if(GraphAlgo == SPMV){
+		return process_func_spmv(vprop, edgew);
+	} else if(GraphAlgo == HITS){
+		return process_func_hits(vprop, edgew);
+	} else if(GraphAlgo == SSSP){
+		return process_func_sssp(vprop, edgew);
+	} else {
+		return process_func_pr(vprop, edgew);
+	}
+}
+value_t reduce_func(vprop_t vprop, value_t res, unsigned int algo){
+	#pragma HLS INLINE 
+	if(GraphAlgo == PAGERANK){ 
+		return reduce_func_pr(vprop, res);
+	} else if(GraphAlgo == SPMV){
+		return reduce_func_spmv(vprop, res);
+	} else if(GraphAlgo == HITS){
+		return reduce_func_hits(vprop, res);
+	} else if(GraphAlgo == SSSP){
+		return reduce_func_sssp(vprop, res);
+	} else {
+		return reduce_func_pr(vprop, res);
+	}
+}	
+#endif 

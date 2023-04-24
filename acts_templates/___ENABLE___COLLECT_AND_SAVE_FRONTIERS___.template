@@ -1,0 +1,49 @@
+keyvalue_t invalidkv; invalidkv.key = INVALIDDATA; invalidkv.value = INVALIDDATA;
+keyvalue_t frontier_data[NUM_VALID_PEs][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = frontier_data complete dim=0
+
+unsigned int start_local_subpartitionID = 0; unsigned int skip_local_subpartitionID = 1;
+
+COLLECT_AND_SAVE_FRONTIERS_LOOP1: for(unsigned int local_subpartitionID=start_local_subpartitionID; local_subpartitionID<NUM_SUBPARTITION_PER_PARTITION; local_subpartitionID+=skip_local_subpartitionID){
+	unsigned int upartitionID = (p_v * NUM_SUBPARTITION_PER_PARTITION) + local_subpartitionID;
+	unsigned int foffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + (p_v * MAX_APPLYPARTITION_VECSIZE);
+	unsigned int offset = local_subpartitionID * VDATA_SUBPARTITION_VECSIZE;
+
+	COLLECT_FRONTIERS_LOOP: for(unsigned int t=0; t<VDATA_SUBPARTITION_VECSIZE; t++){
+	#pragma HLS PIPELINE II={{context['II_COLLECT_FRONTIERS_LOOP1B']}}
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
+		#pragma HLS UNROLL
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL
+				vprop_t vprop =  retrieve_vdatabuffer(v, t, URAM_vprop[inst]);
+				unsigned int vid = 0; //FIXME.
+				
+				#ifdef _DEBUGMODE_KERNELPRINTS_TRACE3
+				std::cout<<"COLLECT FRONTIER INFORMATION SEEN @: inst: ["<<inst<<"]: t: "<<t<<", v: "<<v<<", p__u__: "<<(vid / MAX_UPARTITION_SIZE)<<", vid: "<<vid<<std::endl;
+				#endif
+				frontier_t actvv; actvv.key = vid; actvv.value = vprop.prop; 
+				insert_nfrontierbuffer(v, t, actvv, nfrontier_buffer[inst]); 
+			}
+		}
+		update_bramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___, 1);
+	}
+	
+	SAVE_FRONTIERS_LOOP: for(unsigned int t=0; t<VDATA_SUBPARTITION_VECSIZE; t++){
+	#pragma HLS PIPELINE II={{context['II_SAVE_FRONTIERS_LOOP2B']}}
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
+		#pragma HLS UNROLL
+			retrievevec_nfrontierbuffer(t, frontier_data[inst], nfrontier_buffer[inst]); 
+		}
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
+		#pragma HLS UNROLL
+			offsets2[inst] = foffset + offset + t;
+		}
+		dinsertmany_nfrontierdram(offsets2, t, frontier_data, ens, {% include '___HBM___ARGS___.template' %});
+	}
+	
+	for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+	#pragma HLS UNROLL
+		nfrontier_dram___size[n][upartitionID] = VDATA_SUBPARTITION_VECSIZE; 
+	}
+}
+				
