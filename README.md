@@ -20,6 +20,7 @@ bin/sssp ../datasets/chesapeake/chesapeake.mtx
 
 ## Implementing Graph Algorithms
 "USAGE: ./host [--xware] [--num_pes] [--running synthesis]"
+
 ./evaluate_datasets.sh 2 1 1
 
 ## Implementing Graph Algorithms
