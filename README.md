@@ -18,10 +18,13 @@ make sssp # or for all algorithms, use: make -j$(nproc)
 bin/sssp ../datasets/chesapeake/chesapeake.mtx
 ```
 
-## Implementing Graph Algorithms
+## Sythesizing ACTS using Vitis HLS
+To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the number of PEs as shown
+```cpp
 "USAGE: ./host [--xware] [--num_pes] [--running synthesis]"
-
 ./evaluate_datasets.sh 2 1 1
+}
+```
 
 ## Implementing Graph Algorithms
 For a detailed explanation, please see the full [documentation](https://github.com/gunrock/gunrock/wiki/How-to-write-a-new-graph-algorithm). The following example shows simple APIs using Gunrock's data-centric, bulk-synchronous programming model, we implement Breadth-First Search on GPUs. This example skips the setup phase of creating a `problem_t` and `enactor_t` struct and jumps straight into the actual algorithm.
