@@ -21,12 +21,16 @@ To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the n
 ./evaluate_datasets.sh 2 1 1
 ```
 
-## Running ACTS
-Run ACTS using the commands shown below. More examples shown in ./evaluate_run.sh
+## Configure ACTS
+Configure ACTS environment using the commands shown below. The number of processing elements within each FPGA is specified using the second parameter (This should be the same number of processing elements synthesized unto the FPGA as shown above). More examples shown in ./evaluate_run.sh
 ```cpp
 "USAGE: ./host [--xware] [--num_pes] [--run-in-async-mode?]"
 ./evaluate_datasets.sh 1 12 1
+```		
 
+## Running ACTS
+Run ACTS using the commands shown below. Here you specify the (1) algorithm, (2) number of FPGAs, (3) root vertex id (for traversal based algorithms like BFS, SSSP), (4) whether the graph is unidirectional of bidirectional, (5) the maximum number of iterations to run, (6) the path to graph dataset, and (7) the path to xclbin. More examples shown in ./evaluate_run.sh
+```cpp
 "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 ./host pr 8 1 0 50 path_to_graph path_to_xclbin
 ```		
