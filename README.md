@@ -13,7 +13,7 @@ cd acts-project
 ## Sythesizing ACTS using Vitis HLS
 To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the number of PEs in the second parameter as shown
 ```cpp
-"USAGE: ./host [--xware] [--num_pes] [--running synthesis]"
+"USAGE: ./host [--xware] [--num_pes] [--run-in-async-mode?]"
 ./evaluate_datasets.sh 2 1 1
 ```
 
