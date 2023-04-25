@@ -1,5 +1,4 @@
-# acts-project
-# Gunrock: CUDA/C++ GPU Graph Analytics
+# ACTS: A Near-Memory FPGA Graph Processing Framework
 [![Ubuntu](https://github.com/gunrock/gunrock/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/gunrock/gunrock/actions/workflows/ubuntu.yml) [![Windows](https://github.com/gunrock/gunrock/actions/workflows/windows.yml/badge.svg)](https://github.com/gunrock/gunrock/actions/workflows/windows.yml) [![Code Quality](https://github.com/gunrock/gunrock/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/gunrock/gunrock/actions/workflows/codeql-analysis.yml)
 
 | [**Examples**](https://github.com/gunrock/gunrock/tree/main/examples/algorithms) | [**Project Template**](https://github.com/gunrock/template) | [**Documentation**](https://github.com/gunrock/gunrock/wiki) | [**GitHub Actions**](https://github.com/gunrock/gunrock/actions) |
@@ -11,8 +10,8 @@
 Before building ACTS make sure you have **Jinja 2 Toolkit**[^2] installed on your system. Jinja 2 is a template generator that generates source code tailored to hardware-specific parameters (e.g., number of processing elements to be synthesized on the FPGA). 
 
 ```shell
-git clone https://github.com/gunrock/gunrock.git
-cd gunrock
+git clone https://github.com/Wole308/acts-project.git
+cd acts-project
 mkdir build && cd build
 cmake .. 
 make sssp # or for all algorithms, use: make -j$(nproc)
