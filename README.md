@@ -31,7 +31,7 @@ Configure ACTS environment using the commands shown below. The number of process
 ## Running ACTS 
 Run ACTS using the commands shown below. Here you specify the (1) algorithm, (2) number of FPGAs, (3) root vertex id (for traversal based algorithms like BFS, SSSP), (4) whether the graph is unidirectional of bidirectional, (5) the maximum number of iterations to run, (6) the path to graph dataset, and (7) the path to xclbin. More examples shown in ./evaluate_run.sh
 ```cpp
-"USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
+"USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--graph-direction] [--number-of-iterations] [--path-to-graph] [--path-to-XCLBIN] "
 ./host pr 8 1 0 50 path_to_graph path_to_xclbin
 ```		
 
@@ -51,7 +51,7 @@ doi = {10.1145/3543622.3573180}
 
 ## Copyright & License
 
-ACTS is released under the OpenBSD license
+ACTS is released under the [OpenBSD](https://www.openbsd.org/policy.html) license
 
 is copyright The Regents of the University of California. The library, examples, and all source code are released under [Apache 2.0](https://github.com/gunrock/gunrock/blob/main/LICENSE).
 
