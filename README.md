@@ -48,5 +48,5 @@ doi = {10.1145/3543622.3573180}
 ```
 
 ## Copyright & License
-ACTS is released under the [OpenBSD](https://www.openbsd.org/policy.html) license
+ACTS is released under the [OpenBSD](https://github.com/Wole308/acts-project/blob/main/LICENSE) license
 
