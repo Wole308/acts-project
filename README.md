@@ -19,61 +19,23 @@ bin/sssp ../datasets/chesapeake/chesapeake.mtx
 ```
 
 ## Sythesizing ACTS using Vitis HLS
-To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the number of PEs as shown
+To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the number of PEs in the second parameter as shown
 ```cpp
 "USAGE: ./host [--xware] [--num_pes] [--running synthesis]"
 ./evaluate_datasets.sh 2 1 1
 ```
 
-## Implementing Graph Algorithms
-For a detailed explanation, please see the full [documentation](https://github.com/gunrock/gunrock/wiki/How-to-write-a-new-graph-algorithm). The following example shows simple APIs using Gunrock's data-centric, bulk-synchronous programming model, we implement Breadth-First Search on GPUs. This example skips the setup phase of creating a `problem_t` and `enactor_t` struct and jumps straight into the actual algorithm.
-
-We first prepare our frontier with the initial source vertex to begin
-push-based BFS traversal. A simple `f->push_back(source)` places
-the initial vertex we will use for our first iteration.
+## Running ACTS
+Run ACTS using the commands shown below
 ```cpp
-void prepare_frontier(frontier_t* f,
-                      gcuda::multi_context_t& context) override {
-  auto P = this->get_problem();
-  f->push_back(P->param.single_source);
-}
-```
-We then begin our iterative loop, which iterates until a convergence condition has been met. If no condition has been specified, the loop converges when the frontier is empty.
-```cpp
-void loop(gcuda::multi_context_t& context) override {
-  auto E = this->get_enactor();   // Pointer to enactor interface.
-  auto P = this->get_problem();   // Pointer to problem (data) interface.
-  auto G = P->get_graph();        // Graph that we are processing.
+"USAGE: ./host [--xware] [--num_pes] [--run-in-async-mode?]"
+./evaluate_datasets.sh 1 12 1
 
-  auto single_source = P->param.single_source;  // Initial source node.
-  auto distances = P->result.distances;         // Distances array for BFS.
-  auto visited = P->visited.data().get();       // Visited map.
-  auto iteration = this->iteration;             // Iteration we are on.
+"USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
+./host pr 8 1 0 50 path_to_graph path_to_xclbin
+```		
 
-  // Following lambda expression is applied on every source,
-  // neighbor, edge, weight tuple during the traversal.
-  // Our intent here is to find and update the minimum distance when found.
-  // And return which neighbor goes in the output frontier after traversal.
-  auto search = [=] __host__ __device__(
-                      vertex_t const& source,    // ... source
-                      vertex_t const& neighbor,  // neighbor
-                      edge_t const& edge,        // edge
-                      weight_t const& weight     // weight (tuple).
-                      ) -> bool {
-    auto old_distance =
-      math::atomic::min(&distances[neighbor], iteration + 1);
-    return (iteration + 1 < old_distance);
-  };
-
-  // Execute advance operator on the search lambda expression.
-  // Uses load_balance_t::block_mapped algorithm (try others for perf. tuning.)
-  operators::advance::execute<operators::load_balance_t::block_mapped>(
-    G, E, search, context);
-}
-```
-[include/gunrock/algorithms/bfs.hxx](include/gunrock/algorithms/bfs.hxx)
-
-## How to Cite Gunrock & Essentials
+## How to Cite ACTS & Essentials
 Thank you for citing our work.
 
 ```bibtex
@@ -95,21 +57,6 @@ Thank you for citing our work.
   url =		 {http://escholarship.org/uc/item/9gj6r1dj},
   code =	 {https://github.com/gunrock/gunrock},
   ucdcite =	 {a115},
-}
-```
-
-```bibtex
-@InProceedings{Osama:2022:EOP,
-  author =	 {Muhammad Osama and Serban D. Porumbescu and John D. Owens},
-  title =	 {Essentials of Parallel Graph Analytics},
-  booktitle =	 {Proceedings of the Workshop on Graphs,
-                  Architectures, Programming, and Learning},
-  year =	 2022,
-  series =	 {GrAPL 2022},
-  month =	 may,
-  pages =	 {314--317},
-  doi =		 {10.1109/IPDPSW55747.2022.00061},
-  url =          {https://escholarship.org/uc/item/2p19z28q},
 }
 ```
 
