@@ -18,7 +18,9 @@ To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the n
 ```
 
 ## Configure ACTS
-Configure ACTS environment using the commands shown below. The number of processing elements within each FPGA is specified using the second parameter (This should be the same number of processing elements synthesized unto the FPGA as shown above). More examples shown in ./evaluate_run.sh
+Configure ACTS environment using the commands shown below. 
+
+Here you specify the (1) platform to run acts: 0 for cpu and 1 for fpga, (2) number of processing elements per FPGA, which should equal the number of processing elements synthesized unto the FPGA as shown above (3) whether ACTS should run in synchronous or asynchronous mode. More examples shown in ./evaluate_run.sh
 ```cpp
 "USAGE: ./host [--xware] [--num_pes] [--run-in-async-mode?]"
 ./evaluate_datasets.sh 1 12 1
