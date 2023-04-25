@@ -51,7 +51,7 @@ doi = {10.1145/3543622.3573180}
 
 ## Copyright & License
 
-Gunrock is copyright The Regents of the University of California. The library, examples, and all source code are released under [Apache 2.0](https://github.com/gunrock/gunrock/blob/main/LICENSE).
+ACTS is released under the OpenBSD license
 
-[^1]: This repository has been moved from https://github.com/gunrock/essentials and the previous history is preserved with tags and under `master` branch. Read more about gunrock and essentials in our vision paper: [Essentials of Parallel Graph Analytics](https://escholarship.org/content/qt2p19z28q/qt2p19z28q_noSplash_38a658bccc817ba025517311a776840f.pdf).
-[^2]: Recommended **CUDA v11.5.1 or higher** due to support for stream ordered memory allocators.
+is copyright The Regents of the University of California. The library, examples, and all source code are released under [Apache 2.0](https://github.com/gunrock/gunrock/blob/main/LICENSE).
+
