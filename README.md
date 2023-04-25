@@ -2,9 +2,8 @@
 
 **ACTS** is a graph processing accelerator designed specifically for the FPGA. It uses a **high-level**, **bulk-synchronous/asynchronous**, **data-centric abstraction** focused on operations on vertex or edge frontiers. To tackle the random accesses problem when sending/receiving messages (i.e., vertex updates) between vertices, ACTS' decouples the generation of updates (at source vertices) from the applying these updates (at destination vertices), to restructure their URAM locality in real-time. To tackle the dependency hazards when multiple edges access the same URAM on-chip to read/write vertex properties, ACTS employs a novel edge-packing scheme (ACTPACK) that allow parallel accesses to unique URAMs across the entire processing flow.
 
-## Quick Start Guide
+## Cloning ACTS
 Before building ACTS make sure you have **Jinja 2 Toolkit** installed on your system. Jinja 2 is a template generator that generates source code tailored to hardware-specific parameters (e.g., number of processing elements to be synthesized on the FPGA). 
-
 ```shell
 git clone https://github.com/Wole308/acts-project.git
 cd acts-project
