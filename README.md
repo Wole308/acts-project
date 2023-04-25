@@ -1,9 +1,6 @@
 # ACTS: A Near-Memory FPGA Graph Processing Framework
 [![Ubuntu](https://github.com/gunrock/gunrock/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/gunrock/gunrock/actions/workflows/ubuntu.yml) [![Windows](https://github.com/gunrock/gunrock/actions/workflows/windows.yml/badge.svg)](https://github.com/gunrock/gunrock/actions/workflows/windows.yml) [![Code Quality](https://github.com/gunrock/gunrock/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/gunrock/gunrock/actions/workflows/codeql-analysis.yml)
 
-| [**Examples**](https://github.com/gunrock/gunrock/tree/main/examples/algorithms) | [**Project Template**](https://github.com/gunrock/template) | [**Documentation**](https://github.com/gunrock/gunrock/wiki) | [**GitHub Actions**](https://github.com/gunrock/gunrock/actions) |
-|--------------|----------------------|-------------------|-------------------|
-
 **ACTS**[^1] is a graph processing accelerator designed specifically for the FPGA. It uses a **high-level**, **bulk-synchronous/asynchronous**, **data-centric abstraction** focused on operations on vertex or edge frontiers. To tackle the challenge of random accesses when sending/receiving messages (i.e., vertex updates) between vertices, ACTS' decouples the generation of updates (at source vertices) from the applying these updates at their respective destination vertices. This allows the opportunity to restructure the BRAM locality of the vertex updates in real-time. To tackle the dependency hazards associated with neigboring edges accessing the same URAM on-chip, ACTS employs a novel edge-packing scheme (ACTPACK) that packs edges into edgeblocks and allow parallel URAM accesses during processing. To accomodate processing sparse frontiers, ACTS employs a hybrid scheme where sparse vertex intervals (i.e., consisting few active vertices) are processed with the CSR format, while dense vertex intervals are processed with ACTPACK.
 
 ## Quick Start Guide
@@ -26,7 +23,7 @@ To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the n
 ```
 
 ## Running ACTS
-Run ACTS using the commands shown below
+Run ACTS using the commands shown below. More examples shown in ./evaluate_run.sh
 ```cpp
 "USAGE: ./host [--xware] [--num_pes] [--run-in-async-mode?]"
 ./evaluate_datasets.sh 1 12 1
