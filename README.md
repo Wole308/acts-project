@@ -25,14 +25,14 @@ Here you specify the (1) platform to run acts: 0 for cpu and 1 for fpga, (2) num
 ./evaluate_datasets.sh 1 12 1
 ```		
 
-## Running ACTS 
+## Run ACTS on the FPGA 
 Run ACTS using the commands shown below. Here you specify the (1) algorithm, (2) number of FPGAs, (3) root vertex id (for traversal based algorithms like BFS, SSSP), (4) whether the graph is unidirectional of bidirectional, (5) the maximum number of iterations to run, (6) the path to graph dataset, and (7) the path to xclbin. More examples shown in ./evaluate_run.sh
 ```cpp
 "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--graph-direction] [--number-of-iterations] [--path-to-graph] [--path-to-XCLBIN] "
 ./host pr 8 1 0 50 path_to_graph path_to_xclbin
 ```		
 
-## How to Cite ACTS & Essentials
+## How to Cite ACTS
 Thank you for citing our work.
 
 ```bibtex
