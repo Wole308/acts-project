@@ -1,6 +1,6 @@
 # ACTS: A Near-Memory FPGA Graph Processing Framework
 
-**ACTS**[^1] is a graph processing accelerator designed specifically for the FPGA. It uses a **high-level**, **bulk-synchronous/asynchronous**, **data-centric abstraction** focused on operations on vertex or edge frontiers. To tackle the challenge of random accesses when sending/receiving messages (i.e., vertex updates) between vertices, ACTS' decouples the generation of updates (at source vertices) from the applying these updates at their respective destination vertices. This allows the opportunity to restructure the BRAM locality of the vertex updates in real-time. To tackle the dependency hazards associated with neigboring edges accessing the same URAM on-chip, ACTS employs a novel edge-packing scheme (ACTPACK) that packs edges into edgeblocks and allow parallel URAM accesses during processing. To accomodate processing sparse frontiers, ACTS employs a hybrid scheme where sparse vertex intervals (i.e., consisting few active vertices) are processed with the CSR format, while dense vertex intervals are processed with ACTPACK.
+**ACTS** is a graph processing accelerator designed specifically for the FPGA. It uses a **high-level**, **bulk-synchronous/asynchronous**, **data-centric abstraction** focused on operations on vertex or edge frontiers. To tackle the challenge of random accesses when sending/receiving messages (i.e., vertex updates) between vertices, ACTS' decouples the generation of updates (at source vertices) from the applying these updates at their respective destination vertices. This allows the opportunity to restructure the BRAM locality of the vertex updates in real-time. To tackle the dependency hazards associated with neigboring edges accessing the same URAM on-chip, ACTS employs a novel edge-packing scheme (ACTPACK) that packs edges into edgeblocks and allow parallel URAM accesses during processing. To accomodate processing sparse frontiers, ACTS employs a hybrid scheme where sparse vertex intervals (i.e., consisting few active vertices) are processed with the CSR format, while dense vertex intervals are processed with ACTPACK.
 
 ## Quick Start Guide
 Before building ACTS make sure you have **Jinja 2 Toolkit**[^2] installed on your system. Jinja 2 is a template generator that generates source code tailored to hardware-specific parameters (e.g., number of processing elements to be synthesized on the FPGA). 
@@ -35,24 +35,13 @@ Run ACTS using the commands shown below. More examples shown in ./evaluate_run.s
 Thank you for citing our work.
 
 ```bibtex
-@article{Wang:2017:GGG,
-  author =	 {Yangzihao Wang and Yuechao Pan and Andrew Davidson
-                  and Yuduo Wu and Carl Yang and Leyuan Wang and
-                  Muhammad Osama and Chenshan Yuan and Weitang Liu and
-                  Andy T. Riffel and John D. Owens},
-  title =	 {{G}unrock: {GPU} Graph Analytics},
-  journal =	 {ACM Transactions on Parallel Computing},
-  year =	 2017,
-  volume =	 4,
-  number =	 1,
-  month =	 aug,
-  pages =	 {3:1--3:49},
-  doi =		 {10.1145/3108140},
-  ee =		 {http://arxiv.org/abs/1701.01170},
-  acmauthorize = {https://dl.acm.org/doi/10.1145/3108140?cid=81100458295},
-  url =		 {http://escholarship.org/uc/item/9gj6r1dj},
-  code =	 {https://github.com/gunrock/gunrock},
-  ucdcite =	 {a115},
+@inproceedings{inproceedings,
+author = {Jaiyeoba, Wole and Elyasi, Nima and Choi, Changho and Skadron, Kevin},
+year = {2023},
+month = {02},
+pages = {79-89},
+title = {ACTS: A Near-Memory FPGA Graph Processing Framework},
+doi = {10.1145/3543622.3573180}
 }
 ```
 
