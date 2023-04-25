@@ -23,7 +23,6 @@ To synthesize ACTS on the FPGA, run the ./evaluate_datasets.sh, specifying the n
 ```cpp
 "USAGE: ./host [--xware] [--num_pes] [--running synthesis]"
 ./evaluate_datasets.sh 2 1 1
-}
 ```
 
 ## Implementing Graph Algorithms
