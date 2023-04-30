@@ -23,7 +23,7 @@ public:
 	~create_act_pack();
 
 	unsigned int create_actpack(
-		vector<edge3_type> (&partitioned_edges)[NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS], HBM_channelAXISW_t * HBM_channel[NUM_PEs][2], map_t * edge_maps[NUM_PEs], map_t * vu_map[NUM_PEs], unsigned int offset_dest, 
+		vector<edge3_type> (&partitioned_edges)[NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS], HBM_channelAXISW_t * HBM_channelA[NUM_PEs], HBM_channelAXISW_t * HBM_channelB[NUM_PEs], map_t * edge_maps[NUM_PEs], map_t * vu_map[NUM_PEs], unsigned int offset_dest, 
 		unsigned int num_upartitions, unsigned int num_vpartitions, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int cmd
 		);
 		

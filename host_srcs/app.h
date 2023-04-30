@@ -23,12 +23,8 @@
 #include "act_pack.h"
 #include "create_act_pack.h"
 #include "prepare_graph.h"
-// #include "make_graph.h"
 #include "algorithm.h"
-// #include "app_hw.h"
 #include "host.h"
-// #include "host_fpga.h"
-// #include "host_fpga_async.h"
 #include "../acts_templates/acts_kernel.h"	
 #include "../include/common.h"
 
@@ -37,7 +33,7 @@ public:
 	app();
 	~app();
 	void finish();
-
+	
 	void run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, int graphisundirected, unsigned int numiterations, string graph_path, std::string _binaryFile1);
 	
 	void summary();

@@ -91,13 +91,14 @@ using std::vector;
 #define NUM_HBM_ARGS (NUM_VALID_HBM_CHANNELS * 2)
 #define NUM_HBMC_ARGS 2
 #define NUM_HBMIO_ARGS 2
-#define NUM_HBMIO_CHKPTS_ARGS 0//2
 
 #define RUN_SW_KERNEL
 #define RUN_FPGA_KERNEL
 
 #define ___PRE_RUN___
 #define ___POST_RUN___ 
+
+// #define ___SYNC___ //////////////////////////////////////////////////////////////////////////////////
 
 #ifdef FPGA_IMPL
 bool profiling0 = false; // false*, true;
@@ -106,14 +107,6 @@ bool profiling0 = true;
 #endif 
 bool profiling1_timing = false; //false*, true
 unsigned int num_prints2 = 1;//universalparams.NUM_FPGAS_; 
-
-#ifdef FPGA_IMPL
-#define MIGRATE_HOST_TO_DEVICE() void _migrate_host_to_device(cl::CommandQueue * q, cl_int err, unsigned int fpga, std::vector<cl::Buffer> &buffer_hbm, std::vector<cl::Buffer> &buffer_hbmc)
-#define MIGRATE_DEVICE_TO_HOST() void _migrate_device_to_host(cl::CommandQueue * q, cl_int err, unsigned int fpga, std::vector<cl::Buffer> &buffer_hbm, std::vector<cl::Buffer> &buffer_hbmc)
-#else
-#define MIGRATE_HOST_TO_DEVICE() void _migrate_host_to_device()
-#define MIGRATE_DEVICE_TO_HOST() void _migrate_device_to_host()
-#endif
 
 host::host(universalparams_t _universalparams){
 	utilityobj = new utility(_universalparams);
@@ -189,50 +182,56 @@ void set_callback(cl::Event event, const char* queue_name) {
 }
 
 void _set_args___actions(cl::Kernel * kernels, action_t action, unsigned int mask_i[MAX_IMPORT_BATCH_SIZE], universalparams_t universalparams, cl_int err){
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS, int(action.fpga)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 1, int(action.module)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 2, int(action.graph_iteration)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 3, int(action.start_pu)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 4, int(action.size_pu)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 5, int(action.skip_pu)));	
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 6, int(action.start_pv_fpga)));	
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 7, int(action.start_pv)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 8, int(action.size_pv)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 9, int(action.start_llpset)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 10, int(action.size_llpset)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 11, int(action.start_llpid)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 12, int(action.size_llpid)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 13, int(action.start_gv_fpga)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 14, int(action.start_gv)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 15, int(action.size_gv)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 16, int(action.id_process)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 17, int(action.id_import)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 18, int(action.id_export)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 19, int(action.size_import_export)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 20, int(action.status)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 21, int(universalparams.NUM_FPGAS_)));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 22, int(mask_i[0])));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 23, int(mask_i[1])));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 24, int(mask_i[2])));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 25, int(mask_i[3])));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 26, int(mask_i[4])));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 27, int(mask_i[5])));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 28, int(mask_i[6])));
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + NUM_HBMIO_CHKPTS_ARGS + 29, int(mask_i[7])));
+	
+	// cout<<"&&&&&&&&&&&&&&&>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&& action.start_pu: "<<action.start_pu<<endl;
+	// cout<<"&&&&&&&&&&&&&&&>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&& action.size_pu: "<<action.size_pu<<endl;
+	// cout<<"&&&&&&&&&&&&&&&>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>&&&&&&&&& action.id_process: "<<action.id_process<<endl;
+	
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS, int(action.fpga)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 1, int(action.module)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 2, int(action.graph_iteration)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 3, int(action.start_pu)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 4, int(action.size_pu)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 5, int(action.skip_pu)));	
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 6, int(action.start_pv_fpga)));	
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 7, int(action.start_pv)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 8, int(action.size_pv)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 9, int(action.start_llpset)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 10, int(action.size_llpset)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 11, int(action.start_llpid)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 12, int(action.size_llpid)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 13, int(action.start_gv_fpga)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 14, int(action.start_gv)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 15, int(action.size_gv)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 16, int(action.id_process)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 17, int(action.id_import)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 18, int(action.id_export)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 19, int(action.size_import_export)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 20, int(action.status)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 21, int(universalparams.NUM_FPGAS_)));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 22, int(mask_i[0])));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 23, int(mask_i[1])));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 24, int(mask_i[2])));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 25, int(mask_i[3])));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 26, int(mask_i[4])));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 27, int(mask_i[5])));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 28, int(mask_i[6])));
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 29, int(mask_i[7])));
 }
 #endif 
 
 unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPGAS], universalparams_t universalparams){
 	unsigned int index = 0;
 	// process
-	for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_; t+=universalparams.PE_BATCH_SIZE){ 
+	for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_; t+=PE_BATCH_SIZE){ 
 		action_t action;
 		
 		action.module = PROCESS_EDGES_MODULE;
 		action.graph_iteration = NAp;
 		
 		action.start_pu = t;
-		action.size_pu = universalparams.PE_BATCH_SIZE; 
+		action.size_pu = PE_BATCH_SIZE; 
+		if(universalparams.NUM_FPGAS_==1){ action.size_pu = 2000; }  // NEWCHANGE.
 		if(action.start_pu + action.size_pu > universalparams.NUM_UPARTITIONS){ action.size_pu = universalparams.NUM_UPARTITIONS - action.start_pu; } // FIXME?
 		action.skip_pu = 1;
 		
@@ -252,7 +251,7 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 		action.id_process = INVALID_IOBUFFER_ID;
 		action.id_import = INVALID_IOBUFFER_ID;
 		action.id_export = INVALID_IOBUFFER_ID;
-		action.size_import_export = universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE;
+		action.size_import_export = IMPORT_EXPORT_GRANULARITY_VECSIZE;
 		action.status = 0;
 		
 		actions[fpga][index] = action;
@@ -260,7 +259,7 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 	}
 	// return index; // FIXME.
 	
-	for(unsigned int apply_id=0; apply_id<universalparams.NUM_APPLYPARTITIONS; apply_id+=universalparams.AU_BATCH_SIZE){ 
+	for(unsigned int apply_id=0; apply_id<universalparams.NUM_APPLYPARTITIONS; apply_id+=AU_BATCH_SIZE){ 
 		// apply
 		action_t action;
 		
@@ -273,7 +272,8 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 		
 		action.start_pv_fpga = NAp;
 		action.start_pv = apply_id; // local value 
-		action.size_pv = universalparams.AU_BATCH_SIZE; 
+		action.size_pv = AU_BATCH_SIZE; 
+		if(universalparams.NUM_FPGAS_==1){ action.size_pv = 2000; }  // NEWCHANGE.
 		if(action.start_pv + action.size_pv > universalparams.NUM_APPLYPARTITIONS){ action.size_pv = universalparams.NUM_APPLYPARTITIONS - action.start_pv; } // FIXME?
 		
 		action.start_gv_fpga = NAp;
@@ -288,7 +288,7 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 		action.id_process = INVALID_IOBUFFER_ID;
 		action.id_import = INVALID_IOBUFFER_ID;
 		action.id_export = INVALID_IOBUFFER_ID;
-		action.size_import_export = universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE;
+		action.size_import_export = IMPORT_EXPORT_GRANULARITY_VECSIZE;
 		action.status = 0;
 		
 		actions[fpga][index] = action;
@@ -307,9 +307,9 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 		action.size_pv = NAp;
 		
 		action.start_gv_fpga = NAp;
-		// action.start_gv = (apply_id * (NUM_SUBPARTITION_PER_PARTITION / universalparams.NUM_FPGAS_)) + 0; // t; // local value
 		action.start_gv = apply_id * NUM_SUBPARTITION_PER_PARTITION;
-		action.size_gv = universalparams.GF_BATCH_SIZE;
+		action.size_gv = GF_BATCH_SIZE;
+		if(universalparams.NUM_FPGAS_==1){ action.size_gv = 2000; } // NEWCHANGE.
 		if(action.start_gv + action.size_gv > universalparams.NUM_UPARTITIONS){ action.size_gv = universalparams.NUM_UPARTITIONS - action.start_gv; } // FIXME?
 		
 		action.start_llpset = NAp; 
@@ -320,7 +320,8 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 		action.id_process = INVALID_IOBUFFER_ID;
 		action.id_import = INVALID_IOBUFFER_ID;
 		action.id_export = INVALID_IOBUFFER_ID;
-		action.size_import_export = universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE;
+		action.size_import_export = IMPORT_EXPORT_GRANULARITY_VECSIZE;
+	
 		action.status = 0;
 		
 		actions[fpga][index] = action;
@@ -349,58 +350,6 @@ void initialize_Queue(bool all_vertices_active_in_all_iterations, gas_import_t i
 	}
 }
 
-value_t merge_frontiers(value_t A, value_t B){
-	#pragma HLS INLINE 
-	#ifdef BAKE_PAGERANK_ALGORITHM_FUNCS
-	return A + B;	
-	#endif 
-	#ifdef BAKE_SPMV_ALGORITHM_FUNCS
-	return A + B;	
-	#endif 
-	#ifdef BAKE_HITS_ALGORITHM_FUNCS	
-	return A + B;	
-	#endif 
-}
-
-MIGRATE_HOST_TO_DEVICE(){
-	std::cout << "Copying data (Host to Device)..." << std::endl;
-	std::chrono::steady_clock::time_point begin_time0 = std::chrono::steady_clock::now();
-	for (int i = 0; i < NUM_HBM_ARGS; i++) {
-		std::cout << "Copying data @ channel "<<i<<" (Host to Device)..." << std::endl;
-		#ifdef FPGA_IMPL
-		OCL_CHECK(err, err = q->enqueueMigrateMemObjects({buffer_hbm[i]}, 0));
-		#endif 
-	}
-	for (int i = 0; i < NUM_HBMC_ARGS; i++) {
-		std::cout << "Copying data @ center channel "<<i<<" (Host to Device)..." << std::endl;
-		#ifdef FPGA_IMPL
-		OCL_CHECK(err, err = q->enqueueMigrateMemObjects({buffer_hbmc[i]}, 0));
-		#endif 
-	}
-	#ifdef FPGA_IMPL
-	OCL_CHECK(err, err = q->finish());
-	#endif 
-	double end_time0 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time0).count()) / 1000;	
-	std::cout <<">>> write-to-FPGA time elapsed : "<<end_time0<<" ms, "<<(end_time0 * 1000)<<" microsecs, "<<std::endl;
-	return;
-}
-MIGRATE_DEVICE_TO_HOST(){
-	std::cout << "Getting Results (Device to Host)..." << std::endl;
-	std::chrono::steady_clock::time_point begin_time2 = std::chrono::steady_clock::now();
-	for (int i = 0; i < NUM_HBMC_ARGS; i++) {
-		std::cout << "Copying data @ center channel "<<i<<" (Device to Host)..." << std::endl;
-		#ifdef FPGA_IMPL
-		OCL_CHECK(err, err = q->enqueueMigrateMemObjects({buffer_hbmc[i]}, CL_MIGRATE_MEM_OBJECT_HOST));
-		#endif 
-	}
-	#ifdef FPGA_IMPL
-	OCL_CHECK(err, err = q->finish());
-	#endif 
-	double end_time2 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time2).count()) / 1000;	
-	std::cout <<">>> read-from-FPGA time elapsed : "<<end_time2<<" ms, "<<(end_time2 * 1000)<<" microsecs, "<<std::endl;
-	return;
-}
-
 void run_traversal_algorithm_in_software(unsigned int GraphIter, vector<value_t> &actvvs, vector<value_t> &actvvs_nextit, vector<edge_t> &vertexptrbuffer, vector<edge3_type> &edgedatabuffer, 
 		#ifdef FPGA_IMPL
 		std::vector<int, aligned_allocator<int> > &vdatas,
@@ -417,6 +366,7 @@ void run_traversal_algorithm_in_software(unsigned int GraphIter, vector<value_t>
 		edge_t edges_size = vptr_end - vptr_begin;
 		if(vptr_end < vptr_begin){ continue; } // FIXME.
 		#ifdef _DEBUGMODE_CHECKS3
+		if(vid / MAX_UPARTITION_SIZE >= MAX_NUM_UPARTITIONS){ cout<<"ERROR: vid("<<vid<<") / MAX_UPARTITION_SIZE("<<MAX_UPARTITION_SIZE<<") >= MAX_NUM_UPARTITIONS("<<MAX_NUM_UPARTITIONS<<"). exiting..."<<endl; exit(EXIT_FAILURE); }
 		if(vptr_end < vptr_begin){ cout<<"ERROR: vptr_end("<<vptr_end<<") < vptr_begin("<<vptr_begin<<"). exiting..."<<endl; exit(EXIT_FAILURE); }
 		#endif
 		vertices_processed[GraphIter] += 1; 
@@ -445,15 +395,14 @@ void run_traversal_algorithm_in_software(unsigned int GraphIter, vector<value_t>
 
 long double host::runapp(std::string binaryFile__[2], 
 		vector<edge3_type> &edgedatabuffer, vector<edge_t> &vertexptrbuffer, 
-			HBM_channelAXISW_t * HBM_axichannel[MAX_NUM_FPGAS][NUM_PEs][2], HBM_channelAXISW_t * HBM_axicenter[MAX_NUM_FPGAS][2], unsigned int hbm_channel_wwsize, unsigned int globalparams[1024], universalparams_t universalparams,
+			HBM_channelAXISW_t * HBM_axichannel[MAX_NUM_FPGAS][2][NUM_PEs], HBM_channelAXISW_t * HBM_axicenter[MAX_NUM_FPGAS][2], unsigned int hbm_channel_wwsize, unsigned int globalparams[1024], universalparams_t universalparams,
 				vector<edge3_type> (&final_edge_updates)[NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS]){
-				
-	// unsigned int ARRAY_SIZE = hbm_channel_wwsize * HBM_AXI_PACK_SIZE; 
-	unsigned long ARRAY_SIZE = HBM_CHANNEL_SIZE * HBM_AXI_PACK_SIZE; // FIXME
-	unsigned long ARRAY_CENTER_SIZE = HBM_CENTER_SIZE * HBM_AXI_PACK_SIZE;
+	unsigned int ARRAY_SIZE = hbm_channel_wwsize * HBM_AXI_PACK_SIZE; 
+	// unsigned int ARRAY_CENTER_SIZE = ARRAY_SIZE; // HBM_CENTER_SIZE * HBM_AXI_PACK_SIZE;
+	unsigned int ARRAY_CENTER_SIZE = HBM_CENTER_SIZE * HBM_AXI_PACK_SIZE; // NEWCHANGE.
 	
 	unsigned int report_statistics[64]; for(unsigned int t=0; t<64; t++){ report_statistics[t] = 0; }
-	unsigned int mask_i[MAX_NUM_FPGAS][MAX_IMPORT_BATCH_SIZE]; for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ for(unsigned int t=0; t<universalparams.IMPORT_BATCH_SIZE; t++){ mask_i[fpga][t] = 0; }}
+	unsigned int mask_i[MAX_NUM_FPGAS][MAX_IMPORT_BATCH_SIZE]; for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ for(unsigned int t=0; t<MAX_IMPORT_BATCH_SIZE; t++){ mask_i[fpga][t] = 0; }}
 	
 	bool all_vertices_active_in_all_iterations = false; 
 	if(universalparams.ALGORITHM == PAGERANK || universalparams.ALGORITHM == CF || universalparams.ALGORITHM == HITS || universalparams.ALGORITHM == SPMV){ all_vertices_active_in_all_iterations = true; }
@@ -467,21 +416,22 @@ long double host::runapp(std::string binaryFile__[2],
 	unsigned int * processed_vertex_partitions_record[MAXNUMGRAPHITERATIONS]; for(unsigned int t=0; t<MAXNUMGRAPHITERATIONS; t++){ processed_vertex_partitions_record[t] = new unsigned int[MAX_NUM_UPARTITIONS]; }
 	for(unsigned int iter=0; iter<MAXNUMGRAPHITERATIONS; iter++){ for(unsigned int t=0; t<MAX_NUM_UPARTITIONS; t++){ processed_vertex_partitions_record[iter][t] = 0; }}
 	
+	cout<<"host::runapp_sync: universalparams.NUM_FPGAS_: "<<universalparams.NUM_FPGAS_<<" ---"<<endl;
 	cout<<"host::runapp_sync: NUM_HBM_ARGS: "<<NUM_HBM_ARGS<<" ---"<<endl;
 	cout<<"host::runapp_sync: ARRAY_SIZE: "<<ARRAY_SIZE<<" ---"<<endl;
 	cout<<"host::runapp_sync: HBM_CHANNEL_SIZE: "<<HBM_CHANNEL_SIZE<<" ---"<<endl;
-	cout<<"host::runapp_sync: universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE: "<<universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE<<" ---"<<endl;
+	cout<<"host::runapp_sync: IMPORT_EXPORT_GRANULARITY_VECSIZE: "<<IMPORT_EXPORT_GRANULARITY_VECSIZE<<" ---"<<endl;
 	cout<<"host::runapp_sync: hbm_channel_wwsize * HBM_AXI_PACK_SIZE: "<<hbm_channel_wwsize * HBM_AXI_PACK_SIZE<<" ---"<<endl;
 	
 	// load necessary commands
 	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
 		for(unsigned int i=0; i<NUM_PEs; i++){
-			HBM_axichannel[fpga][i][0][GLOBALPARAMSCODE___ENABLE___PREPAREEDGEUPDATES].data[0] = 0; //
-			HBM_axichannel[fpga][i][0][GLOBALPARAMSCODE___ENABLE___PROCESSEDGEUPDATES].data[0] = 0; //
-			HBM_axichannel[fpga][i][0][GLOBALPARAMSCODE___ENABLE___PROCESSEDGES].data[0] = 1; //	
+			HBM_axichannel[fpga][0][i][GLOBALPARAMSCODE___ENABLE___PREPAREEDGEUPDATES].data[0] = 0; //
+			HBM_axichannel[fpga][0][i][GLOBALPARAMSCODE___ENABLE___PROCESSEDGEUPDATES].data[0] = 0; //
+			HBM_axichannel[fpga][0][i][GLOBALPARAMSCODE___ENABLE___PROCESSEDGES].data[0] = 1; //	
 		}
 	}
-	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ for(unsigned int i=0; i<NUM_PEs; i++){ HBM_axichannel[fpga][i][0][GLOBALPARAMSCODE__COMMANDS__COMMAND0].data[0] = 2; }}
+	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ for(unsigned int i=0; i<NUM_PEs; i++){ HBM_axichannel[fpga][0][i][GLOBALPARAMSCODE__COMMANDS__COMMAND0].data[0] = 2; }}
 	
 	// prepare OCL variables 
 	#ifdef FPGA_IMPL
@@ -489,11 +439,11 @@ long double host::runapp(std::string binaryFile__[2],
 	std::string binaryFile = binaryFile__[0]; 
     cl_int err;
 	
-	vector<cl::Context> contexts(universalparams.NUM_FPGAS_);
-    vector<cl::Program> programs(universalparams.NUM_FPGAS_);
-    vector<cl::Kernel> kernels(universalparams.NUM_FPGAS_);
-    vector<cl::CommandQueue> q(universalparams.NUM_FPGAS_);
-    vector<std::string> device_name(universalparams.NUM_FPGAS_);
+	vector<cl::Context> contexts(16); 
+    vector<cl::Program> programs(16); 
+    vector<cl::Kernel> kernels(16); 
+    vector<cl::CommandQueue> q(16); 
+    vector<std::string> device_name(16); 
 	#endif 
 	
     // load binary to FPGA 
@@ -543,52 +493,59 @@ long double host::runapp(std::string binaryFile__[2],
 
     // variables 
     size_t bytes_per_iteration = ARRAY_SIZE * sizeof(int);
-	cout<<"--- host::runapp_sync: bytes_per_iteration: "<<bytes_per_iteration<<" ---"<<endl;
+	size_t bytesc_per_iteration = ARRAY_CENTER_SIZE * sizeof(int);
+	cout<<"--- host::runapp_sync: bytes_per_iteration: "<<bytes_per_iteration<<", bytesc_per_iteration: "<<bytesc_per_iteration<<" ---"<<endl;
 
 	// allocate sw buffers
 	#ifdef FPGA_IMPL
-	cout<<"host:: allocating software buffers..."<<endl;
-	std::vector<int, aligned_allocator<int> > HBM_axichannel_vector[MAX_NUM_FPGAS][NUM_PEs][2]; for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int j=0; j<2; j++){ HBM_axichannel_vector[fpga][i][j] = std::vector<int, aligned_allocator<int> >(ARRAY_SIZE); }}}
-	std::vector<int, aligned_allocator<int> > HBM_axicenter_vector[MAX_NUM_FPGAS][2]; for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ for(unsigned int i=0; i<2; i++){ HBM_axicenter_vector[fpga][i] = std::vector<int, aligned_allocator<int> >(ARRAY_CENTER_SIZE); }}
+	cout<<"host:: allocating channel buffers..."<<endl;
+	std::vector<int, aligned_allocator<int> > HBM_axichannel_vector[MAX_NUM_FPGAS][32]; for(unsigned int fpga=0; fpga<MAX_NUM_FPGAS; fpga++){ for(unsigned int i=0; i<NUM_HBM_ARGS; i++){ HBM_axichannel_vector[fpga][i] = std::vector<int, aligned_allocator<int> >(ARRAY_SIZE); }}
+	std::vector<int, aligned_allocator<int> > HBM_axicenter_vector[MAX_NUM_FPGAS][2][2]; for(unsigned int fpga=0; fpga<MAX_NUM_FPGAS; fpga++){ for(unsigned int flag=0; flag<2; flag++){ for(unsigned int i=0; i<2; i++){ HBM_axicenter_vector[fpga][flag][i] = std::vector<int, aligned_allocator<int> >(ARRAY_CENTER_SIZE); }}}
 	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
 		for(unsigned int i=0; i<NUM_VALID_PEs; i++){ // REMOVEME. NUM_PEs
-			for(unsigned int j=0; j<2; j++){ 
-				for(unsigned int t=0; t<hbm_channel_wwsize; t++){ 				
-					for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ 
-						HBM_axichannel_vector[fpga][i][j][t*HBM_AXI_PACK_SIZE + v] = HBM_axichannel[fpga][i][j][t].data[v]; 
-					}
-				}
+			for(unsigned int t=0; t<hbm_channel_wwsize; t++){ 
+				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ 
+					utilityobj->checkoutofbounds("host::ERROR 7121a::", t*HBM_AXI_PACK_SIZE + v, ARRAY_SIZE, ARRAY_SIZE, NAp, NAp);
+					utilityobj->checkoutofbounds("host::ERROR 7121b::", t, HBM_CHANNEL_SIZE, ARRAY_SIZE, NAp, NAp);		
+				}				
+				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axichannel_vector[fpga][2*i][t*HBM_AXI_PACK_SIZE + v] = HBM_axichannel[fpga][0][i][t].data[v]; }
+				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axichannel_vector[fpga][2*i+1][t*HBM_AXI_PACK_SIZE + v] = HBM_axichannel[fpga][1][i][t].data[v]; }
 			}
 		}
 	}
 	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
-		for(unsigned int t=0; t<hbm_channel_wwsize; t++){ 
-			for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter_vector[fpga][0][t*HBM_AXI_PACK_SIZE + v] = HBM_axicenter[fpga][0][t].data[v]; }
-			for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter_vector[fpga][1][t*HBM_AXI_PACK_SIZE + v] = HBM_axicenter[fpga][1][t].data[v]; }
+		for(unsigned int flag=0; flag<2; flag++){ 
+			for(unsigned int t=0; t<hbm_channel_wwsize; t++){ 
+				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ 
+					utilityobj->checkoutofbounds("host::ERROR 7121c::", t*HBM_AXI_PACK_SIZE + v, ARRAY_SIZE, ARRAY_SIZE, NAp, NAp);
+					utilityobj->checkoutofbounds("host::ERROR 7121d::", t, HBM_CHANNEL_SIZE, ARRAY_SIZE, NAp, NAp);	
+				}
+				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter_vector[fpga][flag][0][t*HBM_AXI_PACK_SIZE + v] = HBM_axicenter[fpga][0][t].data[v]; }
+				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter_vector[fpga][flag][1][t*HBM_AXI_PACK_SIZE + v] = HBM_axicenter[fpga][1][t].data[v]; }
+			}
 		}
 	}
-	#endif
+	#endif 
 	
 	cout<<"host:: allocating vertex property buffers..."<<endl;
-	unsigned int num_local_upartition_set = MAX_NUM_UPARTITIONS / universalparams.NUM_FPGAS_; // MAX_NUM_UPARTITIONS / universalparams.IMPORT_BATCH_SIZE / universalparams.NUM_FPGAS_ // FIXME.
+	unsigned int num_local_upartition_set = MAX_NUM_UPARTITIONS / universalparams.NUM_FPGAS_; 
 	unsigned int * vertex_properties_map[MAXNUMGRAPHITERATIONS]; for(unsigned int t=0; t<MAXNUMGRAPHITERATIONS; t++){ vertex_properties_map[t] = new unsigned int[MAX_NUM_UPARTITIONS]; }
 	#ifdef FPGA_IMPL
 	std::vector<int, aligned_allocator<int> > vertex_properties((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));  
 	std::vector<int, aligned_allocator<int> > vdatas((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));
-	std::vector<int, aligned_allocator<int> > frontier_properties[num_local_upartition_set][MAX_NUM_FPGAS]; 
+	std::vector<int, aligned_allocator<int> > frontier_properties[MAX_NUM_UPARTITIONS][MAX_NUM_FPGAS]; 
 	for(unsigned int p_u=0; p_u<num_local_upartition_set; p_u++){ 
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			// frontier_properties[p_u][fpga] = std::vector<int, aligned_allocator<int> >(universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE); 
-			frontier_properties[p_u][fpga] = std::vector<int, aligned_allocator<int> >(universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE); 
+			frontier_properties[p_u][fpga] = std::vector<int, aligned_allocator<int> >(IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE); 
 		}
 	}
-	#else // frontier_properties[MAX_NUM_UPARTITIONS / universalparams.NUM_FPGAS_][MAX_NUM_FPGAS][universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE]
+	#else // frontier_properties[MAX_NUM_UPARTITIONS / universalparams.NUM_FPGAS_][MAX_NUM_FPGAS][IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE]
 	vector<unsigned int> vertex_properties((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));
 	vector<unsigned int> vdatas((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));
-	std::vector<unsigned int> frontier_properties[num_local_upartition_set][MAX_NUM_FPGAS]; // frontier_properties[num_local_upartition_set][MAX_NUM_FPGAS][universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE]
+	std::vector<unsigned int> frontier_properties[MAX_NUM_UPARTITIONS][MAX_NUM_FPGAS]; // frontier_properties[num_local_upartition_set][MAX_NUM_FPGAS][IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE]
 	for(unsigned int p_u=0; p_u<num_local_upartition_set; p_u++){ 
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			frontier_properties[p_u][fpga] = std::vector<unsigned int>(universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE); 
+			frontier_properties[p_u][fpga] = std::vector<unsigned int>(IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE); 
 		}
 	}
 	#endif
@@ -599,42 +556,35 @@ long double host::runapp(std::string binaryFile__[2],
 	
     // declare buffers and ext_ptrs
 	#ifdef FPGA_IMPL
-    vector<cl::Event> kernel_events(2 * universalparams.NUM_FPGAS_);
-    vector<cl::Event> read_events(2 * universalparams.NUM_FPGAS_);
-	
-	std::vector<cl::Buffer> buffer_hbm(32 * universalparams.NUM_FPGAS_);
-	std::vector<cl::Buffer> buffer_hbmc(NUM_HBMC_ARGS * universalparams.NUM_FPGAS_);
-	std::vector<cl::Buffer> buffer_import(2 * universalparams.NUM_FPGAS_);
-	std::vector<cl::Buffer> buffer_export(2 * universalparams.NUM_FPGAS_);
-	std::vector<cl::Buffer> buffer_import_chkpt(1 * universalparams.NUM_FPGAS_);
-	std::vector<cl::Buffer> buffer_export_chkpt(1 * universalparams.NUM_FPGAS_);
-	std::vector<cl_mem_ext_ptr_t> inBufExt(32 * universalparams.NUM_FPGAS_);
-	std::vector<cl_mem_ext_ptr_t> inBufExt_c(2 * universalparams.NUM_FPGAS_);
-	std::vector<cl_mem_ext_ptr_t> inBufExt_input(universalparams.NUM_FPGAS_);
-	std::vector<cl_mem_ext_ptr_t> inBufExt_output(universalparams.NUM_FPGAS_);
+    vector<cl::Event> kernel_events(32); // NEWCHANGE.
+    vector<cl::Event> read_events(32);
+	std::vector<cl::Buffer> buffer_hbm(1024);
+	std::vector<cl::Buffer> buffer_hbmc(26);
+	std::vector<cl::Buffer> buffer_import(32);
+	std::vector<cl::Buffer> buffer_export(32);
+	std::vector<cl_mem_ext_ptr_t> inBufExt(32);
+	std::vector<cl_mem_ext_ptr_t> inBufExt_c(32);
+	std::vector<cl_mem_ext_ptr_t> inBufExt_input(32);
+	std::vector<cl_mem_ext_ptr_t> inBufExt_output(32);
 	#endif 
 	
 	// attach ext pointers 
 	#ifdef FPGA_IMPL
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
 		for (int i = 0; i < NUM_HBM_ARGS; i++) {
-			inBufExt[fpga*universalparams.NUM_FPGAS_ + i].obj = HBM_axichannel_vector[fpga][i / 2][i % 2].data();
+			inBufExt[fpga*universalparams.NUM_FPGAS_ + i].obj = HBM_axichannel_vector[fpga][i].data();
 			inBufExt[fpga*universalparams.NUM_FPGAS_ + i].param = 0;
-			#if NUM_PEs==1
-			// nothing? FIXME?
-			#else 
 			inBufExt[fpga*universalparams.NUM_FPGAS_ + i].flags = pc[i];
-			#endif 
 		}
 	}
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
 		for (int i = 0; i < NUM_HBMC_ARGS; i++) {
-			inBufExt_c[fpga*universalparams.NUM_FPGAS_ + i].obj = HBM_axicenter_vector[fpga][i].data();
+			inBufExt_c[fpga*universalparams.NUM_FPGAS_ + i].obj = HBM_axicenter_vector[fpga][i][0].data();
 			inBufExt_c[fpga*universalparams.NUM_FPGAS_ + i].param = 0;
 			inBufExt_c[fpga*universalparams.NUM_FPGAS_ + i].flags = pc[NUM_HBM_ARGS + i];
 		}
-	}	
-	for(unsigned int fpga=0; fpga<device_count; fpga++){ // FIXME.
+	}
+	for(unsigned int fpga=0; fpga<device_count; fpga++){ // FIXME. // NEWCHANGE.
 		inBufExt_input[fpga].obj = frontier_properties[0][0].data(); 
 		inBufExt_input[fpga].param = 0;
 		inBufExt_input[fpga].flags = pc[NUM_HBM_ARGS + NUM_HBMC_ARGS + 0];
@@ -652,8 +602,13 @@ long double host::runapp(std::string binaryFile__[2],
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
 		for (int i = 0; i < NUM_HBM_ARGS; i++) {
 			std::cout << "Creating Buffer "<<i<<"..." << std::endl;
+			#if NUM_PEs==1 // NEWCHANGE.
+			OCL_CHECK(err, buffer_hbm[fpga*universalparams.NUM_FPGAS_ + i] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+											bytes_per_iteration, HBM_axichannel_vector[fpga][i].data(), &err));
+			#else 
 			OCL_CHECK(err, buffer_hbm[fpga*universalparams.NUM_FPGAS_ + i] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
 											bytes_per_iteration, &inBufExt[fpga*universalparams.NUM_FPGAS_ + i], &err));
+			#endif 
 		}
 	}
 	
@@ -662,7 +617,7 @@ long double host::runapp(std::string binaryFile__[2],
 		for (int i = 0; i < NUM_HBMC_ARGS; i++) {
 			std::cout << "Creating Center Buffer "<<i<<"..." << std::endl;
 			OCL_CHECK(err, buffer_hbmc[fpga*universalparams.NUM_FPGAS_ + i] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
-											bytes_per_iteration, &inBufExt_c[fpga*universalparams.NUM_FPGAS_ + i], &err)); 
+											bytesc_per_iteration, &inBufExt_c[fpga*universalparams.NUM_FPGAS_ + i], &err)); 
 		}
 	}
 	#endif
@@ -687,8 +642,30 @@ long double host::runapp(std::string binaryFile__[2],
 	
 	// Copy input data to device global memory
 	#ifdef FPGA_IMPL
-	for(unsigned int fpga=0; fpga<device_count; fpga++){ _migrate_host_to_device(&q[fpga], err, fpga, buffer_hbm, buffer_hbmc); }
+	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+		std::cout << "Copying data (Host to Device)..." << std::endl;
+		std::chrono::steady_clock::time_point begin_time0 = std::chrono::steady_clock::now();
+		for (int i = 0; i < NUM_HBM_ARGS; i++) {
+			std::cout << "Copying data @ channel "<<i<<" (Host to Device)..." << std::endl;
+			#ifdef FPGA_IMPL
+			OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_hbm[i]}, 0));
+			#endif 
+		}
+		for (int i = 0; i < NUM_HBMC_ARGS; i++) {
+			std::cout << "Copying data @ center channel "<<i<<" (Host to Device)..." << std::endl;
+			#ifdef FPGA_IMPL
+			OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_hbmc[i]}, 0));
+			#endif 
+		}
+		#ifdef FPGA_IMPL
+		OCL_CHECK(err, err = q[fpga].finish());
+		#endif 
+		double end_time0 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time0).count()) / 1000;	
+		std::cout <<">>> %%%% write-to-FPGA time elapsed : "<<end_time0<<" ms, "<<(end_time0 * 1000)<<" microsecs, "<<std::endl;
+		// _migrate_host_to_device(&q[fpga], err, fpga, buffer_hbm, buffer_hbmc); 
+	}
 	#endif 
+	// exit(EXIT_SUCCESS);
 
 	#ifndef FPGA_IMPL
 	acts_kernel * acts = new acts_kernel(universalparams);
@@ -807,7 +784,7 @@ long double host::runapp(std::string binaryFile__[2],
 				}
 				#endif 
 				
-				#ifdef _DEBUGMODE_HOSTPRINTS//4
+				#ifdef _DEBUGMODE_HOSTPRINTS4
 				if(profiling0 == true){ 
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ std::cout<<">>> "<<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_<<" imports queue @ fpga "<<fpga<<": "; for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_; t++){ std::cout<<import_Queue[fpga][t].ready_for_import<<", "; } cout<<endl; }
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ std::cout<<">>> "<<universalparams.NUM_UPARTITIONS<<" exports queue @ fpga "<<fpga<<": "; for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t++){ std::cout<<export_Queue[fpga][t].ready_for_export<<", "; } cout<<endl; }
@@ -821,20 +798,20 @@ long double host::runapp(std::string binaryFile__[2],
 					action[fpga].id_import = 0; 
 					action[fpga].id_export = 0; 
 					action[fpga].id_process = launch_idx;
-					action[fpga].size_import_export = universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE; // 
+					action[fpga].size_import_export = IMPORT_EXPORT_GRANULARITY_VECSIZE; // 
 				}
 				
 				// pre-run
 				std::chrono::steady_clock::time_point begin_time2 = std::chrono::steady_clock::now();
 				#ifdef ___PRE_RUN___
-				if(universalparams.NUM_FPGAS_ > 1){
+				if(universalparams.NUM_FPGAS_ > 1){ // FIXME.
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
 						// pre import 
 						import_pointer[fpga] = INVALID_IOBUFFER_ID;
 						action[fpga].id_import = INVALID_IOBUFFER_ID;
-						for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_; t+=universalparams.IMPORT_BATCH_SIZE){
+						for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_; t+=IMPORT_BATCH_SIZE){
 							utilityobj->checkoutofbounds("host::ERROR 2111::", import_Queue[fpga][t].ready_for_import, MAX_NUM_UPARTITIONS, fpga, t, NAp);
-							bool en = true; for(unsigned int k=0; k<universalparams.IMPORT_BATCH_SIZE; k++){ if((import_Queue[fpga][t+k].ready_for_import == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_))){ en = false; break; }} // FIXME?
+							bool en = true; for(unsigned int k=0; k<IMPORT_BATCH_SIZE; k++){ if((import_Queue[fpga][t+k].ready_for_import == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_))){ en = false; break; }} // FIXME?
 							if(en == true){ 
 								import_pointer[fpga] = t;
 								action[fpga].id_import = t; 
@@ -846,9 +823,9 @@ long double host::runapp(std::string binaryFile__[2],
 						process_pointer[fpga] = INVALID_IOBUFFER_ID;
 						action[fpga].id_process = INVALID_IOBUFFER_ID; 
 						if(action[fpga].module != APPLY_UPDATES_MODULE && action[fpga].module != GATHER_FRONTIERS_MODULE){
-							for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_; t+=universalparams.PE_BATCH_SIZE){
+							for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_; t+=PE_BATCH_SIZE){
 								utilityobj->checkoutofbounds("host::ERROR 2112::", process_Queue[fpga][t].ready_for_process, MAX_NUM_UPARTITIONS, fpga, t, NAp);
-								bool en = true; for(unsigned int k=0; k<universalparams.PE_BATCH_SIZE; k++){ if((process_Queue[fpga][t+k].ready_for_process == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_))){ en = false; break; }} // FIXME?
+								bool en = true; for(unsigned int k=0; k<PE_BATCH_SIZE; k++){ if((process_Queue[fpga][t+k].ready_for_process == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_))){ en = false; break; }} // FIXME?
 								if(en == true){
 									process_pointer[fpga] = t;
 									action[fpga].id_process = t; 
@@ -860,18 +837,18 @@ long double host::runapp(std::string binaryFile__[2],
 						
 						// pre gather  
 						if(all_vertices_active_in_all_iterations == false && action[fpga].module == GATHER_FRONTIERS_MODULE){
-							unsigned int was_changed = 0; for(unsigned int k=0; k<universalparams.PE_BATCH_SIZE; k++){ was_changed += processed_vertex_partitions_record[iteration_idx][action[fpga].start_gv + k]; }
+							unsigned int was_changed = 0; for(unsigned int k=0; k<PE_BATCH_SIZE; k++){ was_changed += processed_vertex_partitions_record[iteration_idx][action[fpga].start_gv + k]; }
 							if(was_changed == 0){
-								action[fpga].start_gv = 0; action[fpga].size_gv = 0; 
+								// action[fpga].start_gv = 0; action[fpga].size_gv = 0; 
 							}
 						}
 						
 						// pre export 
 						export_pointer[fpga] = INVALID_IOBUFFER_ID;
 						action[fpga].id_export = INVALID_IOBUFFER_ID;
-						for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=universalparams.EXPORT_BATCH_SIZE){ 
+						for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=EXPORT_BATCH_SIZE){ 
 							utilityobj->checkoutofbounds("host::ERROR 2113::", export_Queue[fpga][t].ready_for_export, MAX_NUM_UPARTITIONS, fpga, t, NAp);
-							bool en = true; for(unsigned int k=0; k<universalparams.EXPORT_BATCH_SIZE; k++){ if((export_Queue[fpga][t+k].ready_for_export == 0) && ((t+k) < universalparams.NUM_UPARTITIONS)){ en = false; break; }} // FIXME?
+							bool en = true; for(unsigned int k=0; k<EXPORT_BATCH_SIZE; k++){ if((export_Queue[fpga][t+k].ready_for_export == 0) && ((t+k) < universalparams.NUM_UPARTITIONS)){ en = false; break; }} // FIXME?
 							if(en == true){
 								export_pointer[fpga] = t;
 								action[fpga].id_export = t; 
@@ -883,7 +860,7 @@ long double host::runapp(std::string binaryFile__[2],
 					#ifdef RUN_SW_KERNEL 				
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
 						if(all_vertices_active_in_all_iterations == false && action[fpga].id_process != INVALID_IOBUFFER_ID){
-							for(unsigned int t=0; t<universalparams.IMPORT_BATCH_SIZE; t++){
+							for(unsigned int t=0; t<IMPORT_BATCH_SIZE; t++){
 								unsigned int p_u = ((action[fpga].start_pu + t) * universalparams.NUM_FPGAS_) + fpga; 
 								mask_i[fpga][t] = 1; // vertex_properties_map[iteration_idx][p_u];
 							}
@@ -897,14 +874,20 @@ long double host::runapp(std::string binaryFile__[2],
 			
 				// Allocate Buffer in Global Memory
 				std::chrono::steady_clock::time_point begin_time3 = std::chrono::steady_clock::now();
-				#ifdef FPGA_IMPL	
+				#ifdef FPGA_IMPL
 				for(unsigned int fpga=0; fpga<device_count; fpga++){ 
-					/// frontier_properties[MAX_NUM_UPARTITIONS / universalparams.NUM_FPGAS_][MAX_NUM_FPGAS][universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE]
-					size_t import_sz = universalparams.NUM_FPGAS_ * universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE; if(action[fpga].id_import == INVALID_IOBUFFER_ID){ import_sz = 16; }
-					size_t export_sz = universalparams.IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE; if(action[fpga].id_export == INVALID_IOBUFFER_ID){ export_sz = 16; }
+					size_t import_id = action[fpga].id_import;
+					size_t export_id = action[fpga].id_export;
+					size_t import_sz = universalparams.NUM_FPGAS_ * IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE; if(action[fpga].id_import == INVALID_IOBUFFER_ID){ import_id = 0; import_sz = 16; }
+					size_t export_sz = IMPORT_EXPORT_GRANULARITY_VECSIZE * HBM_AXI_PACK_SIZE; if(action[fpga].id_export == INVALID_IOBUFFER_ID){ export_id = 0; export_sz = 16; }
 					
-					inBufExt_input[fpga].obj = &frontier_properties[action[fpga].id_import / universalparams.IMPORT_BATCH_SIZE][0][0];
-					inBufExt_output[fpga].obj = &frontier_properties[action[fpga].id_export / universalparams.IMPORT_BATCH_SIZE][fpga][0];	
+					#ifdef _DEBUGMODE_CHECKS3
+					utilityobj->checkoutofbounds("host::ERROR 2113c::", import_id, num_local_upartition_set, import_sz, export_sz, NAp);
+					utilityobj->checkoutofbounds("host::ERROR 2113d::", export_id, num_local_upartition_set, import_sz, export_sz, NAp);
+					#endif 
+					
+					inBufExt_input[fpga].obj = &frontier_properties[import_id / IMPORT_BATCH_SIZE][0][0];
+					inBufExt_output[fpga].obj = &frontier_properties[export_id / IMPORT_BATCH_SIZE][fpga][0];	
 
 					if(profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
 					OCL_CHECK(err, buffer_import[2*fpga + flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
@@ -962,8 +945,8 @@ long double host::runapp(std::string binaryFile__[2],
 					if(action[0].start_pu != NAp) { cout<<"acts started [processing stage]: fpga: "<<fpga<<", start_pu: "<<action[0].start_pu<<", size_pu: "<<action[0].size_pu<<", start_pv_fpga: "<<action[0].start_pv_fpga<<", start_pv: "<<action[0].start_pv<<", size_pv: "<<action[0].size_pv<<", start_gv_fpga: "<<action[0].start_gv_fpga<<", start_gv: "<<action[0].start_gv<<", size_gv: "<<action[0].size_gv<<endl; }
 					if(action[0].start_pv != NAp) { cout<<"acts started [applying stage]: fpga: "<<fpga<<", start_pu: "<<action[0].start_pu<<", size_pu: "<<action[0].size_pu<<", start_pv_fpga: "<<action[0].start_pv_fpga<<", start_pv: "<<action[0].start_pv<<", size_pv: "<<action[0].size_pv<<", start_gv_fpga: "<<action[0].start_gv_fpga<<", start_gv: "<<action[0].start_gv<<", size_gv: "<<action[0].size_gv<<endl; }
 					if(action[0].start_gv != NAp) { cout<<"acts started [gathering stage]: fpga: "<<fpga<<", start_pu: "<<action[0].start_pu<<", size_pu: "<<action[0].size_pu<<", start_pv_fpga: "<<action[0].start_pv_fpga<<", start_pv: "<<action[0].start_pv<<", size_pv: "<<action[0].size_pv<<", start_gv_fpga: "<<action[0].start_gv_fpga<<", start_gv: "<<action[0].start_gv<<", size_gv: "<<action[0].size_gv<<endl; }			
-					if(action[0].id_import != INVALID_IOBUFFER_ID){ cout << "acts started [importing stage]: --> importing upartition: "<<action[0].id_import<<" to "<<action[0].id_import + universalparams.IMPORT_BATCH_SIZE<<"..." <<endl; }
-					if(action[0].id_export != INVALID_IOBUFFER_ID){ cout << "acts started [exporting stage]: <-- exporting vpartition: "<<action[0].id_export<<" to "<<action[0].id_export + universalparams.EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<universalparams.NUM_FPGAS_; n++){ cout<<n<<", "; } cout<<"]..." <<endl; }				
+					if(action[0].id_import != INVALID_IOBUFFER_ID){ cout << "acts started [importing stage]: --> importing upartition: "<<action[0].id_import<<" to "<<action[0].id_import + IMPORT_BATCH_SIZE<<"..." <<endl; }
+					if(action[0].id_export != INVALID_IOBUFFER_ID){ cout << "acts started [exporting stage]: <-- exporting vpartition: "<<action[0].id_export<<" to "<<action[0].id_export + EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<universalparams.NUM_FPGAS_; n++){ cout<<n<<", "; } cout<<"]..." <<endl; }				
 				}
 				#endif 
 				std::chrono::steady_clock::time_point begin_time6 = std::chrono::steady_clock::now();
@@ -988,29 +971,29 @@ long double host::runapp(std::string binaryFile__[2],
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ // universalparams.NUM_FPGAS_ // FIXME.
 						for(unsigned int sub_kernel=0; sub_kernel<NUM_KERNEL_SUBLAUNCHES_PER_LAUNCH; sub_kernel++){ 
 							acts->top_function(
-								(HBM_channelAXI_t *)HBM_axichannel[fpga][0][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][0][1]
+								(HBM_channelAXI_t *)HBM_axichannel[fpga][0][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][0]
 								#if NUM_VALID_HBM_CHANNELS>1
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][1][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][1]
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][2][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][2][1] 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][3][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][3][1] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][1], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][1] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][2], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][2] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][3], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][3] 
 								#if NUM_VALID_HBM_CHANNELS>4 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][4][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][4][1] 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][5][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][5][1] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][4], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][4] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][5], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][5] 
 								#if NUM_VALID_HBM_CHANNELS>6
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][6][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][6][1] 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][7][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][7][1] 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][8][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][8][1] 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][9][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][9][1] 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][10][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][10][1] 
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][11][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][11][1] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][6], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][6] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][7], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][7] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][8], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][8] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][9], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][9] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][10], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][10] 
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][11], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][11] 
 								#if NUM_VALID_HBM_CHANNELS>12
-								,(HBM_channelAXI_t *)HBM_axichannel[fpga][12][0], (HBM_channelAXI_t *)HBM_axichannel[fpga][12][1]
+								,(HBM_channelAXI_t *)HBM_axichannel[fpga][0][12], (HBM_channelAXI_t *)HBM_axichannel[fpga][1][12]
 								#endif 
 								#endif 
 								#endif 
 								#endif 
 								,(HBM_channelAXI_t *)HBM_axicenter[fpga][0], (HBM_channelAXI_t *)HBM_axicenter[fpga][1]
-								,(HBM_channelAXI_t *)&frontier_properties[action[fpga].id_import / universalparams.IMPORT_BATCH_SIZE][0][0], (HBM_channelAXI_t *)&frontier_properties[action[fpga].id_export / universalparams.IMPORT_BATCH_SIZE][fpga][0]
+								,(HBM_channelAXI_t *)&frontier_properties[action[fpga].id_import / IMPORT_BATCH_SIZE][0][0], (HBM_channelAXI_t *)&frontier_properties[action[fpga].id_export / IMPORT_BATCH_SIZE][fpga][0]
 								,fpga ,action[fpga].module ,action[fpga].graph_iteration ,action[fpga].start_pu ,action[fpga].size_pu ,action[fpga].skip_pu ,action[fpga].start_pv_fpga ,action[fpga].start_pv ,action[fpga].size_pv ,action[fpga].start_llpset ,action[fpga].size_llpset ,action[fpga].start_llpid ,action[fpga].size_llpid ,action[fpga].start_gv_fpga ,action[fpga].start_gv ,action[fpga].size_gv ,action[fpga].id_process ,action[fpga].id_import ,action[fpga].id_export ,action[fpga].size_import_export ,action[fpga].status ,universalparams.NUM_FPGAS_			
 								,mask_i[fpga][0] ,mask_i[fpga][1] ,mask_i[fpga][2] ,mask_i[fpga][3] ,mask_i[fpga][4] ,mask_i[fpga][5] ,mask_i[fpga][6] ,mask_i[fpga][7]
 								,final_edge_updates ,report_statistics	
@@ -1038,14 +1021,14 @@ long double host::runapp(std::string binaryFile__[2],
 				double end_time7 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time7).count()) / 1000;	
 				if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::export-frontiers time elapsed : "<<end_time7<<" ms, "<<(end_time7 * 1000)<<" microsecs, "<< RESET << std::endl; }
 				
-				// post-run
+				// post-run 
 				std::chrono::steady_clock::time_point begin_time8 = std::chrono::steady_clock::now();
 				#ifdef ___POST_RUN___
-				if(universalparams.NUM_FPGAS_ > 1){
+				if(universalparams.NUM_FPGAS_ > 1){ // FIXME.
 					// post import: remove partitions just imported from queue; add partitions just imported to process queue 
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
 						if(import_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; }
-						for(unsigned int k=0; k<universalparams.IMPORT_BATCH_SIZE; k++){
+						for(unsigned int k=0; k<IMPORT_BATCH_SIZE; k++){
 							if(import_pointer[fpga] + k < (universalparams.NUM_UPARTITIONS / universalparams.NUM_FPGAS_)){
 								import_Queue[fpga][import_pointer[fpga] + k].ready_for_import -= universalparams.NUM_FPGAS_; 
 								process_Queue[fpga][import_pointer[fpga] + k].tmp_state += universalparams.NUM_FPGAS_;	
@@ -1061,10 +1044,10 @@ long double host::runapp(std::string binaryFile__[2],
 					// post process: remove partitions just processed from queue; indicate that partition has been processed 
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
 						if(process_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; } 
-						for(unsigned int k=0; k<universalparams.PE_BATCH_SIZE; k++){
+						for(unsigned int k=0; k<PE_BATCH_SIZE; k++){
 							if(process_pointer[fpga] + k >= MAX_NUM_UPARTITIONS){ continue; }
 							process_Queue[fpga][process_pointer[fpga] + k].ready_for_process = 0; 
-							for(unsigned int k=0; k<universalparams.PE_BATCH_SIZE; k++){ processed_vertex_partitions_record[iteration_idx][process_pointer[fpga] + k] = 1; } 
+							for(unsigned int k=0; k<PE_BATCH_SIZE; k++){ processed_vertex_partitions_record[iteration_idx][process_pointer[fpga] + k] = 1; } 
 						}
 					}
 					
@@ -1079,7 +1062,7 @@ long double host::runapp(std::string binaryFile__[2],
 					// post export: remove partitions just exported from queue
 					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
 						if(export_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; } // NEWCHANGE.
-						for(unsigned int k=0; k<universalparams.EXPORT_BATCH_SIZE; k++){ 
+						for(unsigned int k=0; k<EXPORT_BATCH_SIZE; k++){ 
 							if(export_pointer[fpga] + k >= MAX_NUM_UPARTITIONS){ continue; }
 							export_Queue[fpga][export_pointer[fpga] + k].ready_for_export = 0; 
 						}
@@ -1087,7 +1070,7 @@ long double host::runapp(std::string binaryFile__[2],
 					
 					// post export: transfer export to imports
 					if(action[0].id_export != INVALID_IOBUFFER_ID){							
-						for(unsigned int k=0; k<universalparams.EXPORT_BATCH_SIZE; k++){ 
+						for(unsigned int k=0; k<EXPORT_BATCH_SIZE; k++){ 
 							unsigned int upartition_id = action[0].id_export + k; 
 							if(upartition_id >= universalparams.NUM_UPARTITIONS){ continue; }
 							import_Queue[upartition_id % universalparams.NUM_FPGAS_][upartition_id / universalparams.NUM_FPGAS_].ready_for_import += universalparams.NUM_FPGAS_; 
@@ -1191,7 +1174,22 @@ long double host::runapp(std::string binaryFile__[2],
 
 	// Copy Result from Device Global Memory to Host Local Memory
 	#ifdef FPGA_IMPL
-	for(unsigned int fpga=0; fpga<device_count; fpga++){ _migrate_device_to_host(&q[fpga], err, fpga, buffer_hbm, buffer_hbmc); }	
+	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+		std::cout << "Getting Results (Device to Host)..." << std::endl;
+		std::chrono::steady_clock::time_point begin_time2 = std::chrono::steady_clock::now();
+		for (int i = 0; i < NUM_HBMC_ARGS; i++) {
+			std::cout << "Copying data @ center channel "<<i<<" (Device to Host)..." << std::endl;
+			#ifdef FPGA_IMPL
+			OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_hbmc[i]}, CL_MIGRATE_MEM_OBJECT_HOST));
+			#endif 
+		}
+		#ifdef FPGA_IMPL
+		OCL_CHECK(err, err = q[fpga].finish());
+		#endif 
+		double end_time2 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time2).count()) / 1000;	
+		std::cout <<">>> read-from-FPGA time elapsed : "<<end_time2<<" ms, "<<(end_time2 * 1000)<<" microsecs, "<<std::endl;
+		// _migrate_device_to_host(&q[fpga], err, fpga, buffer_hbm, buffer_hbmc); 
+	}	
 	#endif 
 			
 	// Wait for all of the OpenCL operations to complete

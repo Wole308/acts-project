@@ -54,7 +54,7 @@ edge3_vec_dt rearrangeLayoutVB(unsigned int s, edge3_vec_dt edge_vec){
 	return edge_vec3;
 }
 
-void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &edgedatabuffer, vector<edge3_type> (&final_edge_updates)[NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS]){			
+void act_pack::load_edgeupdates(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &edgedatabuffer, vector<edge3_type> (&final_edge_updates)[NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS]){			
 	cout<<"=== act_pack: EDGE_PACK_SIZE: "<<EDGE_PACK_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_CHANNEL_PACK_SIZE: "<<HBM_CHANNEL_PACK_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_AXI_PACK_SIZE: "<<HBM_AXI_PACK_SIZE<<" ==="<<endl;
@@ -150,7 +150,7 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 		
 		#ifdef _DEBUGMODE_KERNELPRINTS//4
 		for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u++){
-			for(unsigned int llp_set=0; llp_set<universalparams.NUM_APPLYPARTITIONS; llp_set++){
+			for(unsigned int llp_set=0; llp_set<1; llp_set++){ 
 				if(i==0 && final_edge_updates[i][p_u][llp_set].size() > 0){ cout<<">>> final_edge_updates["<<i<<"]["<<p_u<<"]["<<llp_set<<"].size(): "<<final_edge_updates[i][p_u][llp_set].size()<<""<<endl; }
 			}
 		}

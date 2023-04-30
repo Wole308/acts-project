@@ -19,8 +19,22 @@
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 
 
-// #define NUM_FPGAS {{context['NUM_FPGAs']}} // 8 // 1, 2*, 4, 8
 #define MAX_NUM_FPGAS 8
+#define RUN_IN_ASYNC_MODE {{context['RUN_IN_ASYNC_MODE']}}
+
+//////////////////////////////// FIXME. remove me
+// #define NUM_FPGAS 8 // 2
+
+#define K0 1 // <lowerlimit:1, upperlimit:GF_BATCH_SIZE>
+#define K1 2 // NUM_FPGAS // <lowerlimit:1, upperlimit:NUM_FPGAS*>
+#define AU_BATCH_SIZE 2 // 2*, 11 ///////////////////////////////////////////////////// FIXME.
+#define GF_BATCH_SIZE (AU_BATCH_SIZE * {{context['NUM_PEs']}} ) // 6 (i.e., 24 upartitions)
+#define IMPORT_BATCH_SIZE (GF_BATCH_SIZE / K0) // 6
+#define PE_BATCH_SIZE IMPORT_BATCH_SIZE // 6
+#define EXPORT_BATCH_SIZE (GF_BATCH_SIZE * K1) // 24
+#define IMPORT_EXPORT_GRANULARITY_VECSIZE (IMPORT_BATCH_SIZE * 8184) // NEWCHANGE. 
+
+////////////////////////////////
 
 {%if(context['RUN_IN_ASYNC_MODE']==0)%}
 #define ___SYNC___
@@ -417,13 +431,22 @@ typedef struct {
 	
 	unsigned int NUM_PARTITIONS;
 
-	unsigned int AU_BATCH_SIZE;
-	unsigned int GF_BATCH_SIZE;
-	unsigned int IMPORT_BATCH_SIZE;
-	unsigned int PE_BATCH_SIZE;
-	unsigned int EXPORT_BATCH_SIZE;
-	unsigned int IMPORT_EXPORT_GRANULARITY_VECSIZE; 
+	// unsigned int AU_BATCHV_SIZE; // FIXME.
+	// unsigned int GF_BATCHV_SIZE;
+	// unsigned int IMPORT_BATCHV_SIZE;
+	// unsigned int PE_BATCHV_SIZE;
+	// unsigned int EXPORT_BATCHV_SIZE;
+	// unsigned int IMPORT_EXPORT_GRANULARITYV_VECSIZE; 
 } universalparams_t;
+
+// typedef struct {
+	// unsigned int AU_BATCHV_SIZE; // FIXME.
+	// unsigned int GF_BATCHV_SIZE;
+	// unsigned int IMPORT_BATCHV_SIZE;
+	// unsigned int PE_BATCHV_SIZE;
+	// unsigned int EXPORT_BATCHV_SIZE;
+	// unsigned int IMPORT_EXPORT_GRANULARITYV_VECSIZE; 
+// } async_params_t;
 
 typedef struct {
 	unsigned int BASEOFFSET_VPROP;
