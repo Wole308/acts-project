@@ -3,15 +3,6 @@
 	keyvalue_t nfrontier_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE][MAX_VDATA_SUBPARTITION_VECSIZE]; 
 	#pragma HLS ARRAY_PARTITION variable=nfrontier_buffer complete dim=1
 	#pragma HLS ARRAY_PARTITION variable=nfrontier_buffer complete dim=2
-	unsigned int statsbuffer_maskbased_tmp[NUM_VALID_PEs][EDGE_PACK_SIZE][BLOCKRAM_SIZE];
-	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased_tmp complete dim=1
-	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased_tmp complete dim=2
-	unsigned int statsbuffer_maskbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS][BLOCKRAM_SIZE];
-	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased complete dim=1
-	#pragma HLS ARRAY_PARTITION variable=statsbuffer_maskbased complete dim=2
-	unsigned int statsbuffer_idbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS][BLOCKRAM_SIZE];
-	#pragma HLS ARRAY_PARTITION variable=statsbuffer_idbased complete dim=1 
-	#pragma HLS ARRAY_PARTITION variable=statsbuffer_idbased complete dim=2
 	vtr_t vptr_buffer[NUM_VALID_PEs][VPTR_BUFFER_SIZE];
 	#pragma HLS ARRAY_PARTITION variable=vptr_buffer complete dim=1
 	edge3_type edges_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_BUFFER_SIZE];	
@@ -51,9 +42,6 @@
 #else 
 	keyvalue_t * nfrontier_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
 	keyvalue_t * URAM_frontiers[EDGE_PACK_SIZE]; 
-	unsigned int * statsbuffer_maskbased_tmp[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
-	unsigned int * statsbuffer_maskbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
-	unsigned int * statsbuffer_idbased[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 
 	vtr_t * vptr_buffer[NUM_VALID_PEs]; 
 	edge3_type * edges_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE];
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
@@ -65,9 +53,6 @@
 	keyvalue_t * URAM_updates[NUM_VALID_PEs][EDGE_PACK_SIZE];	
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ nfrontier_buffer[i][v] = new keyvalue_t[MAX_VDATA_SUBPARTITION_VECSIZE]; }}
 	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_frontiers[v] = new keyvalue_t[MAX_APPLYPARTITION_VECSIZE]; }	
-	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ statsbuffer_maskbased_tmp[i][v] = new unsigned int[BLOCKRAM_SIZE]; }}
-	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<MAX_NUM_APPLYPARTITIONS; v++){ statsbuffer_maskbased[i][v] = new unsigned int[BLOCKRAM_SIZE]; }}
-	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<MAX_NUM_APPLYPARTITIONS; v++){ statsbuffer_idbased[i][v] = new unsigned int[BLOCKRAM_SIZE]; }}
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ vptr_buffer[i] = new vtr_t[VPTR_BUFFER_SIZE]; }
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ edges_buffer[i][v] = new edge3_type[EDGE_BUFFER_SIZE]; }}
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
@@ -83,9 +68,6 @@
 unsigned int cfrontier_dram___size[MAX_NUM_UPARTITIONS]; 
 unsigned int nfrontier_dram___size[NUM_VALID_PEs][MAX_NUM_UPARTITIONS];
 #pragma HLS ARRAY_PARTITION variable = nfrontier_dram___size complete dim=1
-unsigned int nfrontier_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE][MAX_NUM_SUBPARTITION_PER_PARTITION]; 
-#pragma HLS ARRAY_PARTITION variable = nfrontier_buffer___size complete dim=1
-#pragma HLS ARRAY_PARTITION variable = nfrontier_buffer___size complete dim=2
 unsigned int updates_tmpbuffer___size[NUM_VALID_PEs][NUM_VALID_PEs]; 
 #pragma HLS ARRAY_PARTITION variable = updates_tmpbuffer___size complete dim=1
 unsigned int updates_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE][MAX_NUM_APPLYPARTITIONS]; 
@@ -116,7 +98,6 @@ unsigned int hybrid_map[MAXNUMGRAPHITERATIONS][MAX_NUM_UPARTITIONS];
 #else 
 unsigned int * cfrontier_dram___size = new unsigned int[MAX_NUM_UPARTITIONS]; 
 unsigned int * nfrontier_dram___size[NUM_VALID_PEs]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ nfrontier_dram___size[i] = new unsigned int[MAX_NUM_UPARTITIONS]; }
-unsigned int * nfrontier_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ nfrontier_buffer___size[i][v] = new unsigned int[MAX_NUM_SUBPARTITION_PER_PARTITION]; }}
 unsigned int updates_tmpbuffer___size[NUM_VALID_PEs][NUM_VALID_PEs]; 
 unsigned int * updates_buffer___size[NUM_VALID_PEs][EDGE_PACK_SIZE]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ updates_buffer___size[i][v] = new unsigned int[MAX_NUM_APPLYPARTITIONS]; }}
 unsigned int stats_buffer___size[NUM_VALID_PEs][MAX_NUM_APPLYPARTITIONS]; 

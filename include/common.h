@@ -2,6 +2,12 @@
 #define COMMON_H
 #include <string.h> 
 #include <cmath> 
+#include <ap_int.h>
+// #include "ap_fixed.h"	
+#include <vector> 
+#include<hls_vector.h> 
+#include<hls_stream.h> 
+#include <iostream>
  
 
  
@@ -12,17 +18,6 @@
 
 #define MAX_NUM_FPGAS 8
 #define RUN_IN_ASYNC_MODE 1
-
-//////////////////////////////// 
-
-#define K0 1 // <lowerlimit:1, upperlimit:GF_BATCH_SIZE>
-#define K1 2 // NUM_FPGAS // <lowerlimit:1, upperlimit:NUM_FPGAS*>
-#define AU_BATCH_SIZE 2 
-#define GF_BATCH_SIZE (AU_BATCH_SIZE * 12 ) // 6 (i.e., 24 upartitions)
-#define IMPORT_BATCH_SIZE (GF_BATCH_SIZE / K0) // 6
-#define PE_BATCH_SIZE IMPORT_BATCH_SIZE // 6
-#define EXPORT_BATCH_SIZE (GF_BATCH_SIZE * K1) // 24
-#define IMPORT_EXPORT_GRANULARITY_VECSIZE 8184
 
 ////////////////////////////////
 
@@ -57,7 +52,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define SW // SWEMU, HW, *SW
+#define HW // SWEMU, HW, *SW
 #if (defined(SWEMU) || defined(HW)) 
 #define FPGA_IMPL
 #endif 
@@ -138,9 +133,8 @@
 
 //////////////// 
 
-// #define NUM_PROCS 2
 #define MAX_NUM_PEs 12
-#define MAX_GLOBAL_NUM_PEs (MAX_NUM_FPGAS * 12)
+#define MAX_GLOBAL_NUM_PEs (MAX_NUM_FPGAS * MAX_NUM_PEs)
 #define NUM_PEs 12		
 #define NUM_VALID_PEs 1
 #define NUM_VALID_HBM_CHANNELS 1
@@ -188,15 +182,11 @@
 #define MAX_APPLYPARTITION_VECSIZE MAX_UPARTITION_VECSIZE
 #define MAX_APPLYPARTITION_SIZE (EDGE_PACK_SIZE * MAX_APPLYPARTITION_VECSIZE) // 131072 
 
-// #define VDATA_SUBPARTITION_VECSIZE (MAX_UPARTITION_VECSIZE / NUM_PEs) // (8184 / 24 = 341)(8184 / 12 = 682)
-// #define VDATA_SUBSUBPARTITION_VECSIZE (1 << 4)
-// #define NUM_SUBPARTITION_PER_PARTITION NUM_PEs
-
 #define MAX_VDATA_SUBPARTITION_VECSIZE (MAX_UPARTITION_VECSIZE / NUM_PEs)
-#define MAX_NUM_SUBPARTITION_PER_PARTITION NUM_PEs
+// #define MAX_NUM_SUBPARTITION_PER_PARTITION NUM_PEs
 
-#define NUM_IMPORT_BUFFERS MAX_NUM_UPARTITIONS // MAX_NUM_UPARTITIONS // 32 // FIXME. AUTOMATE. 
-#define NUM_EXPORT_BUFFERS MAX_NUM_UPARTITIONS // MAX_NUM_UPARTITIONS //32 
+#define NUM_IMPORT_BUFFERS MAX_NUM_UPARTITIONS // 32 // FIXME. AUTOMATE. 
+#define NUM_EXPORT_BUFFERS MAX_NUM_UPARTITIONS //32 
 #define INVALID_IOBUFFER_ID (NUM_IMPORT_BUFFERS - 1) // 511
 
 #define UPDATES_BUFFER_PACK_SIZE MAX(EDGE_PACK_SIZE, NUM_PEs)

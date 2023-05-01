@@ -108,7 +108,7 @@ vtr_t retrieve_vptrbuffer(unsigned int t, MY_IFDEF_VPTRBUFFER()){
 void insert_nfrontierbuffer(unsigned int v, unsigned int t, frontier_t data, MY_IFDEF_NFRONTIER()){
 	#pragma HLS INLINE
 	#ifdef _DEBUGMODE_CHECKS3
-	checkoutofbounds("acts_kernel::ERROR 113::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
+	checkoutofbounds("acts_kernel::ERROR 113::", t, MAX_VDATA_SUBPARTITION_VECSIZE, NAp, NAp, NAp);
 	#endif 
 	nfrontier_buffer[v][t] = data;
 }
@@ -141,68 +141,3 @@ void retrievevec_nfrontierbuffer(unsigned int t, frontier_t data[EDGE_PACK_SIZE]
 	return; 
 }
 
-void insert_statstmpbuffer(unsigned int t, unsigned int v, unsigned int data, MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
-	#pragma HLS INLINE
-	#ifdef _DEBUGMODE_CHECKS3
-	checkoutofbounds("acts_kernel::ERROR 121::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
-	#endif 
-	statsbuffer_maskbased_tmp[v][t] = data;
-}
-unsigned int retrieve_statstmpbuffer(unsigned int t, unsigned int v, MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
-	#pragma HLS INLINE
-	#ifdef _DEBUGMODE_CHECKS3
-	checkoutofbounds("acts_kernel::ERROR 1242::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
-	#endif 
-	return statsbuffer_maskbased_tmp[v][t]; 
-}
-void insertvec_statstmpbuffer(unsigned int t, unsigned int data[EDGE_PACK_SIZE], MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
-	#pragma HLS INLINE
-	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
-	#pragma HLS UNROLL
-		#ifdef _DEBUGMODE_CHECKS3
-		checkoutofbounds("acts_kernel::ERROR 123::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
-		#endif 
-		statsbuffer_maskbased_tmp[v][t] = data[v];
-	}
-}
-void retrievevec_statstmpbuffer(unsigned int t, unsigned int data[EDGE_PACK_SIZE], MY_IFDEF_STATSBUFFERMASKBASED_TMP()){
-	#pragma HLS INLINE
-	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
-	#pragma HLS UNROLL
-		#ifdef _DEBUGMODE_CHECKS3
-		checkoutofbounds("acts_kernel::ERROR 124::", t, MAX_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
-		#endif 
-		data[v] = statsbuffer_maskbased_tmp[v][t];
-	}
-	return; 
-}
-
-void insert_statsbuffer(unsigned int t, unsigned int v, unsigned int data, MY_IFDEF_STATSBUFFERMASKBASED()){	
-	#pragma HLS INLINE
-	#ifdef _DEBUGMODE_CHECKS3
-	checkoutofbounds("acts_kernel::ERROR 125::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
-	#endif 
-	statsbuffer_maskbased[v][t] = data;
-}
-unsigned int retrieve_statsbuffer(unsigned int t, unsigned int v, MY_IFDEF_STATSBUFFERMASKBASED()){
-	#pragma HLS INLINE
-	#ifdef _DEBUGMODE_CHECKS3
-	checkoutofbounds("acts_kernel::ERROR 126::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
-	#endif 
-	return statsbuffer_maskbased[v][t]; 
-}
-
-void insert_stats2buffer(unsigned int t, unsigned int v, unsigned int data, MY_IFDEF_STATSBUFFERIDBASED()){
-	#pragma HLS INLINE
-	#ifdef _DEBUGMODE_CHECKS3
-	checkoutofbounds("acts_kernel::ERROR 127::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
-	#endif 
-	statsbuffer_idbased[v][t] = data;
-}
-unsigned int retrieve_stats2buffer(unsigned int t, unsigned int v, MY_IFDEF_STATSBUFFERIDBASED()){
-	#pragma HLS INLINE
-	#ifdef _DEBUGMODE_CHECKS3
-	checkoutofbounds("acts_kernel::ERROR 128::", t, BLOCKRAM_SIZE, NAp, NAp, NAp);
-	#endif 
-	return statsbuffer_idbased[v][t]; 
-}

@@ -334,8 +334,6 @@ void dinsertmany_nfrontierdram(unsigned int offsets[NUM_VALID_PEs], unsigned int
 	#pragma HLS ARRAY_PARTITION variable=data_ complete dim=0
 	unsigned int offsets_[NUM_VALID_PEs];
 	#pragma HLS ARRAY_PARTITION variable=offsets_ complete
-	bool ens_[NUM_VALID_PEs];
-	#pragma HLS ARRAY_PARTITION variable=ens_ complete
 	for(unsigned int n=0; n<NUM_VALID_PEs; n++){
 	#pragma HLS UNROLL
 		offsets_[n] = offsets[n];
@@ -344,13 +342,8 @@ void dinsertmany_nfrontierdram(unsigned int offsets[NUM_VALID_PEs], unsigned int
 	#pragma HLS UNROLL	
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 		#pragma HLS UNROLL
-			if(ens[n][v] == true){
-				data_[n][2*v] = datas[n][v].key;
-				data_[n][2*v+1] = datas[n][v].value;
-			} else {
-				data_[n][2*v] = INVALIDDATA;
-				data_[n][2*v+1] = INVALIDDATA;
-			}
+			data_[n][2*v] = datas[n][v].key;
+			data_[n][2*v+1] = datas[n][v].value;
 		}
 	}
 	master_insertmany_vec(offsets_, data_, {% include '___HBM___ARGS___.template' %});

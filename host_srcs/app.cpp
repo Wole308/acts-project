@@ -185,6 +185,7 @@ unsigned int load_globalparams2(HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBA
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEDSTVID].data[0] = 16;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__NUM_RUNS].data[0] = 1; // 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs].data[0] = universalparams.GLOBAL_NUM_PEs_; // 
+		// HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs].data[0] = NUM_PEs; // FIXMEEEEEEEEEEEEEEEEEEEEEEE //////////////////////////////////////////
 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___RESETBUFFERSATSTART].data[0] = 1; // FIXME.
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PREPAREEDGEUPDATES].data[0] = 1; //
@@ -216,7 +217,7 @@ unsigned int load_globalparams2(HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBA
 	// exit(EXIT_SUCCESS);
 }
 
-unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2], HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs], 
+unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS], HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs], 
 		vector<edge3_type> (&partitioned_edges)[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS],
 		unsigned int rootvid, unsigned int max_degree,
 		utility * utilityobj, universalparams_t universalparams, unsigned int globalparams[1024]){
@@ -329,11 +330,14 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2], HBM_chann
 	if(min_lenght > lenght){ min_lenght = lenght; }
 	total_lenght += lenght;
 		
+	unsigned int realized_lenght = total_lenght * EDGE_PACK_SIZE;
+	unsigned int ideal_lenght = universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_;
+	unsigned int percentage_increase = (((realized_lenght - ideal_lenght) * 100) / ideal_lenght);
 	cout<<"### app: max_lenght (ww): "<<max_lenght<<", max_lenght: "<<max_lenght * EDGE_PACK_SIZE<<endl;
 	cout<<"### app: min_lenght (ww): "<<min_lenght<<", min_lenght: "<<min_lenght * EDGE_PACK_SIZE<<endl;
-	cout<<"### app: total_lenght (ww): "<<total_lenght<<", total_lenght: "<<total_lenght * EDGE_PACK_SIZE<<" (ideal lenght: "<<universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_<<")"<<endl;
+	cout<<"### app: total_lenght (ww): "<<total_lenght<<", total_lenght: "<<total_lenght * EDGE_PACK_SIZE<<" (ideal lenght: "<<universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_<<") (=>"<<percentage_increase<<" % increase)"<<endl;
 	if(max_lenght - min_lenght > 20000000){ cout<<"app: ERROR 445. max - min > 20000000. EXITING..."<<endl; exit(EXIT_FAILURE); }  
-	// exit(EXIT_SUCCESS);
+	if(percentage_increase > 40){ cout<<"app: ERROR 445. percentage_increase("<<percentage_increase<<") > 40. EXITING..."<<endl; exit(EXIT_FAILURE); }  
 	return max_lenght;
 }
 
@@ -354,17 +358,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	
 	NUM_FPGAS = num_fpgas;
 	universalparams_t mock_universalparams = get_universalparams(algo, num_fpgas, numiterations, rootvid, NAp, NAp, false);
-	cout<<"app::run::  NUM_FPGAS: "<<num_fpgas<<endl;
-	cout<<"app::run::  NUM_PEs: "<<NUM_PEs<<endl;
-	cout<<"app::run::  RUN_IN_ASYNC_MODE: "<<RUN_IN_ASYNC_MODE<<endl;
-	cout<<"app::run::  PE_BATCH_SIZE: "<<PE_BATCH_SIZE<<endl;
-	cout<<"app::run::  GF_BATCH_SIZE: "<<GF_BATCH_SIZE<<endl;
-	cout<<"app::run::  AU_BATCH_SIZE: "<<AU_BATCH_SIZE<<endl;
-	cout<<"app::run::  IMPORT_BATCH_SIZE: "<<IMPORT_BATCH_SIZE<<endl;
-	cout<<"app::run::  EXPORT_BATCH_SIZE: "<<EXPORT_BATCH_SIZE<<endl;
-	// cout<<"app::run::  IMPORT_EXPORT_GRANULARITY_VECSIZE: "<<IMPORT_EXPORT_GRANULARITY_VECSIZE<<endl;
-	// exit(EXIT_SUCCESS);
-	
+
 	std::string binaryFile[2]; binaryFile[0] = _binaryFile1;
 	std::cout << std::setprecision(2) << std::fixed;
 	
@@ -372,7 +366,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	vector<edge_t> vertexptrbuffer;
 
 	HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs]; 
-	HBM_channelAXISW_t * HBM_axicenter[2]; 
+	HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS]; 
 	unsigned int globalparams[1024];
 
 	// allocate AXI HBM memory
@@ -385,9 +379,11 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	}
 	
 	cout<<"app: initializing HBM_axicenters"<<endl;
-	for(unsigned int n=0; n<2; n++){
-		HBM_axicenter[n] = new HBM_channelAXISW_t[HBM_CENTER_SIZE]; 
-		for(unsigned int t=0; t<HBM_CENTER_SIZE; t++){ for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter[n][t].data[v] = 0; }}
+	for(unsigned int i=0; i<MAX_NUM_FPGAS; i++){ 
+		for(unsigned int n=0; n<2; n++){
+			HBM_axicenter[n][i] = new HBM_channelAXISW_t[HBM_CENTER_SIZE]; 
+			for(unsigned int t=0; t<HBM_CENTER_SIZE; t++){ for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter[n][i][t].data[v] = 0; }}
+		}
 	}
 	
 	string GRAPH_NAME = ""; 
@@ -637,7 +633,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	host * hostobj = new host(universalparams);
 	// unsigned int hbm_channel_wwsize = HBM_CHANNEL_SIZE;
 	unsigned int hbm_channel_wwsize = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS]; // HBM_CHANNEL_SIZE
-	hostobj->runapp(binaryFile, edgedatabuffer, vertexptrbuffer, HBM_axichannel, HBM_axicenter, hbm_channel_wwsize, globalparams, universalparams, partitioned_edges);
+	hostobj->runapp(binaryFile, edgedatabuffer, vertexptrbuffer, HBM_axichannel, HBM_axicenter, hbm_channel_wwsize, globalparams, universalparams);
 	
 	// for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ for(unsigned int p_u=0; p_u<MAX_NUM_UPARTITIONS; p_u++){ for(unsigned int llp_set=0; llp_set<MAX_NUM_LLPSETS; llp_set++){ partitioned_edges[i][p_u][llp_set].clear(); }}}
 	return;

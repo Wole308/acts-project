@@ -416,7 +416,7 @@ void save_final_edges(unsigned int cmd, unsigned int base_offset, map_t stats[ED
 
 unsigned int create_act_pack::create_actpack(
 		vector<edge3_type> (&partitioned_edges)[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS], HBM_channelAXISW_t * HBM_channelA[MAX_GLOBAL_NUM_PEs], HBM_channelAXISW_t * HBM_channelB[MAX_GLOBAL_NUM_PEs], map_t * returned_edge_maps[MAX_GLOBAL_NUM_PEs], map_t * returned_vu_map[MAX_GLOBAL_NUM_PEs], unsigned int offset_dest, 
-		unsigned int num_upartitions, unsigned int num_vpartitions, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int cmd
+		unsigned int num_upartitions, unsigned int num_llpset, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int cmd
 		){		
 
 	edge_dtype * URAM_edges[NUM_VALID_PEs][EDGE_PACK_SIZE];for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_edges[i][v] = new edge_dtype[EDGE_UPDATES_DRAMBUFFER_LONGSIZE]; }}
@@ -433,24 +433,24 @@ unsigned int create_act_pack::create_actpack(
 	
 	map_t vupdates_map[MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS];
 	for(unsigned int p_u=0; p_u<num_upartitions; p_u++){	
-		for(unsigned int t=0; t<num_vpartitions; t++){	
+		for(unsigned int t=0; t<num_llpset; t++){	
 			vupdates_map[p_u][t].offset = 0; vupdates_map[p_u][t].size = 0;
 		}
 	}
 	
 	map_t vupdates2_map[MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS];
 	for(unsigned int p_u=0; p_u<num_upartitions; p_u++){	
-		for(unsigned int t=0; t<num_vpartitions; t++){	
+		for(unsigned int t=0; t<num_llpset; t++){	
 			vupdates2_map[p_u][t].offset = 0; vupdates2_map[p_u][t].size = 0;
 		}
 	}
 	
 	unsigned int returned_volume_size = 0; unsigned int returned_volume2_size = 0;
-	CREATE_ACTPACK_BASELOOP1: for(unsigned int p_u=start_pu; p_u<start_pu + size_pu; p_u+=skip_pu){
+	CREATE_ACTPACK_BASELOOP1: for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u+=1){
 		#ifdef _DEBUGMODE_KERNELPRINTS4
-		cout<<"### creating act-pack in upartition "<<p_u<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; 
+		if(p_u < 32){ cout<<"### creating act-pack in upartition "<<p_u<<" (of "<<universalparams.NUM_UPARTITIONS<<"): [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; }
 		#endif 
-		CREATE_ACTPACK_BASELOOP1B: for(unsigned int llp_set=0; llp_set<num_vpartitions; llp_set++){ // num_vpartitions
+		CREATE_ACTPACK_BASELOOP1B: for(unsigned int llp_set=0; llp_set<num_llpset; llp_set++){ // num_llpset
 			if(partitioned_edges[0][p_u][llp_set].size() == 0){ continue; } // NEW FIXME.	
 				
 			#ifdef _DEBUGMODE_KERNELPRINTS//4	
@@ -644,15 +644,17 @@ unsigned int create_act_pack::create_actpack(
 		// exit(EXIT_SUCCESS);
 	} // p_u
 	
-	map_t vertex_updates_map[MAX_NUM_LLPSETS]; 
-	map_t vertex_updates2_map[MAX_NUM_LLPSETS]; 
-	for(unsigned int t=0; t<num_vpartitions+1; t++){ 
+	// map_t vertex_updates_map[MAX_NUM_LLPSETS]; 
+	// map_t vertex_updates2_map[MAX_NUM_LLPSETS]; 
+	map_t vertex_updates_map[16]; 
+	map_t vertex_updates2_map[16]; 
+	for(unsigned int t=0; t<num_llpset+1; t++){ 
 		vertex_updates_map[t].offset=0; vertex_updates_map[t].size=0;
 		vertex_updates2_map[t].offset=0; vertex_updates2_map[t].size=0; 
 	}
 	unsigned int returned_running_size1 = 0;
 	for(unsigned int p_u=0; p_u<num_upartitions; p_u++){	
-		for(unsigned int t=0; t<num_vpartitions; t++){ 
+		for(unsigned int t=0; t<num_llpset; t++){ 
 			#ifdef _DEBUGMODE_KERNELPRINTS//4
 			cout<<"finish: vupdates_map["<<p_u<<"]["<<t<<"].size: "<<vupdates_map[p_u][t].size<<endl;
 			#endif 
@@ -664,32 +666,32 @@ unsigned int create_act_pack::create_actpack(
 			#endif 
 		}
 	}	
-	for(unsigned int t=1; t<num_vpartitions+1; t++){	
+	for(unsigned int t=1; t<num_llpset+1; t++){	
 		vertex_updates_map[t].offset = vertex_updates_map[t-1].offset + vertex_updates_map[t-1].size;	// 35:34
 	}	
-	for(unsigned int t=1; t<num_vpartitions+1; t++){	
+	for(unsigned int t=1; t<num_llpset+1; t++){	
 		vertex_updates2_map[t].offset = vertex_updates2_map[t-1].offset + vertex_updates2_map[t-1].size;	
 	}	
-	unsigned int last_index = num_vpartitions - 1;
+	unsigned int last_index = num_llpset - 1;
 	// vertex_updates2_map[1][0].offset = vertex_updates2_map[last_index].offset + vertex_updates2_map[fpga][last_index].size; 
-	for(unsigned int t=0; t<num_vpartitions+1; t++){	
+	for(unsigned int t=0; t<num_llpset+1; t++){	
 		#ifdef _DEBUGMODE_KERNELPRINTS//4
 		cout<<"finish: vertex_updates_map["<<t<<"].offset: "<<vertex_updates_map[t].offset<<", vertex_updates_map["<<t<<"].size: "<<vertex_updates_map[t].size<<endl;
 		#endif
 	}
-	for(unsigned int t=0; t<num_vpartitions+1; t++){	
+	for(unsigned int t=0; t<num_llpset+1; t++){	
 		vertex_updates_map[t].size = 0;	
 		vertex_updates2_map[t].size = 0;	
 	}
-		for(unsigned int n=0; n<NUM_VALID_PEs; n++){
-			for(unsigned int t=0; t<num_vpartitions; t++){		
-				unsigned int index = t;
-				returned_vu_map[n][index] = vertex_updates2_map[t];
-				#ifdef _DEBUGMODE_KERNELPRINTS//4
-				cout<<"---------- prepare-edge-updates: returned_vu_map["<<n<<"]["<<index<<"].offset: "<<returned_vu_map[n][index].offset<<", returned_vu_map["<<n<<"]["<<index<<"].size: "<<returned_vu_map[n][index].size<<endl; 
-				#endif 
-			}
+	for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+		for(unsigned int t=0; t<num_llpset; t++){		
+			unsigned int index = t;
+			returned_vu_map[n][index] = vertex_updates2_map[t];
+			#ifdef _DEBUGMODE_KERNELPRINTS//4
+			cout<<"---------- prepare-edge-updates: returned_vu_map["<<n<<"]["<<index<<"].offset: "<<returned_vu_map[n][index].offset<<", returned_vu_map["<<n<<"]["<<index<<"].size: "<<returned_vu_map[n][index].size<<endl; 
+			#endif 
 		}
+	}
 	#ifdef _DEBUGMODE_KERNELPRINTS//4
 	cout<<"------------------------ create_act_pack::FINISH: returned_volume_size: "<<returned_volume_size<<", returned_volume_size * EDGE_PACK_SIZE: "<<returned_volume_size * EDGE_PACK_SIZE<<endl;
 	cout<<"------------------------ create_act_pack::FINISH: returned_volume2_size: "<<returned_volume2_size<<", returned_volume2_size * EDGE_PACK_SIZE: "<<returned_volume2_size * EDGE_PACK_SIZE<<endl;

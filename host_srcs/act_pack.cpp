@@ -17,9 +17,13 @@ unsigned int get_local2(unsigned int vid, universalparams_t universalparams){
 unsigned int get_local4(unsigned int vid, universalparams_t universalparams){
 	return (vid / universalparams.GLOBAL_NUM_PEs_) + (vid % 234);
 }
+unsigned int get_local7(unsigned int vid, universalparams_t universalparams){
+	return (vid / universalparams.GLOBAL_NUM_PEs_) + (vid % 234);
+}
 unsigned int get_local(unsigned int s, unsigned int vid, universalparams_t universalparams){
 	if(s==0){ return get_local2(vid, universalparams); }
 	else if (s==1){ return get_local4(vid, universalparams); }
+	else if (s==2){ return get_local7(vid, universalparams); } // FIXME.
 	else { cout<<"act_pack: ERROR 2323: s("<<s<<") option is invalid. EXITING..."<<endl; exit(EXIT_FAILURE); }
 }
 
@@ -28,6 +32,9 @@ unsigned int get_H2(unsigned int vid, universalparams_t universalparams){
 }
 unsigned int get_H4(unsigned int vid, universalparams_t universalparams){
 	return (vid / 234) % universalparams.GLOBAL_NUM_PEs_; // FIXME
+}
+unsigned int get_H7(unsigned int vid, unsigned int ping_pong, universalparams_t universalparams){
+	return ping_pong; // FIXME
 }
 
 unsigned int get_local_to_upartitionn(unsigned int lvid){
@@ -76,8 +83,9 @@ void act_pack::load_edgeupdates(vector<edge_t> &vertexptrbuffer, vector<edge3_ty
 	
 	bool satisfied=false;
 	unsigned int tryy=0;
-	for(tryy=0; tryy<2; tryy++){ // FIXME.
+	for(tryy=2; tryy<3; tryy++){ // FIXME.
 		cout<<"+++ act_pack:: tryy: "<<tryy<<". "<<endl; 
+		unsigned int ping_pong = 0;
 		for(unsigned int vid=0; vid<universalparams.NUM_VERTICES-1; vid++){
 			edge_t vptr_begin = vertexptrbuffer[vid];
 			edge_t vptr_end = vertexptrbuffer[vid+1];
@@ -91,7 +99,9 @@ void act_pack::load_edgeupdates(vector<edge_t> &vertexptrbuffer, vector<edge3_ty
 				if(edge.srcvid >= universalparams.NUM_VERTICES || edge.dstvid >= universalparams.NUM_VERTICES){ continue; } 
 				
 				unsigned int H=0;
-				if(tryy==0){ H = get_H2(edge.dstvid, universalparams); } else{ H = get_H4(edge.dstvid, universalparams); }
+				if(tryy==0){ H = get_H2(edge.dstvid, universalparams); } 
+				else if(tryy==1){ H = get_H4(edge.dstvid, universalparams); }
+				else { H = get_H7(edge.dstvid, ping_pong, universalparams); ping_pong+=1; if(ping_pong >= universalparams.GLOBAL_NUM_PEs_){ ping_pong = 0; } }	// FIXME.				
 				utilityobj->checkoutofbounds("loadedges::ERROR 223::", H, universalparams.GLOBAL_NUM_PEs_, edge.srcvid, edge.dstvid, MAX_UPARTITION_SIZE);
 				
 				edges_in_channel[H].push_back(edge);
@@ -99,6 +109,7 @@ void act_pack::load_edgeupdates(vector<edge_t> &vertexptrbuffer, vector<edge3_ty
 		}
 		#ifdef _DEBUGMODE_HOSTPRINTS4
 		for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ cout<<"act-pack edges:: PE: "<<i<<": edges_in_channel["<<i<<"].size(): "<<edges_in_channel[i].size()<<""<<endl; }
+		cout<<"----- ideal act-pack edges:: "<<(universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_)<<" ----- "<<endl;
 		#endif 
 		unsigned int max=0; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ if(max < edges_in_channel[i].size()){ max = edges_in_channel[i].size(); } }
 		unsigned int min=0xFFFFFFFE; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ if(min > edges_in_channel[i].size()){ min = edges_in_channel[i].size(); } }
