@@ -29,16 +29,16 @@ DATSETS=(
 		# kron_g500-logn20 
 		# rmat_16m_256m 
 		twitter7 
-		rmat_16m_1024m
-		rmat_32m_2048m 
-		sk-2005 
-		uk-2005 
-		com-Friendster
+		# rmat_16m_1024m
+		# rmat_32m_2048m 
+		# sk-2005 
+		# uk-2005 
+		# com-Friendster
 		)
 		
 NUM_FPGAS=(
-		2 
-		4
+		# 2 
+		# 4
 		8
 		)
 		
@@ -48,18 +48,18 @@ NUM_PES=(
 		)
 		
 XCLBINS=(
-		# "/home/oj2zf/Documents/acts-project-debug/outputs/vector_addition.xclbin"
-		# "/home/oj2zf/Documents/acts-project-debug/outputs/vector_addition_ddr.xclbin"
-		"/home/oj2zf/Documents/acts-project-debug/outputs/vector_addition_hbm.xclbin"		
+		# "outputs/vector_addition.xclbin"
+		# "outputs/vector_addition_ddr.xclbin"
+		"outputs/vector_addition_hbm.xclbin"		
 		)
 		
 RUN_IN_ASYNC_MODE=(
-		# 1
-		0
+		1
+		# 0
 		)
 	
-XWARE_ID=1 # 0, 1
-MAX_NUM_ITERATIONS=20
+XWARE_ID=0 # 0, 1
+MAX_NUM_ITERATIONS=1
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do	
@@ -69,25 +69,25 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 			
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host pr ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				./host pr ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				sleep 2
-				cp -rf /home/oj2zf/Documents/acts-project-debug/opencl_summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				# exit
+				cp -rf opencl_summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				exit
 			done
 
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				echo bfs algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host bfs ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_bfs/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				./host bfs ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_bfs/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				sleep 2
-				cp -rf /home/oj2zf/Documents/acts-project-debug/opencl_summary.csv results/results_bfs/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				cp -rf opencl_summary.csv results/results_bfs/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				# exit
 			done
 
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				echo sssp algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host sssp ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				./host sssp ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				sleep 2
-				cp -rf /home/oj2zf/Documents/acts-project-debug/opencl_summary.csv results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				cp -rf opencl_summary.csv results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				# exit
 			done	
 		done

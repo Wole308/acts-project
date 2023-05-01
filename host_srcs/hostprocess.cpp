@@ -24,10 +24,7 @@ int main(int argc, char** argv){
 	#endif
 	
 	app * appobj = new app();	
-	// void run(std::string algorithm, unsigned int numiterations, unsigned int rootvid, string graph_path, int graphisundirected, std::string _binaryFile1);
-	// appobj->run(argv[1], stoi(argv[2]), stoi(argv[3]), stoi(argv[4]), argv[5], argv[6]);
 	appobj->run(argv[1], stoi(argv[2]), stoi(argv[3]), stoi(argv[4]), stoi(argv[5]), argv[6], argv[7]);
-	// appobj->run("nap", "sssp", 1, "/home/oj2zf/Documents/dataset/soc-LiveJournal1.mtx", 1, 16, "NAp");
 	
 	#ifdef _DEBUGMODE_TIMERS3
 	std::cout << endl << "TEST FINISHED" << std::endl; 

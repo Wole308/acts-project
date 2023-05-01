@@ -11,52 +11,49 @@ for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }
 checkoutofbounds("acts_kernel::ERROR 12073::", cfrontier_dram___size[p_u], MAX_APPLYPARTITION_VECSIZE+1, NAp, NAp, NAp);
 #endif 
 
-for(unsigned int remote_fpga=0; remote_fpga<action.numfpgas; remote_fpga++){ // NOTE: merging of frontier properties from different fpgas happen here.
-	READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<cfrontier_dram___size[p_u]; t++){ 
-	#pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1A']}}	
-		{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-		data[{{v}}] = HBM_centerA[uoffset + t].data[{{v}}];
-		{%endfor%}
-		{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-		data[{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_centerB[uoffset + t].data[{{v}}];
-		{%endfor%}	
-		
-		{%for n in context['NUM_VALID_PEs_seq']%}
-		{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-		HBM_channelA{{n % context['HBM_FANOUT']}}[offset_c + t].data[{{v}}] = data[{{v}}];
-		{%endfor%}
-		{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-		HBM_channelB{{n % context['HBM_FANOUT']}}[offset_c + t].data[{{v}}] = data[{{context['HBM_AXI_PACK_SIZE'] + v}}];
-		{%endfor%}
-		{%endfor%}	
-	}
+READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<cfrontier_dram___size[p_u]; t++){ 
+#pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1A']}}	
+	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
+	data[{{v}}] = HBM_centerA[uoffset + t].data[{{v}}];
+	{%endfor%}
+	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
+	data[{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_centerB[uoffset + t].data[{{v}}];
+	{%endfor%}	
+	
+	{%for n in context['NUM_VALID_PEs_seq']%}
+	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
+	HBM_channelA{{n % context['HBM_FANOUT']}}[offset_c + t].data[{{v}}] = data[{{v}}];
+	{%endfor%}
+	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
+	HBM_channelB{{n % context['HBM_FANOUT']}}[offset_c + t].data[{{v}}] = data[{{context['HBM_AXI_PACK_SIZE'] + v}}];
+	{%endfor%}
+	{%endfor%}	
+}
 
-	// parallel-read and map active frontiers [done]
-	MY_LOOP173: for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }
-	unsigned int uoffset = p_u * MAX_UPARTITION_SIZE;
-	READ_FRONTIERS_LOOP2: for(unsigned int t=0; t<cfrontier_dram___size[p_u]; t++){ 
-	#pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1B']}}	
-		dretrievemany_cfrontierdram_tmp(globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], offsets, t, kvdatas, {% include '___HBM___ARGS___.template' %});
-		insertvec_cfrontierbuffer_tmp(t, kvdatas[0], URAM_frontiers); // NEW
-		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
-		#pragma HLS UNROLL 
-			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-			#pragma HLS UNROLL
-				unsigned int srcvid_lpv__ = (kvdatas[inst][v].key - uoffset) >> EDGE_PACK_SIZE_POW;
-				if(kvdatas[inst][v].key != INVALIDDATA && srcvid_lpv__ < MAX_UPARTITION_VECSIZE){
-					unsigned int srcvid_lpv = srcvid_lpv__; 
-					vprop_t tmp; tmp.prop = kvdatas[inst][v].value; tmp.degree = MASK_CODE_PE;
-					insert_vdatabuffer(v, srcvid_lpv, tmp, URAM_vprop[inst]); 
-				}
+// parallel-read and map active frontiers [done]
+for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }
+READ_FRONTIERS_LOOP2: for(unsigned int t=0; t<cfrontier_dram___size[p_u]; t++){ 
+#pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1B']}}	
+	dretrievemany_cfrontierdram_tmp(globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], offsets, t, kvdatas, {% include '___HBM___ARGS___.template' %});
+	insertvec_cfrontierbuffer_tmp(t, kvdatas[0], URAM_frontiers); // NEW
+	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+	#pragma HLS UNROLL 
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+		#pragma HLS UNROLL
+			unsigned int srcvid_lpv__ = (kvdatas[inst][v].key - uoffset) >> EDGE_PACK_SIZE_POW;
+			if(kvdatas[inst][v].key != INVALIDDATA && srcvid_lpv__ < MAX_UPARTITION_VECSIZE){
+				unsigned int srcvid_lpv = srcvid_lpv__; 
+				vprop_t tmp; tmp.prop = kvdatas[inst][v].value; tmp.degree = MASK_CODE_PE;
+				insert_vdatabuffer(v, srcvid_lpv, tmp, URAM_vprop[inst]); 
 			}
 		}
-		
-		#ifdef ___ENABLE___IMPORT_EXPORT___
-		hidden_import_and_export_function(t, import_offset, export_offset, action.size_import_export, HBM_centerA, HBM_centerB, HBM_import, HBM_export, action);
-		#endif 
-		 
-		update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___READ_FRONTIER_PROPERTIES___, 1);
 	}
+	
+	#ifdef ___ENABLE___IMPORT_EXPORT___
+	hidden_import_and_export_function(t, import_offset, export_offset, action.size_import_export, HBM_centerA, HBM_centerB, HBM_import, HBM_export, action);
+	#endif 
+	 
+	update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___READ_FRONTIER_PROPERTIES___, 1);
 }
 
 

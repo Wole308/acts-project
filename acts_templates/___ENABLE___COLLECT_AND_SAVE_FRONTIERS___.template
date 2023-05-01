@@ -1,15 +1,12 @@
-keyvalue_t invalidkv; invalidkv.key = INVALIDDATA; invalidkv.value = INVALIDDATA;
 keyvalue_t frontier_data[NUM_VALID_PEs][EDGE_PACK_SIZE];
 #pragma HLS ARRAY_PARTITION variable = frontier_data complete dim=0
 
-unsigned int start_local_subpartitionID = 0; unsigned int skip_local_subpartitionID = 1;
-
-COLLECT_AND_SAVE_FRONTIERS_LOOP1: for(unsigned int local_subpartitionID=start_local_subpartitionID; local_subpartitionID<NUM_SUBPARTITION_PER_PARTITION; local_subpartitionID+=skip_local_subpartitionID){
-	unsigned int upartitionID = (p_v * NUM_SUBPARTITION_PER_PARTITION) + local_subpartitionID;
+COLLECT_AND_SAVE_FRONTIERS_LOOP1: for(unsigned int local_subpartitionID=0; local_subpartitionID<num_subpartition_per_partition; local_subpartitionID+=1){
+	unsigned int upartitionID = (p_v * num_subpartition_per_partition) + local_subpartitionID;
 	unsigned int foffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + (p_v * MAX_APPLYPARTITION_VECSIZE);
-	unsigned int offset = local_subpartitionID * VDATA_SUBPARTITION_VECSIZE;
+	unsigned int offset = local_subpartitionID * vdata_subpartition_vecsize;
 
-	COLLECT_FRONTIERS_LOOP: for(unsigned int t=0; t<VDATA_SUBPARTITION_VECSIZE; t++){
+	COLLECT_FRONTIERS_LOOP: for(unsigned int t=0; t<vdata_subpartition_vecsize; t++){
 	#pragma HLS PIPELINE II={{context['II_COLLECT_FRONTIERS_LOOP1B']}}
 		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 		#pragma HLS UNROLL
@@ -28,7 +25,7 @@ COLLECT_AND_SAVE_FRONTIERS_LOOP1: for(unsigned int local_subpartitionID=start_lo
 		update_bramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___, 1);
 	}
 	
-	SAVE_FRONTIERS_LOOP: for(unsigned int t=0; t<VDATA_SUBPARTITION_VECSIZE; t++){
+	SAVE_FRONTIERS_LOOP: for(unsigned int t=0; t<vdata_subpartition_vecsize; t++){
 	#pragma HLS PIPELINE II={{context['II_SAVE_FRONTIERS_LOOP2B']}}
 		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 		#pragma HLS UNROLL
@@ -43,7 +40,10 @@ COLLECT_AND_SAVE_FRONTIERS_LOOP1: for(unsigned int local_subpartitionID=start_lo
 	
 	for(unsigned int n=0; n<NUM_VALID_PEs; n++){
 	#pragma HLS UNROLL
-		nfrontier_dram___size[n][upartitionID] = VDATA_SUBPARTITION_VECSIZE; 
+		#ifdef _DEBUGMODE_CHECKS3
+		checkoutofbounds("acts_kernel::ERROR 76021::", upartitionID, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
+		#endif 
+		nfrontier_dram___size[n][upartitionID] = vdata_subpartition_vecsize; 
 	}
 }
 				

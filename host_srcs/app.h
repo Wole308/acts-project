@@ -35,6 +35,7 @@ public:
 	void finish();
 	
 	void run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, int graphisundirected, unsigned int numiterations, string graph_path, std::string _binaryFile1);
+	void run2(std::string algo, unsigned int num_fpgas, unsigned int rootvid, int graphisundirected, unsigned int numiterations, string graph_path, std::string _binaryFile1);
 	
 	void summary();
 	

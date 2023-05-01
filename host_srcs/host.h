@@ -34,8 +34,8 @@ public:
 	
 	long double runapp(std::string binaryFile[2], 
 		vector<edge3_type> &edgedatabuffer, vector<edge_t> &vertexptrbuffer, 
-			HBM_channelAXISW_t * HBM_axichannel[MAX_NUM_FPGAS][2][NUM_PEs], HBM_channelAXISW_t * HBM_axicenter[MAX_NUM_FPGAS][2], unsigned int hbm_channel_wwsize, unsigned int globalparams[1024], universalparams_t universalparams,			
-				vector<edge3_type> (&final_edge_updates)[NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS]);	
+			HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs], HBM_channelAXISW_t * HBM_axicenter[2], unsigned int hbm_channel_wwsize, unsigned int globalparams[1024], universalparams_t universalparams,			
+				vector<edge3_type> (&final_edge_updates)[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS]);	
 	
 private:
 	utility * utilityobj;

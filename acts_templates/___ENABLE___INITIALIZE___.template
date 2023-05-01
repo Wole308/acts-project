@@ -1,13 +1,4 @@
-unsigned int maxGraphIter = 0;
-unsigned int total_num_actvvs = 0; 
-#ifdef ___ENABLE___COLLECTACTIVEDSTVIDS___
-bool enable___collectactivedstvids = true;
-#else 
-bool enable___collectactivedstvids = false; // false
-#endif 
 unsigned int max_limit = 0, max_limit2 = 0; 
-unsigned int CONST1 = NUM_PEs * EDGE_PACK_SIZE; 
-unsigned int CONST2 = VDATA_SUBPARTITION_VECSIZE * NUM_PEs * EDGE_PACK_SIZE;
 for(unsigned int k=0; k<2; k++){ for(unsigned int t=0; t<32; t++){ _NUMCLOCKCYCLES_[k][t] = 0; } }
 unsigned int total_cycles = 0;
 

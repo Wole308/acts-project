@@ -24,11 +24,11 @@ public:
 	~act_pack();
 	
 	void pack(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &edgedatabuffer, 
-		vector<edge3_vec_dt> (&act_pack_edges)[NUM_PEs], map_t * act_pack_map[NUM_PEs][MAX_NUM_UPARTITIONS], map_t * act_pack_map2[NUM_PEs][MAX_NUM_UPARTITIONS],
-		vector<edge3_vec_dt> (&act_pack_edgeudates)[NUM_PEs], map_t * act_pack_edgeudates_map[NUM_PEs][MAX_NUM_UPARTITIONS]
+		vector<edge3_vec_dt> (&act_pack_edges)[MAX_GLOBAL_NUM_PEs], map_t * act_pack_map[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS], map_t * act_pack_map2[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS],
+		vector<edge3_vec_dt> (&act_pack_edgeudates)[MAX_GLOBAL_NUM_PEs], map_t * act_pack_edgeudates_map[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS]
 		);
 		
-	void load_edgeupdates(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &edgedatabuffer, vector<edge3_type> (&final_edge_updates)[NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS]);
+	void load_edgeupdates(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &edgedatabuffer, vector<edge3_type> (&final_edge_updates)[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS]);				
 
 private:
 	utility * utilityobj;
