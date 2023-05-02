@@ -890,11 +890,19 @@ long double host::runapp(std::string binaryFile__[2],
 				// Allocate Buffer in Global Memory
 				std::chrono::steady_clock::time_point begin_time3 = std::chrono::steady_clock::now();
 				#ifdef FPGA_IMPL
-				for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+				size_t import_sz = 0; size_t export_sz = 0; size_t import_batch_size = 0; size_t export_batch_size = 0;
+				for(unsigned int fpga=0; fpga<device_count; fpga++){ 					
 					size_t import_id = action[fpga].id_import;
 					size_t export_id = action[fpga].id_export;
-					size_t import_sz = MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; if(action[fpga].id_import == INVALID_IOBUFFER_ID){ import_id = 0; import_sz = 16; }
-					size_t export_sz = MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; if(action[fpga].id_export == INVALID_IOBUFFER_ID){ export_id = 0; export_sz = 16; } // NOTE: export from an FPGA only carries portion of a upartition
+					
+					import_batch_size = _IMPORT_BATCH_SIZE; if(import_batch_size >= universalparams.NUM_UPARTITIONS){ import_batch_size = universalparams.NUM_UPARTITIONS; }
+					export_batch_size = _EXPORT_BATCH_SIZE; if(export_batch_size >= universalparams.NUM_UPARTITIONS){ export_batch_size = universalparams.NUM_UPARTITIONS; }
+					
+					import_sz = import_batch_size * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; 
+					export_sz = export_batch_size * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; 
+					
+					if(action[fpga].id_import == INVALID_IOBUFFER_ID){ import_id = 0; import_sz = 16; }
+					if(action[fpga].id_export == INVALID_IOBUFFER_ID){ export_id = 0; export_sz = 16; } // NOTE: export from an FPGA only carries portion of a upartition
 					// import_id = 0; export_id = 0; import_sz = 16; export_sz = 16; // FIXME.
 					
 					#ifdef _DEBUGMODE_CHECKS3 
@@ -902,10 +910,8 @@ long double host::runapp(std::string binaryFile__[2],
 					utilityobj->checkoutofbounds("host::ERROR 2113d::", export_id, MAX_NUM_UPARTITIONS, import_sz, export_sz, NAp);
 					#endif 
 					
-					inBufExt_input[fpga].obj = &frontier_properties[import_id][0][0];
-					inBufExt_output[fpga].obj = &frontier_properties[export_id][0][0];	
-					// inBufExt_input[fpga].obj = &frontier_properties[0][0][0];
-					// inBufExt_output[fpga].obj = &frontier_properties[0][0][0];	
+					inBufExt_input[fpga].obj = &frontier_properties[0][0][0]; // &frontier_properties[import_id][0][0];
+					inBufExt_output[fpga].obj = &frontier_properties[0][0][0]; // &frontier_properties[export_id][0][0];	
 
 					if(profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
 					OCL_CHECK(err, buffer_import[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
@@ -963,8 +969,8 @@ long double host::runapp(std::string binaryFile__[2],
 					if(action[0].start_pu != NAp) { cout<<"acts started [processing stage]: fpga: "<<fpga<<", start_pu: "<<action[0].start_pu<<" [id_process: "<<action[0].id_process<<"], size_pu: "<<action[0].size_pu<<", start_pv: "<<action[0].start_pv<<", size_pv: "<<action[0].size_pv<<", start_gv: "<<action[0].start_gv<<", size_gv: "<<action[0].size_gv<<endl; }
 					if(action[0].start_pv != NAp) { cout<<"acts started [applying stage]: fpga: "<<fpga<<", start_pu: "<<action[0].start_pu<<", size_pu: "<<action[0].size_pu<<", start_pv: "<<action[0].start_pv<<", size_pv: "<<action[0].size_pv<<", start_gv: "<<action[0].start_gv<<", size_gv: "<<action[0].size_gv<<endl; }
 					if(action[0].start_gv != NAp) { cout<<"acts started [gathering stage]: fpga: "<<fpga<<", start_pu: "<<action[0].start_pu<<", size_pu: "<<action[0].size_pu<<", start_pv: "<<action[0].start_pv<<", size_pv: "<<action[0].size_pv<<", start_gv: "<<action[0].start_gv<<", size_gv: "<<action[0].size_gv<<endl; }			
-					if(action[0].id_import != INVALID_IOBUFFER_ID){ cout << "acts started [importing stage]: --> importing upartition: "<<action[0].id_import<<" to "<<action[0].id_import + _IMPORT_BATCH_SIZE<<"..." <<endl; }
-					if(action[0].id_export != INVALID_IOBUFFER_ID){ cout << "acts started [exporting stage]: <-- exporting vpartition: "<<action[0].id_export<<" to "<<action[0].id_export + _EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<universalparams.NUM_FPGAS_; n++){ cout<<n<<", "; } cout<<"]..." <<endl; }				
+					if(action[0].id_import != INVALID_IOBUFFER_ID){ cout << "acts started [importing stage]: --> importing upartition: "<<action[0].id_import<<" to "<<action[0].id_import + _IMPORT_BATCH_SIZE<<" (import_batch_size: "<<import_batch_size<<", import_sz: "<<import_sz<<")..." <<endl; }
+					if(action[0].id_export != INVALID_IOBUFFER_ID){ cout << "acts started [exporting stage]: <-- exporting vpartition: "<<action[0].id_export<<" to "<<action[0].id_export + _EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<universalparams.NUM_FPGAS_; n++){ cout<<n<<", "; } cout<<"]... (export_batch_size: "<<export_batch_size<<", export_sz: "<<export_sz<<")" <<endl; }				
 				}
 				#endif 
 				std::chrono::steady_clock::time_point begin_time6 = std::chrono::steady_clock::now();
