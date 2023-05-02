@@ -293,8 +293,10 @@ MY_IFDEF_TOPLEVELFUNC(){
 	unsigned int export_offset = action.id_export * action.size_import_export;
 	unsigned int vdata_subpartition_vecsize = MAX_UPARTITION_VECSIZE / globalparams[GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs];
 	unsigned int num_subpartition_per_partition = globalparams[GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs];
-	// cout<<"acts kernel- vdata_subpartition_vecsize: "<<vdata_subpartition_vecsize<<endl;
-	// cout<<"acts kernel- num_subpartition_per_partition: "<<num_subpartition_per_partition<<endl;
+	#ifdef _DEBUGMODE_KERNELPRINTS//4
+	cout<<"acts kernel- vdata_subpartition_vecsize: "<<vdata_subpartition_vecsize<<endl;
+	cout<<"acts kernel- num_subpartition_per_partition: "<<num_subpartition_per_partition<<endl;
+	#endif 
 	
 	// load vertex-updates map 
 	LOAD_UPDATEPTRS_lOOP1: for(unsigned int fpga=0; fpga<action.numfpgas; fpga++){
