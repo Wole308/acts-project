@@ -624,17 +624,15 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	unsigned int lastww_addr2 = load_globalparams2(HBM_axichannel, globalparams, universalparams, rootvid, NAp, utilityobj);
 	print_globalparams(globalparams, universalparams, utilityobj);
 
-	//Free 
-	// edgedatabuffer.clear();
-	// vertexptrbuffer.clear();
-	// exit(EXIT_SUCCESS); 
-
 	cout<<"app -------------------------------------------- SEEN 101."<<endl;
 	host * hostobj = new host(universalparams);
 	// unsigned int hbm_channel_wwsize = HBM_CHANNEL_SIZE;
 	unsigned int hbm_channel_wwsize = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS]; // HBM_CHANNEL_SIZE
-	hostobj->runapp(binaryFile, edgedatabuffer, vertexptrbuffer, HBM_axichannel, HBM_axicenter, hbm_channel_wwsize, globalparams, universalparams);
+	hostobj->runapp(graph_path, binaryFile, edgedatabuffer, vertexptrbuffer, HBM_axichannel, HBM_axicenter, hbm_channel_wwsize, globalparams, universalparams);
 	
+	//Free 
+	// edgedatabuffer.clear();
+	// vertexptrbuffer.clear();
 	// for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ for(unsigned int p_u=0; p_u<MAX_NUM_UPARTITIONS; p_u++){ for(unsigned int llp_set=0; llp_set<MAX_NUM_LLPSETS; llp_set++){ partitioned_edges[i][p_u][llp_set].clear(); }}}
 	return;
 }

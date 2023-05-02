@@ -32,7 +32,7 @@ public:
 	host(universalparams_t _universalparams);
 	~host();
 	
-	long double runapp(std::string binaryFile[2], 
+	long double runapp(string graph_path, std::string binaryFile[2], 
 		vector<edge3_type> &edgedatabuffer, vector<edge_t> &vertexptrbuffer, 
 			HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs], HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS], unsigned int hbm_channel_wwsize, unsigned int globalparams[1024], universalparams_t universalparams);	
 	
