@@ -463,11 +463,12 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	#endif 
 	
     // load binary to FPGA 
+	unsigned int device_count = universalparams.NUM_FPGAS_;
 	#ifdef FPGA_IMPL
     std::cout << "Creating Context..." << std::endl;
     auto devices = xcl::get_xil_devices();
     bool valid_device = false;
-	unsigned int device_count = devices.size(); // FIXME.
+	device_count = devices.size(); // FIXME.
 	unsigned int num_u280_devices = 0; 
 	for(unsigned int fpga=0; fpga<devices.size(); fpga++){ if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_xdma_201920_3"){ num_u280_devices += 1; }}
 	device_count = num_u280_devices;
@@ -521,8 +522,8 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		for(unsigned int i=0; i<NUM_VALID_PEs; i++){ // NUM_VALID_PEs // FIXME.
 			for(unsigned int t=0; t<hbm_channel_wwsize; t++){ 
 				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ 
-					utilityobj->checkoutofbounds("host::ERROR 7121a::", t*HBM_AXI_PACK_SIZE + v, ARRAY_SIZE, ARRAY_SIZE, NAp, NAp);
-					utilityobj->checkoutofbounds("host::ERROR 7121b::", t, HBM_CHANNEL_SIZE, ARRAY_SIZE, NAp, NAp);		
+					// utilityobj->checkoutofbounds("host::ERROR 7121a::", t*HBM_AXI_PACK_SIZE + v, ARRAY_SIZE, ARRAY_SIZE, NAp, NAp);
+					// utilityobj->checkoutofbounds("host::ERROR 7121b::", t, HBM_CHANNEL_SIZE, ARRAY_SIZE, NAp, NAp);		
 				}				
 				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axichannel_vector[fpga][2*i][t*HBM_AXI_PACK_SIZE + v] = HBM_axichannel[0][(fpga * NUM_PEs) + i][t].data[v]; } // FIXME.
 				for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axichannel_vector[fpga][2*i+1][t*HBM_AXI_PACK_SIZE + v] = HBM_axichannel[1][(fpga * NUM_PEs) + i][t].data[v]; }
@@ -532,8 +533,8 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
 		for(unsigned int t=0; t<hbm_channel_wwsize; t++){ 
 			for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ 
-				utilityobj->checkoutofbounds("host::ERROR 7121c::", t*HBM_AXI_PACK_SIZE + v, ARRAY_SIZE, ARRAY_SIZE, NAp, NAp);
-				utilityobj->checkoutofbounds("host::ERROR 7121d::", t, HBM_CHANNEL_SIZE, ARRAY_SIZE, NAp, NAp);	
+				// utilityobj->checkoutofbounds("host::ERROR 7121c::", t*HBM_AXI_PACK_SIZE + v, ARRAY_SIZE, ARRAY_SIZE, NAp, NAp);
+				// utilityobj->checkoutofbounds("host::ERROR 7121d::", t, HBM_CHANNEL_SIZE, ARRAY_SIZE, NAp, NAp);	
 			}
 			for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter_vector[fpga][0][t*HBM_AXI_PACK_SIZE + v] = HBM_axicenter[0][fpga][t].data[v]; }
 			for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter_vector[fpga][1][t*HBM_AXI_PACK_SIZE + v] = HBM_axicenter[1][fpga][t].data[v]; }
@@ -634,6 +635,27 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		}
 	}
 	#endif
+	
+	#ifdef FPGA_IMPL
+	std::cout << "Creating I/O Buffers..." << std::endl;
+	for(unsigned int fpga=0; fpga<device_count; fpga++){
+		for(unsigned int flag=0; flag<2; flag++){
+			inBufExt_input[fpga].obj = &vertex_properties[0];
+			inBufExt_output[fpga].obj = &vertex_properties[0];
+			
+			unsigned int import_sz = _IMPORT_BATCH_SIZE * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; 
+			unsigned int export_sz = (_EXPORT_BATCH_SIZE * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_; // NOTE: fewer things to export than to import
+
+			if(profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
+			OCL_CHECK(err, buffer_import[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
+											(import_sz * sizeof(int)), &inBufExt_input[fpga], &err)); 
+			
+			if(profiling0 == true){ std::cout << "Creating Export Buffers..." << std::endl; }
+			OCL_CHECK(err, buffer_export[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
+											(export_sz * sizeof(int)), &inBufExt_output[fpga], &err)); 
+		}
+	}
+	#endif 
 	
 	// Set Kernel Arguments
 	#ifdef FPGA_IMPL
@@ -889,7 +911,6 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			
 				// Allocate Buffer in Global Memory
 				std::chrono::steady_clock::time_point begin_time3 = std::chrono::steady_clock::now();
-				#ifdef FPGA_IMPL
 				size_t import_sz = 0; size_t export_sz = 0; size_t import_batch_size = 0; size_t export_batch_size = 0;
 				for(unsigned int fpga=0; fpga<device_count; fpga++){ 					
 					size_t import_id = action[fpga].id_import;
@@ -899,29 +920,41 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 					export_batch_size = _EXPORT_BATCH_SIZE; if(export_batch_size >= universalparams.NUM_UPARTITIONS){ export_batch_size = universalparams.NUM_UPARTITIONS; }
 					
 					import_sz = import_batch_size * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; 
-					export_sz = export_batch_size * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; 
+					export_sz = (export_batch_size * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_; // NOTE: fewer things to export than to import
 					
-					if(action[fpga].id_import == INVALID_IOBUFFER_ID){ import_id = 0; import_sz = 16; }
-					if(action[fpga].id_export == INVALID_IOBUFFER_ID){ export_id = 0; export_sz = 16; } // NOTE: export from an FPGA only carries portion of a upartition
-					import_id = 0; export_id = 0; import_sz = 16; export_sz = 16; // FIXME.
+					if(action[fpga].id_import == INVALID_IOBUFFER_ID){ import_id = 0; import_sz = 16; import_batch_size = 0; }
+					if(action[fpga].id_export == INVALID_IOBUFFER_ID){ export_id = 0; export_sz = 16; export_batch_size = 0; } 
+					// import_id = 0; export_id = 0; import_sz = 16; export_sz = 16; // FIXME.
+					
+					if(fpga==0){ 
+						// cout<<"--- report_statistics[___CODE___IMPORT_BATCH_SIZE___]: "<<report_statistics[___CODE___IMPORT_BATCH_SIZE___]<<endl;
+						// cout<<"--- import_batch_size: "<<import_batch_size<<endl;
+						report_statistics[___CODE___IMPORT_BATCH_SIZE___] += import_batch_size;
+						report_statistics[___CODE___EXPORT_BATCH_SIZE___] += export_batch_size;
+					}
 					
 					#ifdef _DEBUGMODE_CHECKS3 
 					utilityobj->checkoutofbounds("host::ERROR 2113c::", import_id, MAX_NUM_UPARTITIONS, import_sz, export_sz, NAp);
 					utilityobj->checkoutofbounds("host::ERROR 2113d::", export_id, MAX_NUM_UPARTITIONS, import_sz, export_sz, NAp);
+					utilityobj->checkoutofbounds("host::ERROR 2113e::", import_sz, (MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE), import_sz, export_sz, NAp);
+					utilityobj->checkoutofbounds("host::ERROR 2113f::", export_sz, (MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE), import_sz, export_sz, NAp);
 					#endif 
 					
-					inBufExt_input[fpga].obj = &frontier_properties[0][0][0]; // &frontier_properties[import_id][0][0];
-					inBufExt_output[fpga].obj = &frontier_properties[0][0][0]; // &frontier_properties[export_id][0][0];	
+					#ifdef FPGA_IMPL
+					// inBufExt_input[fpga].obj = &frontier_properties[0][0][0]; // &frontier_properties[import_id][0][0];
+					// inBufExt_output[fpga].obj = &frontier_properties[0][0][0]; // &frontier_properties[export_id][0][0];	
+					inBufExt_input[fpga].obj = &vertex_properties[0];
+					inBufExt_output[fpga].obj = &vertex_properties[0];
 
-					if(profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
+					/* if(profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
 					OCL_CHECK(err, buffer_import[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
 													(import_sz * sizeof(int)), &inBufExt_input[fpga], &err)); 
 					
 					if(profiling0 == true){ std::cout << "Creating Export Buffers..." << std::endl; }
 					OCL_CHECK(err, buffer_export[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
-													(export_sz * sizeof(int)), &inBufExt_output[fpga], &err)); 
+													(export_sz * sizeof(int)), &inBufExt_output[fpga], &err));  */
+					#endif 
 				}
-				#endif
 				double end_time3 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time3).count()) / 1000;	
 				if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::allocate-buffer-in-global-memory time elapsed "<<end_time3<<" ms, "<<(end_time3 * 1000)<<" microsecs, "<< RESET << std::endl; }
 				
@@ -953,7 +986,11 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 				#ifdef FPGA_IMPL
 				if(profiling0 == true){ std::cout << "Host to FPGA Transfer..." << std::endl; }
 				for(unsigned int fpga=0; fpga<device_count; fpga++){ 
-					OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_import[fpga][flag]}, 0, nullptr, &write_event[fpga]));
+					if(import_sz < 64){
+						write_event[fpga] = CL_COMPLETE;
+					} else {
+						OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_import[fpga][flag]}, 0, nullptr, &write_event[fpga]));
+					} 
 					set_callback(write_event[fpga], "ooo_queue");
 					#ifdef ___SYNC___
 					OCL_CHECK(err, err = write_event[fpga].wait()); 
@@ -1035,8 +1072,12 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 				if(profiling0 == true){ std::cout << "FPGA to Host Transfer..." << std::endl; }
 				for(unsigned int fpga=0; fpga<device_count; fpga++){ 
 					std::vector<cl::Event> eventList; eventList.push_back(kernel_events[fpga][flag]);
-					OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_export[fpga][flag]}, CL_MIGRATE_MEM_OBJECT_HOST, &eventList,
-															&read_events[fpga][flag]));			
+					if(export_sz < 64){
+						read_events[fpga][flag] = CL_COMPLETE;
+					} else {
+						OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_export[fpga][flag]}, CL_MIGRATE_MEM_OBJECT_HOST, &eventList,
+																&read_events[fpga][flag]));			
+					}
 					set_callback(read_events[fpga][flag], "ooo_queue");
 					#ifdef ___SYNC___ // FIXME
 					OCL_CHECK(err, err = read_events[fpga][flag].wait()); 
@@ -1144,6 +1185,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	
 	double end_time = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time).count()) / 1000;	
 	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<end_time<<" ms, "<<(end_time * 1000)<<" microsecs, "<< RESET << std::endl;
+	// std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Throughput (MTEPS) = " << (universalparams.NUM_EDGES / end_time / num_iterations) / 1000 << " MTEPS, Throughput (BTEPS) = " << (universalparams.NUM_EDGES / end_time / num_iterations) / 1000000 << " BTEPS "<< RESET << std::endl;			
 	
 	unsigned int total_vertices_processed = 0; for(unsigned int iter=0; iter<num_iterations; iter++){ total_vertices_processed += vertices_processed[iter]; cout<<"host:: number of active vertices in iteration "<<iter<<": "<<(unsigned int)vertices_processed[iter]<<endl; } cout<<"host:: total: "<<total_vertices_processed<<endl;
 	unsigned int total_edges_processed = 0; for(unsigned int iter=0; iter<num_iterations; iter++){ total_edges_processed += edges_processed[iter]; cout<<"host:: number of edges processed in iteration "<<iter<<": "<<(unsigned int)edges_processed[iter]<<endl; } cout<<"host:: total: "<<total_edges_processed<<endl;
@@ -1159,6 +1201,18 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	cout<<"*"<<(report_statistics[___CODE___SAVE_DEST_PROPERTIES___] * EDGE_PACK_SIZE * universalparams.GLOBAL_NUM_PEs_) / num_iterations<<", ";
 	cout<<"*"<<(report_statistics[___CODE___GATHER_FRONTIERINFOS___] * EDGE_PACK_SIZE) / num_iterations<<"";
 	cout<<"][Per FPGA / iteration]"<<endl;
+	
+	// cout<<"[IMPORT_BATCH_SIZE, EXPORT_BATCH_SIZE, IMPORT_SIZE, EXPORT_SIZE, NUM_UPARTITIONS, NUM_APPLYPARTITIONS]"<<endl;		
+	cout<<"[IMPORT_BATCH_SIZE, EXPORT_BATCH_SIZE, NUM_UPARTITIONS, NUM_APPLYPARTITIONS]"<<endl;	
+	cout<<">>> [";
+	cout<<"*"<<(report_statistics[___CODE___IMPORT_BATCH_SIZE___]) / num_iterations<<", ";
+	cout<<"*"<<(report_statistics[___CODE___EXPORT_BATCH_SIZE___]) / num_iterations<<", ";
+	cout<<"*"<<(report_statistics[___CODE___IMPORT_BATCH_SIZE___] / num_iterations) * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE<<", ";
+	cout<<"*"<<(report_statistics[___CODE___EXPORT_BATCH_SIZE___] / num_iterations) * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE<<", ";
+	cout<<"*"<<universalparams.NUM_UPARTITIONS<<", ";
+	cout<<"*"<<universalparams.NUM_APPLYPARTITIONS<<", ";
+	cout<<"][Per FPGA / iteration]"<<endl;
+	
 	#ifdef _DEBUGMODE_HOSTPRINTS//4
 	cout<<">>> [";
 	cout<<""<<(report_statistics[___CODE___READ_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE * universalparams.NUM_FPGAS_) / num_iterations<<", ";
@@ -1178,6 +1232,8 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		cout<<"--- "<<active_vertices_in_iteration[1][t].A<<" active vertices processed in iteration "<<t<<" in "<<active_vertices_in_iteration[1][t].B<<" ms  [FPGA]"<<endl; 
 	}
 	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<total_time<<" ms, "<<(total_time * 1000)<<" microsecs, "<< RESET << std::endl;
+	
+	
 	if(all_vertices_active_in_all_iterations == false){ 
 		cout<<"host:: Software-Only mode"<<endl;
 		unsigned int total_time = 0;
@@ -1200,7 +1256,9 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		} 
 		std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<total_time<<" ms, "<<(total_time * 1000)<<" microsecs, "<< RESET << std::endl;
 	}
-
+	
+	std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Throughput (MTEPS) = " << (universalparams.NUM_EDGES / (end_time / num_iterations)) / 1000 << " MTEPS, Throughput (BTEPS) = " << (universalparams.NUM_EDGES / (end_time / num_iterations)) / 1000000 << " BTEPS "<< RESET << std::endl;			
+	
 	// Copy Result from Device Global Memory to Host Local Memory
 	#ifdef FPGA_IMPL
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
@@ -1230,7 +1288,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		OCL_CHECK(err, err = q[fpga].finish());
 	}
 	#endif
-
+	
 	printf("TEST %s\n", "PASSED");
     return EXIT_SUCCESS;
 }

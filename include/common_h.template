@@ -135,6 +135,8 @@
 #define ___CODE___NUMBER_OF_EDGEUPDATES_LOADED___ 15
 #define ___CODE___NUMBER_OF_EDGEUPDATES_APPLIED___ 16
 #define ___CODE___NUMBER_OF_NEW_EDGEUPDATES_ADDED___ 17
+#define ___CODE___IMPORT_BATCH_SIZE___ 18
+#define ___CODE___EXPORT_BATCH_SIZE___ 19
 
 //////////////// 
 
