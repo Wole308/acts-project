@@ -17,10 +17,11 @@
 #endif 
 
 #define MAX_NUM_FPGAS 8
-#define RUN_IN_ASYNC_MODE 1
+#define RUN_IN_ASYNC_MODE 0
 
 ////////////////////////////////
 
+#define ___SYNC___
 	
 
 #define ALL_MODULES 222

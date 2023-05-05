@@ -1,0 +1,34 @@
+HEADER
+VTF File Version,1.1
+VTF File Type,1
+PID,24590
+Generated on,2023-05-04 23:28:57
+Resolution,ms
+Min Resolution,ns
+Trace Version,1.1
+TraceID,24591
+XRT  Version,2.14.354
+Tool Version,2022.2
+Platform,
+Target,System Run
+
+STRUCTURE
+Group_Start,
+Group_End,
+
+MAPPING
+8,clCreateCommandQueue
+7,clCreateContext
+9,clCreateProgramWithBinary
+4,clGetDeviceIDs
+6,clGetDeviceInfo
+1,clGetExtensionFunctionAddress
+2,clGetExtensionFunctionAddressForPlatform
+3,clGetPlatformInfo
+10,clReleaseDevice
+5,clRetainDevice
+
+EVENTS
+
+DEPENDENCIES
+

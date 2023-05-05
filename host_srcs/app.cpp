@@ -126,7 +126,6 @@ void print_globalparams(unsigned int globalparams[1024], universalparams_t unive
 	utilityobj->checkoutofbounds("app::ERROR 2234::", lastww_addr, HBM_CHANNEL_SIZE, universalparams.NUM_APPLYPARTITIONS, MAX_APPLYPARTITION_VECSIZE, NAp);
 	cout<<"app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_VERTICES: "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_VERTICES]<<endl;
 	cout<<"app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_EDGES: "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_EDGES]<<endl;
-	cout<<"app -------------------------------------------- SEEN 606."<<endl;
 	#endif 
 	return;
 	// exit(EXIT_SUCCESS);
@@ -338,6 +337,7 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 	cout<<"### app: total_lenght (ww): "<<total_lenght<<", total_lenght: "<<total_lenght * EDGE_PACK_SIZE<<" (ideal lenght: "<<universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_<<") (=>"<<percentage_increase<<" % increase)"<<endl;
 	if(max_lenght - min_lenght > 20000000){ cout<<"app: ERROR 445. max - min > 20000000. EXITING..."<<endl; exit(EXIT_FAILURE); }  
 	if(percentage_increase > 40){ cout<<"app: ERROR 445. percentage_increase("<<percentage_increase<<") > 40. EXITING..."<<endl; exit(EXIT_FAILURE); }  
+	// exit(EXIT_SUCCESS);/////////////////////////////////////
 	return max_lenght;
 }
 
@@ -624,7 +624,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	unsigned int lastww_addr2 = load_globalparams2(HBM_axichannel, globalparams, universalparams, rootvid, NAp, utilityobj);
 	print_globalparams(globalparams, universalparams, utilityobj);
 
-	cout<<"app -------------------------------------------- SEEN 101."<<endl;
+	// exit(EXIT_SUCCESS);///////////////////
 	host * hostobj = new host(universalparams);
 	// unsigned int hbm_channel_wwsize = HBM_CHANNEL_SIZE;
 	unsigned int hbm_channel_wwsize = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS]; // HBM_CHANNEL_SIZE

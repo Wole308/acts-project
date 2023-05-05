@@ -445,8 +445,9 @@ unsigned int create_act_pack::create_actpack(
 		}
 	}
 	
-	unsigned int returned_volume_size = 0; unsigned int returned_volume2_size = 0;
-	CREATE_ACTPACK_BASELOOP1: for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u+=1){
+	unsigned int returned_volume_size = 0; unsigned int returned_volume2_size[NUM_VALID_PEs]; for(unsigned int t=0; t<NUM_VALID_PEs; t++){ returned_volume2_size[t] = 0; }
+	CREATE_ACTPACK_BASELOOP1: for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u+=1){ 
+	// CREATE_ACTPACK_BASELOOP1: for(unsigned int p_u=0; p_u<1; p_u+=1){ // FIXME.
 		#ifdef _DEBUGMODE_KERNELPRINTS4
 		if(p_u < 32){ cout<<"### creating act-pack in upartition "<<p_u<<" (of "<<universalparams.NUM_UPARTITIONS<<"): [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; }
 		#endif 
@@ -596,13 +597,13 @@ unsigned int create_act_pack::create_actpack(
 					}
 				} else {
 					#ifdef _DEBUGMODE_KERNELPRINTS4_CREATEACTPACT // NUM_LLP_PER_LLPSET
-					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (before): edges_map[n]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
+					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (before): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
 					#endif 	
 					for(unsigned int i=0; i<NUM_VALID_PEs; i++){
 						save_final_edges(cmd, offset_dest, stats[i], URAM_edges[i], edges_map[i], edges_dmap[i], HBM_channelA[i], HBM_channelB[i], universalparams);	
 					}
 					#ifdef _DEBUGMODE_KERNELPRINTS4_CREATEACTPACT
-					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (after): edges_map[n]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
+					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (after): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
 					#endif 
 				}	
 
@@ -616,7 +617,7 @@ unsigned int create_act_pack::create_actpack(
 							cout<<"---------- prepare-edge-updates: running_offset["<<n<<"]: "<<running_offset[n]<<""<<endl; 
 							#endif 
 							running_offset[n] += edges_map[n][llp_id].size;
-							returned_volume2_size += edges_map[n][llp_id].size;
+							returned_volume2_size[n] += edges_map[n][llp_id].size;
 						}
 						
 						map_t edge_map_vec[NUM_VALID_PEs];
@@ -692,14 +693,14 @@ unsigned int create_act_pack::create_actpack(
 			#endif 
 		}
 	}
-	#ifdef _DEBUGMODE_KERNELPRINTS//4
+	#ifdef _DEBUGMODE_KERNELPRINTS4
 	cout<<"------------------------ create_act_pack::FINISH: returned_volume_size: "<<returned_volume_size<<", returned_volume_size * EDGE_PACK_SIZE: "<<returned_volume_size * EDGE_PACK_SIZE<<endl;
-	cout<<"------------------------ create_act_pack::FINISH: returned_volume2_size: "<<returned_volume2_size<<", returned_volume2_size * EDGE_PACK_SIZE: "<<returned_volume2_size * EDGE_PACK_SIZE<<endl;
+	for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"------------------------ create_act_pack::FINISH: returned_volume2_size["<<n<<"]: "<<returned_volume2_size[n]<<", returned_volume2_size["<<n<<"] * EDGE_PACK_SIZE: "<<returned_volume2_size[n] * EDGE_PACK_SIZE<<endl; }
 	#endif 
 	// return running_offset[0];
 	// exit(EXIT_SUCCESS);
 	// return returned_volume_size;
-	return returned_volume2_size;
+	return returned_volume2_size[0];
 }
 
 

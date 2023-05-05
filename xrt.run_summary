@@ -1,0 +1,30 @@
+{
+    "schema_version": {
+        "major": "1",
+        "minor": "3",
+        "patch": "0"
+    },
+    "generation": {
+        "this_file": "\/home\/oj2zf\/Documents\/acts-project\/xrt.run_summary",
+        "source": "vp",
+        "PID": "24590",
+        "timestamp": "1683257337325",
+        "flags": [
+            ""
+        ]
+    },
+    "files": [
+        {
+            "name": "opencl_trace.csv",
+            "type": "VP_TRACE"
+        },
+        {
+            "name": "device_trace_0.csv",
+            "type": "VP_TRACE"
+        },
+        {
+            "name": "summary.csv",
+            "type": "PROFILE_SUMMARY"
+        }
+    ]
+}
