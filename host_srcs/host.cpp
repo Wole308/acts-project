@@ -96,7 +96,7 @@ using std::vector;
 #define RUN_FPGA_KERNEL
 
 #define ___PRE_RUN___
-#define ___POST_RUN___ // FIXME.
+#define ___POST_RUN___ // FIXME. 
 
 // #define ___SYNC___ //////////////////////////////////////////////////////////////////////////////////
 
@@ -330,6 +330,38 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 	}
 	return index;
 }
+unsigned int load_actions_coarse(unsigned int fpga, action_t * actions[MAX_NUM_FPGAS], unsigned int _PE_BATCH_SIZE, unsigned int _AU_BATCH_SIZE, unsigned int _IMPORT_BATCH_SIZE, universalparams_t universalparams){
+	action_t action;
+	
+	action.module = ALL_MODULES;
+	action.graph_iteration = NAp;
+	
+	action.start_pu = 0;
+	action.size_pu = universalparams.NUM_UPARTITIONS;
+	action.skip_pu = 1;
+	
+	action.start_pv_fpga = NAp;
+	action.start_pv = 0;
+	action.size_pv = universalparams.NUM_APPLYPARTITIONS;; // FIXME.
+	
+	action.start_gv_fpga = NAp;
+	action.start_gv = 0; 
+	action.size_gv = universalparams.NUM_UPARTITIONS; // FIXME.
+	
+	action.start_llpset = NAp; 
+	action.size_llpset = NAp; 
+	action.start_llpid = NAp; 
+	action.size_llpid = NAp; 
+	
+	action.id_process = INVALID_IOBUFFER_ID;
+	action.id_import = INVALID_IOBUFFER_ID;
+	action.id_export = INVALID_IOBUFFER_ID;
+	action.size_import_export = _IMPORT_BATCH_SIZE; 
+	action.status = 0;
+	
+	actions[fpga][0] = action;
+	return 1;
+}
 
 void initialize_Queue(bool all_vertices_active_in_all_iterations, gas_import_t * import_Queue[MAX_NUM_FPGAS], gas_process_t * process_Queue[MAX_NUM_FPGAS], gas_export_t * export_Queue[MAX_NUM_FPGAS], universalparams_t universalparams){
 	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
@@ -389,6 +421,7 @@ void run_traversal_algorithm_in_software(unsigned int GraphIter, vector<value_t>
 			edges_processed[GraphIter] += 1; 
 		}
 	}
+	// exit(EXIT_SUCCESS);
 	return; 
 }
 
@@ -470,15 +503,12 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
     bool valid_device = false;
 	device_count = devices.size(); // FIXME.
 	unsigned int num_u280_devices = 0; 
-	// for(unsigned int fpga=0; fpga<devices.size(); fpga++){ if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_xdma_201920_3"){ num_u280_devices += 1; }}
-	for(unsigned int fpga=0; fpga<devices.size(); fpga++){ 
-		
-		cout<<"--------------------- FPGA "<<fpga<<" device name: "<<devices[fpga].getInfo<CL_DEVICE_NAME>()<<endl;
-		
-		
-		if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_gen3x16_xdma_base_1"){ num_u280_devices += 1; }} // xilinx_u280_gen3x16_xdma_base_1 // xilinx_u280_gen3x16_xdma_1_202211_1
-		
-		
+
+	for(unsigned int fpga=0; fpga<devices.size(); fpga++){  
+		cout<<"host:: FPGA "<<fpga<<" device name: "<<devices[fpga].getInfo<CL_DEVICE_NAME>()<<endl;
+		if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_gen3x16_xdma_base_1"){ num_u280_devices += 1; } // xilinx_u280_xdma_201920_3
+	} 
+
 	device_count = num_u280_devices;
 	cout<<"------------------------------------------- host: "<<device_count<<" devices found. -------------------------------------------"<<endl;
 	if(device_count==0){ cout<<"host: ERROR 234. no FPGA devices found. EXITING..."<<endl; exit(EXIT_FAILURE); }
@@ -515,6 +545,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
         exit(EXIT_FAILURE);
     }
 	#endif 
+	// exit(EXIT_SUCCESS);/////////////////////////////////
 
     // variables 
     size_t bytes_per_iteration = ARRAY_SIZE * sizeof(int);
@@ -722,13 +753,14 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	unsigned int num_launches = 0;
 	action_t * actions[MAX_NUM_FPGAS]; for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ actions[fpga] = new action_t[1024]; }
 	for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-		num_launches = load_actions_fine(fpga, actions, _PE_BATCH_SIZE, _AU_BATCH_SIZE, _IMPORT_BATCH_SIZE, universalparams);
+		if(universalparams.NUM_FPGAS_ == 1){ num_launches = load_actions_coarse(fpga, actions, _PE_BATCH_SIZE, _AU_BATCH_SIZE, _IMPORT_BATCH_SIZE, universalparams); } 
+		else { num_launches = load_actions_fine(fpga, actions, _PE_BATCH_SIZE, _AU_BATCH_SIZE, _IMPORT_BATCH_SIZE, universalparams); }
 	}
 
 	// Run kernel in CPU-only environment
 	#ifdef RUN_SW_KERNEL
 	actvvs.clear(); actvvs_nextit.clear(); 
-	actvvs.push_back(1);
+	actvvs.push_back(universalparams.ROOTVID);
 	for(unsigned int i=0; i<128; i++){ vertices_processed[i] = 0; edges_processed[i] = 0; } 
 	for(unsigned int i=0; i<universalparams.NUM_VERTICES; i++){ vdatas[i] = 0xFFFFFFFF; }
 	for(unsigned int i=0; i<actvvs.size(); i++){ vdatas[actvvs[i]] = 0; }
@@ -736,7 +768,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	tuple_t active_vertices_in_iteration[2][128]; for(unsigned int i=0; i<128; i++){ active_vertices_in_iteration[0][i].A = 0; active_vertices_in_iteration[0][i].B = 0; active_vertices_in_iteration[1][i].A = 0; active_vertices_in_iteration[1][i].B = 0; } 
 	active_vertices_in_iteration[0][0].A = 1;
 	unsigned int GraphIter;
-	for (GraphIter = 0; GraphIter < 16; GraphIter++) {
+	for (GraphIter = 0; GraphIter < 16; GraphIter++){
 		std::chrono::steady_clock::time_point begin_time0 = std::chrono::steady_clock::now();
 		
 		for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t++){ vpartition_stats[t].A = 0; vpartition_stats[t].B = 0; }
@@ -767,6 +799,9 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	
 	bool enable_import = true; bool enable_export = true; //for(unsigned int t=0; t<2; t++){ enable_export[t] = true; }
 	bool read_events_bool[MAX_NUM_FPGAS][2]; for(unsigned int t=0; t<MAX_NUM_FPGAS; t++){ for(unsigned int k=0; k<2; k++){ read_events_bool[t][k] = false; }}
+	
+	actvvs.clear(); actvvs_nextit.clear(); 
+	actvvs.push_back(universalparams.ROOTVID);
 	
 	// Run kernel in FPGA/CPU environment
 	std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
@@ -1211,6 +1246,13 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	cout<<"*"<<(report_statistics[___CODE___SAVE_DEST_PROPERTIES___] * EDGE_PACK_SIZE * universalparams.GLOBAL_NUM_PEs_) / num_iterations<<", ";
 	cout<<"*"<<(report_statistics[___CODE___GATHER_FRONTIERINFOS___] * EDGE_PACK_SIZE) / num_iterations<<"";
 	cout<<"][Per FPGA / iteration]"<<endl;
+	
+	cout<<"[NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]"<<endl;																									
+	cout<<">>> [";
+	cout<<"*"<<(report_statistics[___CODE___NUMBER_OF_EDGE_INSERTIONS___] * EDGE_PACK_SIZE) / num_iterations<<", ";
+	cout<<"*"<<(report_statistics[___CODE___NUMBER_OF_EDGE_UPDATINGS___] * EDGE_PACK_SIZE) / num_iterations<<", ";
+	cout<<"*"<<(report_statistics[___CODE___NUMBER_OF_EDGE_DELETIONS___] * EDGE_PACK_SIZE) / num_iterations<<", ";
+	cout<<"][Per FPGA / iteration]"<<endl;
 		
 	cout<<"[IMPORT_BATCH_SIZE, EXPORT_BATCH_SIZE, NUM_UPARTITIONS, NUM_APPLYPARTITIONS]"<<endl;	
 	cout<<">>> [";
@@ -1242,7 +1284,6 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	}
 	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<total_time<<" ms, "<<(total_time * 1000)<<" microsecs, "<< RESET << std::endl;
 	
-	
 	if(all_vertices_active_in_all_iterations == false){ 
 		cout<<"host:: Software-Only mode"<<endl;
 		unsigned int total_time = 0;
@@ -1268,7 +1309,9 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	
 	std::cout << endl << TIMINGRESULTSCOLOR << ">>> "<<": Number of edges: " << universalparams.NUM_EDGES << ", time elapsed per iteration = " << end_time / num_iterations << " ms "<< RESET << std::endl;			
 	std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Throughput (MTEPS) = " << (universalparams.NUM_EDGES / (end_time / num_iterations)) / 1000 << " MTEPS, Throughput (BTEPS) = " << (universalparams.NUM_EDGES / (end_time / num_iterations)) / 1000000 << " BTEPS "<< RESET << std::endl;			
-	
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Edge-update Throughput (MUEPS) = " << ((universalparams.NUM_UPARTITIONS * universalparams.NUM_APPLYPARTITIONS * NUM_PEs * universalparams.NUM_FPGAS_ * 512 * 16) / (end_time / num_iterations)) / 1000 << " MUEPS, Throughput (BTEPS) = " << ((universalparams.NUM_UPARTITIONS * universalparams.NUM_APPLYPARTITIONS * NUM_PEs * universalparams.NUM_FPGAS_ * 512 * 16) / (end_time / num_iterations)) / 1000000 << " BTEPS "<< RESET << std::endl;			
+	#endif 
 	// Copy Result from Device Global Memory to Host Local Memory
 	#ifdef FPGA_IMPL
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ 

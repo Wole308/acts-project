@@ -22,13 +22,6 @@
 	#pragma HLS ARRAY_PARTITION variable=URAM_vprop complete dim=2 
 	// #pragma HLS aggregate variable=URAM_vprop 
 
-	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-	edge_update_type URAM_edgeupdates[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE];	
-	#pragma HLS resource variable=URAM_edgeupdates core=XPM_MEMORY uram 
-	#pragma HLS ARRAY_PARTITION variable=URAM_edgeupdates complete dim=1	
-	#pragma HLS ARRAY_PARTITION variable=URAM_edgeupdates complete dim=2	
-	#endif 
-	
 	map_t URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE];
 	#pragma HLS resource variable=URAM_map core=XPM_MEMORY uram 
 	#pragma HLS ARRAY_PARTITION variable=URAM_map complete dim=1	
@@ -44,9 +37,6 @@
 	keyvalue_t * URAM_frontiers[EDGE_PACK_SIZE]; 
 	vtr_t * vptr_buffer[NUM_VALID_PEs]; 
 	edge3_type * edges_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE];
-	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-	edge_update_type * URAM_edgeupdates[NUM_VALID_PEs][EDGE_PACK_SIZE];
-	#endif 
 	map_t * URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE];
 	keyvalue_t * updates_buffer2[NUM_VALID_PEs][UPDATES_BUFFER_PACK_SIZE]; 
 	vprop_t * URAM_vprop[NUM_VALID_PEs][EDGE_PACK_SIZE];
@@ -55,13 +45,28 @@
 	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_frontiers[v] = new keyvalue_t[MAX_APPLYPARTITION_VECSIZE]; }	
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ vptr_buffer[i] = new vtr_t[VPTR_BUFFER_SIZE]; }
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ edges_buffer[i][v] = new edge3_type[EDGE_BUFFER_SIZE]; }}
-	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_edgeupdates[i][v] = new edge_update_type[EDGE_UPDATES_DRAMBUFFER_SIZE]; }}
-	#endif 
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_map[i][v] = new map_t[EDGE_UPDATES_DRAMBUFFER_SIZE]; }}
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<UPDATES_BUFFER_PACK_SIZE; v++){ updates_buffer2[i][v] = new keyvalue_t[UPDATES_BUFFER_SIZE]; }}
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_vprop[i][v] = new vprop_t[MAXVALID_APPLYPARTITION_VECSIZE]; }}
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_updates[i][v] = new keyvalue_t[8192]; }}
+#endif 
+
+// offset_t edgeupdatesptrs[NUM_VALID_PEs][1024];
+// #pragma HLS ARRAY_PARTITION variable=edgeupdatesptrs complete dim=1
+
+#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+#ifdef ___RUNNING_FPGA_SYNTHESIS___ 
+	edge_update_type URAM_edgeupdates[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE];	
+	#pragma HLS resource variable=URAM_edgeupdates core=XPM_MEMORY uram 
+	#pragma HLS ARRAY_PARTITION variable=URAM_edgeupdates complete dim=1	
+	#pragma HLS ARRAY_PARTITION variable=URAM_edgeupdates complete dim=2	
+#else 
+	edge_update_type * URAM_edgeupdates[NUM_VALID_PEs][EDGE_PACK_SIZE];
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_edgeupdates[i][v] = new edge_update_type[EDGE_UPDATES_DRAMBUFFER_SIZE]; }}
+#endif 
+unsigned int edgeupdates_hash_ids[NUM_VALID_PEs][EDGE_PACK_SIZE][BLOCKRAM_SIZE];	
+#pragma HLS ARRAY_PARTITION variable=edgeupdates_hash_ids complete dim=1
+#pragma HLS ARRAY_PARTITION variable=edgeupdates_hash_ids complete dim=2
 #endif 
 
 #ifdef FPGA_IMPL	
@@ -149,8 +154,10 @@ unsigned int vid_first0[NUM_VALID_PEs];
 unsigned int vid_first1[NUM_VALID_PEs]; 
 #pragma HLS ARRAY_PARTITION variable = vid_first1 complete
 unsigned int globalparams[GLOBALBUFFER_SIZE];
-map_t updatesptrs[MAX_NUM_FPGAS][MAX_NUM_LLPSETS];
+map_t updatesptrs[MAX_NUM_FPGAS][64]; // MAX_NUM_LLPSETS];
 #pragma HLS ARRAY_PARTITION variable = updatesptrs complete dim=1
+offset_t edgeupdatesptrs[NUM_VALID_PEs][EDGE_UPDATES_PTR_MAXSIZE];
+#pragma HLS ARRAY_PARTITION variable=edgeupdatesptrs complete dim=1
 unsigned int limits[NUM_VALID_PEs];
 #pragma HLS ARRAY_PARTITION variable = limits complete
 unsigned int max_limits[NUM_VALID_PEs];

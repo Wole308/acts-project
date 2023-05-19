@@ -95,7 +95,7 @@ void act_pack::load_edgeupdates(vector<edge_t> &vertexptrbuffer, vector<edge3_ty
 			
 			for(unsigned int i=0; i<edges_size; i++){
 				edge3_type this_edge = edgedatabuffer[vptr_begin + i];
-				edge3_type edge; edge.srcvid = this_edge.srcvid; edge.dstvid = this_edge.dstvid; edge.valid = 1;
+				edge3_type edge; edge.srcvid = this_edge.srcvid; edge.dstvid = this_edge.dstvid; 
 				if(edge.srcvid >= universalparams.NUM_VERTICES || edge.dstvid >= universalparams.NUM_VERTICES){ continue; } 
 				
 				unsigned int H=0;

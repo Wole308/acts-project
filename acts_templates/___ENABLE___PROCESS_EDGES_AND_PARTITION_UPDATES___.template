@@ -2,7 +2,7 @@ unsigned int offsets[NUM_VALID_PEs];
 #pragma HLS ARRAY_PARTITION variable = offsets complete
 offset_t offset_partition[NUM_VALID_PEs][EDGE_PACK_SIZE][MAX_NUM_APPLYPARTITIONS];
 #pragma HLS ARRAY_PARTITION variable=offset_partition complete dim=1	
-#pragma HLS ARRAY_PARTITION variable=offset_partition complete dim=2	
+#pragma HLS ARRAY_PARTITION variable=offset_partition complete dim=2
 map_t edge_maps[NUM_VALID_PEs];
 #pragma HLS ARRAY_PARTITION variable=edge_maps complete	
 keyvalue_t update_in[NUM_VALID_PEs][EDGE_PACK_SIZE];
@@ -25,7 +25,7 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 		
 	EC_PROCESS_EDGES_LOOP1B: for(unsigned int llp_id=0; llp_id<1; llp_id++){ // NUM_LLP_PER_LLPSET
 		// load edges map
-		#ifdef ___NOT_YET_IMPLEMENTED___
+		#ifdef ___NOT_YET_IMPLEMENTED___ 
 		load_edgemaps((p_u * MAX_NUM_LLP_PER_UPARTITION) + (llp_set * NUM_LLP_PER_LLPSET) + llp_id, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS2], edge_maps, {% include '___HBM___ARGS___.template' %});
 		#endif 
 		
@@ -137,19 +137,30 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 						}
 					}
 					
-					for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 	
-					#pragma HLS UNROLL
-						offsets3[inst] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][partition].offset + updatesptrs[0][partition].size + t;
-					}
+					unsigned int offset___ = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][partition].offset + updatesptrs[0][partition].size + t;
 					
 					#ifdef _DEBUGMODE_CHECKS3	
-					checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offsets3[0], globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[0][partition].size, NAp); 
+					checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[0][partition].size, NAp); 
 					#endif	
-					dinsertmany_updatesdram(offsets3, update_out, {% include '___HBM___ARGS___.template' %});
+					dinsertmany_updatesdram(offset___, update_out, {% include '___HBM___ARGS___.template' %});
 				}
 				
 				updatesptrs[0][partition].size += offset_partition[0][0][partition].size;
 			}
+			
+			// record updates 
+			#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+			unsigned int offset = (p_u * globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]);
+			for(unsigned int partition=0; partition<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; partition++){
+				for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 	
+					#pragma HLS UNROLL
+					#ifdef _DEBUGMODE_CHECKS3	
+					checkoutofbounds("acts_kernel::process-edges::ERROR 88137::", offset + partition, EDGE_UPDATES_PTR_MAXSIZE, NAp, offset, partition); 
+					#endif	
+					edgeupdatesptrs[inst][offset + partition].size += offset_partition[0][0][partition].size;
+				}
+			}
+			#endif
 		}
 		
 		// collect stats
@@ -159,7 +170,6 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 	// exit(EXIT_SUCCESS); 
 }
 // exit(EXIT_SUCCESS); 
-
 
 
 						

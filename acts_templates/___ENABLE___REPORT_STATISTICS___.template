@@ -1,7 +1,7 @@
 #ifdef _DEBUGMODE_CHECKS3 
 
 #ifdef _DEBUGMODE_KERNELPRINTS4
-if(action.status == 1 && action.fpga < num_prints){ 
+if(action.fpga < num_prints){ 
 	cout<<"[acts: READ_FRONTIERS, ";
 	cout<<"PROCESSEDGES, "; 
 	cout<<"READ_DESTS, "; 
@@ -9,11 +9,11 @@ if(action.status == 1 && action.fpga < num_prints){
 	cout<<"COLLECT_FRONTIERS, "; 
 	cout<<"SAVE_DEST, "; 
 	cout<<"GATHER_FRONTIERS] "; 
-	// cout<<"[IMPORT_FRONTIERS, "; 
-	// cout<<"EXPORT_FRONTIERS] "; 
 	cout<<endl;
 }																										
+#endif 
 
+#ifdef _DEBUGMODE_KERNELPRINTS4
 if(action.fpga < num_prints){ 
 cout<<">>> [Per FPGA][";
 cout<<_NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
@@ -23,40 +23,32 @@ cout<<_NUMCLOCKCYCLES_[0][___CODE___APPLYUPDATES___] * EDGE_PACK_SIZE<<", ";
 cout<<_NUMCLOCKCYCLES_[0][___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE * NUM_PEs<<", ";
 cout<<_NUMCLOCKCYCLES_[0][___CODE___SAVE_DEST_PROPERTIES___] * EDGE_PACK_SIZE * NUM_PEs<<", ";
 cout<<_NUMCLOCKCYCLES_[0][___CODE___GATHER_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___IMPORT_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___EXPORT_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
 cout<<"]";
 cout<<endl;
 }
-
-// cout<<">>> [";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___RESETBUFFERSATSTART___]<<", ";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___ECPROCESSEDGES___] * EDGE_PACK_SIZE<<", ";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___READ_DEST_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___APPLYUPDATES___] * EDGE_PACK_SIZE<<", ";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___SAVE_DEST_PROPERTIES___] * EDGE_PACK_SIZE<<", ";
-// cout<<_NUMCLOCKCYCLES_[0][___CODE___GATHER_FRONTIERINFOS___] * EDGE_PACK_SIZE<<"";
-// cout<<"]";
-// cout<<endl;
-
-#ifdef _DEBUGMODE_KERNELPRINTS//4
-if(action.status == 1){ 
-	cout<<"[# EDGEUPDATES_LOADED, "; 
-	cout<<"# EDGEUPDATES_APPLIED, "; 
-	cout<<"# NEW_EDGEUPDATES_ADDED]";
-	cout<<endl;
-}	
-
-cout<<" [";
-cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGEUPDATES_LOADED___] * EDGE_PACK_SIZE<<", ";
-cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGEUPDATES_APPLIED___] * EDGE_PACK_SIZE<<", ";
-cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_NEW_EDGEUPDATES_ADDED___] * EDGE_PACK_SIZE<<"";
-cout<<"]";
-cout<<endl;
 #endif 
 
+#ifdef _DEBUGMODE_KERNELPRINTS4
+if(action.fpga < num_prints){ 
+	cout<<"[acts: NUMBER_OF_EDGE_INSERTIONS, "; 
+	cout<<"NUMBER_OF_EDGE_UPDATINGS, "; 
+	cout<<"NUMBER_OF_EDGE_DELETIONS]";
+	cout<<endl;
+}	
+#endif 
+
+#ifdef _DEBUGMODE_KERNELPRINTS4
+if(action.fpga < num_prints){ 
+cout<<">>> [Per FPGA][";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGE_INSERTIONS___] * EDGE_PACK_SIZE<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGE_UPDATINGS___] * EDGE_PACK_SIZE<<", ";
+cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGE_DELETIONS___] * EDGE_PACK_SIZE<<"";
+cout<<"]";
+cout<<endl;
+}
+#endif 
+
+#ifdef _DEBUGMODE_KERNELPRINTS4
 if(action.fpga==0){
 	report_statistics[___CODE___RESETBUFFERSATSTART___] += _NUMCLOCKCYCLES_[0][___CODE___RESETBUFFERSATSTART___];
 	report_statistics[___CODE___READ_FRONTIER_PROPERTIES___] += _NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___];
@@ -66,6 +58,10 @@ if(action.fpga==0){
 	report_statistics[___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___] += _NUMCLOCKCYCLES_[0][___CODE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___];
 	report_statistics[___CODE___SAVE_DEST_PROPERTIES___] += _NUMCLOCKCYCLES_[0][___CODE___SAVE_DEST_PROPERTIES___];
 	report_statistics[___CODE___GATHER_FRONTIERINFOS___] += _NUMCLOCKCYCLES_[0][___CODE___GATHER_FRONTIERINFOS___];
+	
+	report_statistics[___CODE___NUMBER_OF_EDGE_INSERTIONS___] += _NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGE_INSERTIONS___];
+	report_statistics[___CODE___NUMBER_OF_EDGE_UPDATINGS___] += _NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGE_UPDATINGS___];
+	report_statistics[___CODE___NUMBER_OF_EDGE_DELETIONS___] += _NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGE_DELETIONS___];
 }
 // cout<<"~~~~~~~~~~~~~~ report_statistics[___CODE___READ_FRONTIER_PROPERTIES___]: "<<report_statistics[___CODE___READ_FRONTIER_PROPERTIES___]<<", _NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___]: "<<_NUMCLOCKCYCLES_[0][___CODE___READ_FRONTIER_PROPERTIES___]<<endl;				
 #endif 

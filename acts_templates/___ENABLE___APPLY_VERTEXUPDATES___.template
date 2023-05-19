@@ -7,9 +7,9 @@ if(en == true){ cout<<"### applying vertex updates in vpartition "<<p_v<<": [PEs
 #endif 
 
 APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){				
-#pragma HLS PIPELINE II={{context['II_APPLY_UPDATES_LOOP1']}}	
-// #pragma HLS dependence variable=URAM_vprop type=inter false	
-	dretrievemany_udatesdram(globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][p_v].offset, p_v, t, updates_vecs, {% include '___HBM___ARGS___.template' %}); // NEW
+#pragma HLS PIPELINE II={{context['II_APPLY_UPDATES_LOOP1']}}
+	dretrievemany_udatesdram(globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][p_v].offset, t, updates_vecs, {% include '___HBM___ARGS___.template' %}); // NEW
+
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL
 		uint512_vec_dt updates_vec = updates_vecs[inst];
@@ -24,7 +24,6 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 			if(t < limits[inst]){ checkoutofbounds("acts_kernel::ERROR 727a::", dstvid_lp, MAX_APPLYPARTITION_SIZE, NAp, inst, update.key); checkoutofbounds("acts_kernel::ERROR 727b::", dstvid_lpv, MAX_APPLYPARTITION_VECSIZE, NAp, inst, update.key); }					
 			#endif
 			vprop_t vprop = URAM_vprop[inst][v][dstvid_lpv];
-			// vprop_t vprop; vprop.prop = dstvid_lpv; // FIXME.
 			vprop_t newprop; newprop.prop = INVALIDDATA; newprop.degree = INVALIDDATA;
 			unsigned int new_vprop = reduce_funcG(vprop, update.value, globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM]);
 			if(t < limits[inst]){ 
@@ -44,7 +43,7 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 	hidden_import_and_export_function(t, import_offset, export_offset, action.size_import_export, HBM_centerA, HBM_centerB, HBM_import, HBM_export, action);
 	#endif 
 }		
-
+// exit(EXIT_SUCCESS);	
 
 
 

@@ -73,8 +73,11 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 			if (linecount % 100000000 == 0){ cout<<"prepare_graph: loading edges "<<linecount<<endl; } 
 			
 			sscanf(line.c_str(), "%i %i", &dstv, &srcv);
+			// sscanf(line.c_str(), "%i %i %i", &dstv, &srcv, &weight); // FIXME.
 			if(srcv > max_vertex){ max_vertex = srcv; }
 			if(dstv > max_vertex){ max_vertex = dstv; }
+			
+			if (edgesbuffer.size() < 16){ cout<<"prepare_graph:: edge: srcv: "<<srcv<<", dstv: "<<dstv<<", weight: "<<weight<<endl; } 
 			
 			edge3_type edge; edge.srcvid = srcv; edge.dstvid = dstv; edge.weight = rand() % 10 - 1;
 			edgesbuffer.push_back(edge);

@@ -11,7 +11,7 @@
  
 
  
-// #define ___ENABLE___DYNAMICGRAPHANALYTICS___
+#define ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifndef ___RUNNING_FPGA_SYNTHESIS___
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 
@@ -24,7 +24,7 @@
 #define ___SYNC___
 	
 
-#define ALL_MODULES 222
+#define ALL_MODULES 222 
 // #define PREPARE_EDGEUPDATES_MODULE 2220
 #define PREPROCESSING_MODULE 2210
 #define COMMIT_EDGEUPDATES_MODULE 2221
@@ -113,7 +113,7 @@
 ////////////////
 
 #define ___CODE___RESETBUFFERSATSTART___ 0
-// #define ___CODE___NUMBER_OF_EDGEUPDATES_LOADED___ 1
+// #define ___CODE___NUMBER_OF_EDGE_INSERTIONS___ 1
 #define ___CODE___PROCESSEDGES___ 1
 #define ___CODE___READ_FRONTIER_PROPERTIES___ 2
 #define ___CODE___VCPROCESSEDGES___ 3
@@ -128,9 +128,9 @@
 #define ___CODE___GATHER_FRONTIERINFOS___ 12
 #define ___CODE___IMPORT_FRONTIERINFOS___ 13
 #define ___CODE___EXPORT_FRONTIERINFOS___ 14
-#define ___CODE___NUMBER_OF_EDGEUPDATES_LOADED___ 15
-#define ___CODE___NUMBER_OF_EDGEUPDATES_APPLIED___ 16
-#define ___CODE___NUMBER_OF_NEW_EDGEUPDATES_ADDED___ 17
+#define ___CODE___NUMBER_OF_EDGE_INSERTIONS___ 15
+#define ___CODE___NUMBER_OF_EDGE_UPDATINGS___ 16
+#define ___CODE___NUMBER_OF_EDGE_DELETIONS___ 17
 #define ___CODE___IMPORT_BATCH_SIZE___ 18
 #define ___CODE___EXPORT_BATCH_SIZE___ 19
 
@@ -208,12 +208,13 @@
 #define EDGE_BUFFER_SIZE 512   //8192// 512 // FIXME.
 #define UPDATES_BUFFER_SIZE 512	
 #endif 	
-// #define VERTEXUPDATES_BUFFER_SIZE (512 * NUM_PEs) 
 #if NUM_PEs==1
 	#define VERTEXUPDATES_BUFFER_SIZE (8192 * MAX_NUM_PEs)
 	#else
 	#define VERTEXUPDATES_BUFFER_SIZE 8192
 	#endif 
+
+#define EDGE_UPDATES_PTR_MAXSIZE 2048
 
 // #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 64) 
 #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 128) 
@@ -343,14 +344,17 @@ typedef struct {
 	keyy_t srcvid;
 	keyy_t dstvid;
 	unsigned int weight;
-	unsigned int valid;
 } edge3_type; 
+
+typedef struct {
+	edge2_type data[EDGE_PACK_SIZE];
+} edge2_vec_dt;
 
 typedef struct {
 	edge3_type data[EDGE_PACK_SIZE];
 } edge3_vec_dt;
 
-typedef edge2_type edge_update_type;
+typedef edge3_type edge_update_type; // NEW CHANGE
 
 typedef struct {
 	edge_update_type data[EDGE_PACK_SIZE];

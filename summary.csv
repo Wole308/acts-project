@@ -1,6 +1,6 @@
 Profile Summary
-Generated on: 2023-05-04 23:28:57
-Msec since Epoch: 1683257337324
+Generated on: 2023-05-18 16:35:10
+Msec since Epoch: 1684442110159
 Profiled application: host
 Target platform: Xilinx
 Tool version: 2022.2
@@ -8,26 +8,68 @@ XRT build version: 2.14.354
 Build version branch: 2022.2
 Build version hash: 43926231f7183688add2dccfd391b36a1f000bea
 Build version date: N/A
-Target devices: 
+Target devices: xilinx_u280_gen3x16_xdma_base_1-0
 Flow mode: System Run
 
 OpenCL API Calls
 API Name,Number Of Calls,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),
-clCreateCommandQueue,1,0.015667,0.015667,0.015667,0.015667,
-clCreateContext,1,7.19339,7.19339,7.19339,7.19339,
-clCreateProgramWithBinary,1,44.1842,44.1842,44.1842,44.1842,
-clGetDeviceIDs,5,0.078074,0.001068,0.0156148,0.067395,
-clGetDeviceInfo,6,16.7011,0.000682,2.78351,16.6877,
-clGetExtensionFunctionAddress,2,0.0337,0.006598,0.01685,0.027102,
-clGetExtensionFunctionAddressForPlatform,2,0.017112,0.00295,0.008556,0.014162,
-clGetPlatformInfo,6,0.011475,0.001211,0.0019125,0.003453,
-clReleaseDevice,3,0.005971,0.000873,0.00199033,0.004047,
-clRetainDevice,4,0.004592,0.000589,0.001148,0.001617,
+clCreateBuffer,10,7.10816,0.008236,0.710816,2.12939,
+clCreateCommandQueue,1,0.015402,0.015402,0.015402,0.015402,
+clCreateContext,1,7.26191,7.26191,7.26191,7.26191,
+clCreateKernel,1,0.625438,0.625438,0.625438,0.625438,
+clCreateProgramWithBinary,1,109.204,109.204,109.204,109.204,
+clEnqueueMigrateMemObjects,8,0.26364,0.002465,0.032955,0.173222,
+clEnqueueNDRangeKernel,1,0.074476,0.074476,0.074476,0.074476,
+clFinish,4,115.247,0.004812,28.8118,72.3825,
+clFlush,2,0.014995,0.00713,0.0074975,0.007865,
+clGetDeviceIDs,5,0.092483,0.001013,0.0184966,0.082067,
+clGetDeviceInfo,6,16.6473,0.000691,2.77456,16.6335,
+clGetEventInfo,6,0.029859,0.00412,0.0049765,0.005964,
+clGetExtensionFunctionAddress,2,0.050472,0.009596,0.025236,0.040876,
+clGetExtensionFunctionAddressForPlatform,2,0.020595,0.00392,0.0102975,0.016675,
+clGetPlatformInfo,6,0.013919,0.001092,0.00231983,0.004213,
+clReleaseCommandQueue,1,0.006412,0.006412,0.006412,0.006412,
+clReleaseContext,1,0.033305,0.033305,0.033305,0.033305,
+clReleaseDevice,4,0.012187,0.001039,0.00304675,0.00706,
+clReleaseEvent,10,0.060352,0.001332,0.0060352,0.021618,
+clReleaseKernel,1,23.4251,23.4251,23.4251,23.4251,
+clReleaseMemObject,26,0.108737,0.00066,0.00418219,0.030453,
+clReleaseProgram,2,0.032975,0.002604,0.0164875,0.030371,
+clRetainDevice,4,0.004216,0.000484,0.001054,0.001589,
+clRetainEvent,7,0.065338,0.001481,0.009334,0.01945,
+clRetainMemObject,16,0.035507,0.000589,0.00221919,0.007004,
+clRetainProgram,1,0.001599,0.001599,0.001599,0.001599,
+clSetEventCallback,3,0.00834,0.001258,0.00278,0.005208,
+clSetKernelArg,36,0.050694,0.000539,0.00140817,0.010191,
+clWaitForEvents,3,178.336,0.250033,59.4452,177.752,
 
+Kernel Execution
+Kernel,Number Of Enqueues,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),
+top_function,1,177.484,177.484,177.484,177.484,
 
+Top Kernel Execution
+Kernel Instance Address,Kernel,Context ID,Command Queue ID,Device,Start Time (ms),Duration (ms),Global Work Size,Local Work Size,
+93934862162400,top_function,0,0,xilinx_u280_gen3x16_xdma_base_1-0,36135.2,177.484,1:1:1,1:1:1,
 
+Top Memory Writes: Host to Global Memory
+Buffer Address,Context ID,Command Queue ID,Start Time (ms),Duration (ms),Buffer Size (KB),Writing Rate(MB/s),
+536870912,0,0,11713.6,21.8626,268435,12278.3,
+805306368,0,0,11735.5,21.6557,268435,12395.6,
+0,0,0,11685,14.267,169321,11868,
+268435456,0,0,11699.4,14.2099,169321,11915.7,
+1073750016,0,0,36134.8,0.111979,0.064,0.571536,
+1342185472,0,0,36135.1,0.066075,0.064,0.968596,
 
+Top Memory Reads: Host to Global Memory
+Buffer Address,Context ID,Command Queue ID,Start Time (ms),Duration (ms),Buffer Size (KB),Reading Rate(MB/s),
+536870912,0,0,36313.6,21.4982,268435,12486.4,
+805306368,0,0,36335.1,21.3221,268435,12589.5,
+1342185472,0,0,36313.1,0.072875,0.064,0.878216,
 
+Data Transfer: Host to Global Memory
+Context:Number of Devices,Transfer Type,Number Of Buffer Transfers,Transfer Rate (MB/s),Average Bandwidth Utilization (%),Average Buffer Size (KB),Total Time (ms),Average Time (ms),
+context0:1,READ,3,12516.5,79.4503,178957,42.8931,14.2977,
+context0:1,WRITE,6,12130.7,77.0015,145919,72.1733,12.0289,
 
 Compute Unit Utilization
 Device,Compute Unit,Kernel,Global Work Size,Local Work Size,Number Of Calls,Dataflow Execution,Max Overlapping Executions,Dataflow Acceleration,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),Clock Frequency (MHz),
@@ -42,19 +84,78 @@ Device,Compute Unit,Kernel,Global Work Size,Local Work Size,Number Of Calls,Data
 
 Guidance Parameters
 Parameter,Element,Value,
-PLRAM_DEVICE,all,0,
-HBM_DEVICE,all,0,
+DEVICE_EXEC_TIME,xilinx_u280_gen3x16_xdma_base_1-0,177.484,
+NUM_MONITORS,xilinx_u280_gen3x16_xdma_base_1-0|XCL_PERF_MON_MEMORY|0,0,
+NUM_MONITORS,xilinx_u280_gen3x16_xdma_base_1-0|XCL_PERF_MON_ACCEL|0,0,
+NUM_MONITORS,xilinx_u280_gen3x16_xdma_base_1-0|XCL_PERF_MON_STR|0,0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[0],1,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[1],1,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[2],1,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[3],1,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[4],1,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[5],1,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[6],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[7],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[8],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[9],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[10],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[11],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[12],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[13],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[14],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[15],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[16],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[17],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[18],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[19],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[20],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[21],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[22],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[23],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[24],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[25],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[26],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[27],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[28],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[29],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[30],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HBM[31],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|DDR[0],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|DDR[1],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|PLRAM[0],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|PLRAM[1],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|PLRAM[2],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|PLRAM[3],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|PLRAM[4],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|PLRAM[5],0,
+MEMORY_USAGE,xilinx_u280_gen3x16_xdma_base_1-0|HOST[0],0,
+PLRAM_DEVICE,all,1,
+HBM_DEVICE,all,1,
 KDMA_DEVICE,all,0,
 P2P_DEVICE,all,0,
+KERNEL_COUNT,top_function,1,
 TRACE_MEMORY,all,FIFO,
-APPLICATION_RUN_TIME_MS,all,231.922,
-MIGRATE_MEM,host,0,
+PLRAM_SIZE_BYTES,xilinx_u280_gen3x16_xdma_base_1-0,0,
+TRACE_BUFFER_FULL,xilinx_u280_gen3x16_xdma_base_1-0,false
+MEMORY_TYPE_BIT_WIDTH,xilinx_u280_gen3x16_xdma_base_1-0|HBM,256,
+MEMORY_TYPE_BIT_WIDTH,xilinx_u280_gen3x16_xdma_base_1-0|DDR,512,
+MEMORY_TYPE_BIT_WIDTH,xilinx_u280_gen3x16_xdma_base_1-0|PLRAM,512,
+APPLICATION_RUN_TIME_MS,all,39565.6,
+MIGRATE_MEM,host,8,
 P2P_HOST_TRANSFERS,host,0,
 OBJECTS_RELEASED,all,1,
 CU_CONTEXT_EN,all,0,
-BUFFER_RD_ACTIVE_TIME_MS,all,0,
-BUFFER_WR_ACTIVE_TIME_MS,all,0,
-BUFFER_TX_ACTIVE_TIME_MS,all,0,
+MAX_PARALLEL_KERNEL_ENQUEUES,top_function,1,
+COMMAND_QUEUE_OOO,93938509191680,0,
+KERNEL_BUFFER_INFO,top_function|HBM_channelA0|HBM[0]|1,169321088,
+KERNEL_BUFFER_INFO,top_function|HBM_channelB0|HBM[1]|1,169321088,
+KERNEL_BUFFER_INFO,top_function|HBM_centerA|HBM[2]|1,268435456,
+KERNEL_BUFFER_INFO,top_function|HBM_centerB|HBM[3]|1,268435456,
+KERNEL_BUFFER_INFO,top_function|HBM_import|HBM[4]|1,64,
+KERNEL_BUFFER_INFO,top_function|HBM_export|HBM[5]|1,64,
+BUFFER_RD_ACTIVE_TIME_MS,all,42.8931,
+BUFFER_WR_ACTIVE_TIME_MS,all,72.1733,
+BUFFER_TX_ACTIVE_TIME_MS,all,24671.4,
 TOTAL_KERNEL_RUN_TIME_MS,all,0,
 XRT_INI_SETTING,opencl_trace,1,Generation of trace of OpenCL APIs and memory transfers
 XRT_INI_SETTING,device_counters,1,Hardware counters added to summary file

@@ -42,6 +42,12 @@
 #include <thread>
 #include <string.h>
 #include <mutex>
+
+#include <cstdlib>
+#include <iostream>
+#include <time.h>
+
+
 #include "../host_srcs/algorithm.h"
 #include "../host_srcs/utility.h"
 #endif 

@@ -543,7 +543,21 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 		globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__PARTIALLYPROCESSEDEDGEUPDATES] + globalparams[GLOBALPARAMSCODE__WWSIZE__PARTIALLYPROCESSEDEDGEUPDATES]; 
 	}
 	size_u32 = 0; 
-	unsigned int approx_actpacksz = (universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_ / EDGE_PACK_SIZE) + (1024000 / EDGE_PACK_SIZE);
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
+		unsigned int base_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES];
+		for(unsigned int p=0; p<__NUM_UPARTITIONS * __NUM_APPLYPARTITIONS; p++){ 
+			for(unsigned int t=0; t<512; t++){ 
+				for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+					utilityobj->checkoutofbounds("app::ERROR 71711::", base_offset + (p * 512 + t), HBM_CHANNEL_SIZE, NAp, NAp, NAp);
+					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * 512 + t), 2 * v, rand() % EDGE_UPDATES_DRAMBUFFER_SIZE, universalparams);
+					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * 512 + t), 2 * v + 1, rand() % EDGE_UPDATES_DRAMBUFFER_SIZE, universalparams);
+					if(i==0){ size_u32 += 2; }
+				}
+			}
+		}
+	}
+	#endif 
 
 	// load edges (csr format)
 	cout<<"loading csr edges..."<<endl;
@@ -556,6 +570,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	
 	// allocate edges space (actpack format)
 	cout<<"loading act-pack edges..."<<endl;
+	unsigned int approx_actpacksz = (universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_ / EDGE_PACK_SIZE) + (1024000 / EDGE_PACK_SIZE);
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ 
 		globalparams[GLOBALPARAMSCODE__WWSIZE__CSREDGES] = (size_u32 / HBM_CHANNEL_PACK_SIZE) + 16;
 		globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__CSREDGES] + globalparams[GLOBALPARAMSCODE__WWSIZE__CSREDGES]; 

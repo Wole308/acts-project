@@ -5,8 +5,12 @@
 #define ___ENABLE___RESET_BUFFERS___
 #define ___ENABLE___ECPROCESSEDGES___II1___ 
 #define ___ENABLE___APPLYUPDATESMODULE___ 
-	#define ___ENABLE___READ_DEST_PROPERTIES___ 
-	#define ___ENABLE___APPLYUPDATES___II1___
+	#define ___ENABLE___READ_DEST_PROPERTIES___ 	
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+		#define ___ENABLE___APPLYVERTEXUPDATES_AND_APPLYEDGES___II1___
+	#else 
+		#define ___ENABLE___APPLYUPDATES___II1___
+	#endif 
 	#define ___ENABLE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___ 
 	#define ___ENABLE___SAVE_DEST_PROPERTIES___ 
 #define ___ENABLE___GATHER_FRONTIERINFOS___ 
@@ -317,6 +321,16 @@ MY_IFDEF_TOPLEVELFUNC(){
 			#endif 
 		}
 	}
+	
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	for(unsigned int t=0; t<1024; t++){
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 	
+			#pragma HLS UNROLL
+			edgeupdatesptrs[inst][t].offset = 0; 
+			edgeupdatesptrs[inst][t].size = 0;
+		}
+	}
+	#endif 
 
 	unsigned int GraphIter=0; 
 	unsigned int MASK_CODE = 1 + GraphIter;
@@ -328,13 +342,40 @@ MY_IFDEF_TOPLEVELFUNC(){
 	{% include '___ENABLE___CLEAR_COUNTERS___.template' %}	
 	#endif
 	
+	// clear URAMs
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	MY_LOOP1580: for(unsigned int t=0; t<EDGE_UPDATES_DRAMBUFFER_SIZE; t++){ 
+	#pragma HLS PIPELINE II=1
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+		#pragma HLS UNROLL
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL		
+				URAM_map[inst][v][t].offset = 0; 
+				URAM_map[inst][v][t].size = 0;	
+				URAM_edgeupdates[inst][v][t].srcvid = INVALIDDATA; 
+				URAM_edgeupdates[inst][v][t].dstvid = INVALIDDATA; 
+			}
+		}
+	}
+
+	MY_LOOP1481: for(unsigned int t=0; t<BLOCKRAM_SIZE; t++){ 
+	#pragma HLS PIPELINE II=1
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+		#pragma HLS UNROLL	
+			for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+			#pragma HLS UNROLL	
+				edgeupdates_hash_ids[inst][v][t] = 0; 
+			}
+		}
+	}
+	#endif
+	
 	// process-edges and partition-updates 
 	#ifdef ___ENABLE___PROCESSEDGES___
 	if(action.module == PROCESS_EDGES_MODULE || action.module == ALL_MODULES){
 	PROCESS_EDGES_MODULE_LOOP1B: for(unsigned int local_pu=action.start_pu; local_pu<action.start_pu + action.size_pu; local_pu+=action.skip_pu){
 
 		unsigned int p_u = local_pu; 
-		// unsigned int p_u = (local_pu * action.numfpgas) + action.fpga; // NOTE: conversion from local p_u to global p_u happens here
 		action.id_process = p_u; 
 		MASK_CODE_PE = ((1 + GraphIter) * MAX_NUM_UPARTITIONS) + p_u;
 		if(p_u >= globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]){ continue; } 
@@ -343,13 +384,6 @@ MY_IFDEF_TOPLEVELFUNC(){
 		#ifdef _DEBUGMODE_KERNELPRINTS4 
 		if(action.fpga < num_prints){ cout<<"### processing edges in upartition "<<local_pu<<" (global: "<<p_u<<"): [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]<<"]"<<endl; }
 		#endif 
-		
-		// insert/delete/update edges
-		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-		if(___ENABLE___PROCESSEDGEUPDATES___BOOL___ == 1){	
-			// ___ENABLE___APPLY_EDGEUPDATES___
-		}	
-		#endif
 		
 		// read & map frontier properties 
 		#ifdef ___ENABLE___READ_FRONTIER_PROPERTIES___
@@ -371,7 +405,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	}
 	#endif 
 	// exit(EXIT_SUCCESS); 
-	
+
 	unsigned int totalactvvs2 = 0; 
 	frontier_t actvv[EDGE_PACK_SIZE]; 
 	for(unsigned int p_u=0; p_u<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]; p_u++){ upartition_vertices[p_u].count = 0; }
@@ -390,8 +424,11 @@ MY_IFDEF_TOPLEVELFUNC(){
 		
 		#ifdef _DEBUGMODE_KERNELPRINTS4 
 		if(action.fpga < num_prints){ cout<<"### applying vertex updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]<<", "<<updatesptrs[0][p_v].size<<"]"<<endl; } 
-		if(false && action.fpga < num_prints){ cout<<"))))))))))))))))))))))) APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<0<<"]["<<p_v<<"].size: "<<updatesptrs[0][p_v].size<<" ((((((((((((((((((((((( "<<endl; }
-		if(false && action.fpga < num_prints){ cout<<"))))))))))))))))))))))) APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
+		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
+		if(action.fpga < num_prints){ cout<<"### applying edge updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"]"<<endl; } 
+		#endif 
+		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<0<<"]["<<p_v<<"].size: "<<updatesptrs[0][p_v].size<<" ((((((((((((((((((((((( "<<endl; }
+		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
 		#endif 
 		
 		if(vpartition_vertices[0][p_v].count > 0 || all_vertices_active_in_all_iterations == true){ 
@@ -404,9 +441,15 @@ MY_IFDEF_TOPLEVELFUNC(){
 			
 			// apply updates
 			#ifdef ___ENABLE___APPLYUPDATES___II1___ 
-			if(___ENABLE___APPLYUPDATES___BOOL___ == 1){	
-				{% include '___ENABLE___APPLY_VERTEXUPDATES___.template' %}				
+			if(___ENABLE___APPLYUPDATES___BOOL___ == 1){
+				{% include '___ENABLE___APPLY_VERTEXUPDATES___.template' %}			
 			}	
+			#endif 
+			
+			#ifdef ___ENABLE___APPLYVERTEXUPDATES_AND_APPLYEDGES___II1___ 
+			if(___ENABLE___APPLYUPDATES___BOOL___ == 1){
+				{% include '___ENABLE___APPLY_ALLUPDATES___.template' %}	
+			}
 			#endif 
 			
 			// collect and save frontiers
