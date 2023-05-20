@@ -687,7 +687,7 @@ unsigned int create_act_pack::create_actpack(
 		for(unsigned int t=0; t<num_llpset; t++){		
 			unsigned int index = t;
 			returned_vu_map[n][index] = vertex_updates2_map[t];
-			#ifdef _DEBUGMODE_KERNELPRINTS//4
+			#ifdef _DEBUGMODE_KERNELPRINTS4
 			cout<<"create-actpack: returned_vu_map["<<n<<"]["<<index<<"].offset: "<<returned_vu_map[n][index].offset<<", returned_vu_map["<<n<<"]["<<index<<"].size: "<<returned_vu_map[n][index].size<<endl; 
 			#endif 
 		}
@@ -696,6 +696,7 @@ unsigned int create_act_pack::create_actpack(
 	cout<<"create-actpack: FINISH: returned_volume_size: "<<returned_volume_size<<", returned_volume_size * EDGE_PACK_SIZE: "<<returned_volume_size * EDGE_PACK_SIZE<<endl;
 	for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"create-actpack: FINISH: returned_volume2_size["<<n<<"]: "<<returned_volume2_size[n]<<", returned_volume2_size["<<n<<"] * EDGE_PACK_SIZE: "<<returned_volume2_size[n] * EDGE_PACK_SIZE<<endl; }
 	#endif 
+	// exit(EXIT_SUCCsESS);
 	return returned_volume2_size[0];
 }
 

@@ -231,7 +231,7 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 	
 	map_t * edge_maps[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ edge_maps[i] = new map_t[MAX_NUM_UPARTITIONS * MAX_NUM_LLP_PER_UPARTITION]; }
 	map_t * edge_maps_large[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ edge_maps_large[i] = new map_t[MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS]; }
-	map_t * vu_map[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ vu_map[i] = new map_t[MAX_NUM_LLPSETS]; }
+	map_t * vu_map[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ vu_map[i] = new map_t[MAX_NUM_LLPSETS]; } // universalparams.NUM_APPLYPARTITIONS
 
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
 		for(unsigned int t=0; t<MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS; t++){
@@ -312,7 +312,7 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 		}
 	}
 	
-	// load vertex map	
+	// load vertex update map	
 	for(unsigned int t=0; t<num_llpset; t++){		
 		unsigned int index = t;
 		for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){

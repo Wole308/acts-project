@@ -14,7 +14,7 @@
 {%if(context['RUNNING_SYNTHESIS'] == "1")%}
 #define ___RUNNING_FPGA_SYNTHESIS___
 {%endif%} 
-#define ___ENABLE___DYNAMICGRAPHANALYTICS___
+// #define ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifndef ___RUNNING_FPGA_SYNTHESIS___
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 

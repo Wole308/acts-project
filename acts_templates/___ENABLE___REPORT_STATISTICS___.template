@@ -28,6 +28,7 @@ cout<<endl;
 }
 #endif 
 
+#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifdef _DEBUGMODE_KERNELPRINTS4
 if(action.fpga < num_prints){ 
 	cout<<"[acts: NUMBER_OF_EDGE_INSERTIONS, "; 
@@ -46,6 +47,7 @@ cout<<_NUMCLOCKCYCLES_[0][___CODE___NUMBER_OF_EDGE_DELETIONS___] * EDGE_PACK_SIZ
 cout<<"]";
 cout<<endl;
 }
+#endif 
 #endif 
 
 #ifdef _DEBUGMODE_KERNELPRINTS4

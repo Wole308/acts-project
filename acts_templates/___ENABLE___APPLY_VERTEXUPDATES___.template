@@ -1,14 +1,15 @@
 uint512_vec_dt updates_vecs[NUM_VALID_PEs];
 #pragma HLS ARRAY_PARTITION variable=updates_vecs complete
-max_limit = 0; for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ limits[inst] = updatesptrs[0][p_v].size; } for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ if(max_limit < limits[inst]){ max_limit = limits[inst]; }}
+max_limit = 0; for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ limits[inst] = updatesptrs[p_v].size; } for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ if(max_limit < limits[inst]){ max_limit = limits[inst]; }}
 
 #ifdef _DEBUGMODE_KERNELPRINTS//4 
 if(en == true){ cout<<"### applying vertex updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; } 
 #endif 
 
+unsigned int updates_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[p_v].offset;
 APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){				
 #pragma HLS PIPELINE II={{context['II_APPLY_UPDATES_LOOP1']}}
-	dretrievemany_udatesdram(globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][p_v].offset, t, updates_vecs, {% include '___HBM___ARGS___.template' %}); // NEW
+	dretrievemany_udatesdram(updates_offset + t, updates_vecs, {% include '___HBM___ARGS___.template' %}); // NEW
 
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL

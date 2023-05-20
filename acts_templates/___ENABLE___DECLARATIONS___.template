@@ -154,8 +154,7 @@ unsigned int vid_first0[NUM_VALID_PEs];
 unsigned int vid_first1[NUM_VALID_PEs]; 
 #pragma HLS ARRAY_PARTITION variable = vid_first1 complete
 unsigned int globalparams[GLOBALBUFFER_SIZE];
-map_t updatesptrs[MAX_NUM_FPGAS][64]; // MAX_NUM_LLPSETS];
-#pragma HLS ARRAY_PARTITION variable = updatesptrs complete dim=1
+map_t updatesptrs[MAX_NUM_APPLYPARTITIONS]; // MAX_NUM_LLPSETS];
 offset_t edgeupdatesptrs[NUM_VALID_PEs][EDGE_UPDATES_PTR_MAXSIZE];
 #pragma HLS ARRAY_PARTITION variable=edgeupdatesptrs complete dim=1
 unsigned int limits[NUM_VALID_PEs];

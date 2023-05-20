@@ -41,7 +41,7 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 		max_sz = 0; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ limits[n] = edge_maps[n].size; } for(unsigned int n=0; n<NUM_VALID_PEs; n++){ if(max_sz < limits[n]){ max_sz = limits[n]; }}			
 		for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = edge_maps[n].offset; }	
 		#ifdef _DEBUGMODE_KERNELPRINTS//4
-		if(action.fpga < num_prints){ for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"process-edges: edges map offsets: "; cout<<offsets[n]<<", max_sz: "<<max_sz<<", updatesptrs["<<action.fpga<<"]["<<llp_set<<"].offset: "<<updatesptrs[action.fpga][llp_set].offset<<", updatesptrs["<<action.fpga<<"]["<<llp_set<<"].size: "<<updatesptrs[action.fpga][llp_set].size<<endl; }}				
+		if(action.fpga < num_prints){ for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"process-edges: edges map offsets: "; cout<<offsets[n]<<", max_sz: "<<max_sz<<", updatesptrs["<<llp_set<<"].offset: "<<updatesptrs[llp_set].offset<<", updatesptrs["<<llp_set<<"].size: "<<updatesptrs[llp_set].size<<endl; }}				
 		#endif 	
 		
 		// process edges and save vertex updates 
@@ -137,15 +137,15 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 						}
 					}
 					
-					unsigned int offset___ = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][partition].offset + updatesptrs[0][partition].size + t;
+					unsigned int offset___ = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[partition].offset + updatesptrs[partition].size + t;
 					
 					#ifdef _DEBUGMODE_CHECKS3	
-					checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[0][partition].size, NAp); 
+					checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[partition].size, NAp); 
 					#endif	
 					dinsertmany_updatesdram(offset___, update_out, {% include '___HBM___ARGS___.template' %});
 				}
 				
-				updatesptrs[0][partition].size += offset_partition[0][0][partition].size;
+				updatesptrs[partition].size += offset_partition[0][0][partition].size;
 			}
 			
 			// record updates 

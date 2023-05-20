@@ -32,11 +32,7 @@ unsigned int threshold___activedstvids = globalparams[GLOBALPARAMSCODE__PARAM__T
 unsigned int async_batch = globalparams[GLOBALPARAMSCODE__ASYNC__BATCH]; 
 unsigned int _ASYNC_BATCH_SIZE_ = globalparams[GLOBALPARAMSCODE__ASYNC__BATCHSIZE];	
 
-bool all_vertices_active_in_all_iterations = true; 
-// if(globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == PAGERANK || globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == CF || globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == HITS || globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM] == SPMV){ all_vertices_active_in_all_iterations = true; }					
-// for(unsigned int p=0; p<MAX_NUM_UPARTITIONS; p++){ cfrontier_dram___size[p] = 0; } // FIXME.
-if(all_vertices_active_in_all_iterations == true){ for(unsigned int p_u=0; p_u<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]; p_u+=1){ cfrontier_dram___size[p_u] = MAXVALID_APPLYPARTITION_VECSIZE; }} 
-else { cfrontier_dram___size[0] = 1; }// activate root vid
+for(unsigned int p_u=0; p_u<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]; p_u+=1){ cfrontier_dram___size[p_u] = MAXVALID_APPLYPARTITION_VECSIZE; }
 unsigned int threshold___activefrontiers = globalparams[GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEFRONTIERSFORCONTROLSWITCH]; 
 
 #ifdef _DEBUGMODE_KERNELPRINTS//4
@@ -55,20 +51,4 @@ if(action.status == 1){
 	cout<<"### GAS iteration: 0 [1 active vertices]"<<endl; 
 }
 #endif 
-
-// reset ubuffer 
-if(all_vertices_active_in_all_iterations == false){ 
-	vprop_t prop; prop.prop = 0; prop.degree = INVALIDMASK; 
-	RESET_BUFFERS_lOOP: for(unsigned int t=0; t<MAX_UPARTITION_VECSIZE; t++){ 
-	#pragma HLS PIPELINE II=1
-		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
-		#pragma HLS UNROLL
-			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
-			#pragma HLS UNROLL
-				insert_vdatabuffer(v, t, prop, URAM_vprop[inst]); 
-			}
-		}
-		update_bramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___READ_FRONTIER_PROPERTIES___, 1);
-	}
-}
 	

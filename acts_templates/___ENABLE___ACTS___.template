@@ -5,7 +5,7 @@
 #define ___ENABLE___RESET_BUFFERS___
 #define ___ENABLE___ECPROCESSEDGES___II1___ 
 #define ___ENABLE___APPLYUPDATESMODULE___ 
-	#define ___ENABLE___READ_DEST_PROPERTIES___ 	
+#define ___ENABLE___READ_DEST_PROPERTIES___ 	
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
 		#define ___ENABLE___APPLYVERTEXUPDATES_AND_APPLYEDGES___II1___
 	#else 
@@ -303,23 +303,17 @@ MY_IFDEF_TOPLEVELFUNC(){
 	#endif 
 	
 	// load vertex-updates map 
-	LOAD_UPDATEPTRS_lOOP1: for(unsigned int fpga=0; fpga<action.numfpgas; fpga++){
-		#ifdef _DEBUGMODE_KERNELPRINTS4
-		if(action.module == ALL_MODULES){ cout<<"acts: offsets for fpga "<<fpga<<endl; }
+	#ifdef _DEBUGMODE_KERNELPRINTS4
+	if((action.module == ALL_MODULES || action.module == PROCESS_EDGES_MODULE) && (action.start_pu == 0)){ cout << "acts: resetting updates space..." <<endl; }
+	#endif 
+	LOAD_UPDATEPTRS_lOOP1B: for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; t++){	
+	#pragma HLS PIPELINE II=1
+		updatesptrs[t] = load_vupdate_map(globalparams[GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS], t, {% include '___HBM___ARGS___.template' %});	
+		updatesptrs[t].offset = 0; // FIXME.
+		if((action.module == ALL_MODULES || action.module == PROCESS_EDGES_MODULE) && (action.start_pu == 0)){ updatesptrs[t].size = 0; }				
+		#ifdef _DEBUGMODE_KERNELPRINTS//4
+		if(action.fpga < num_prints){ cout<<"acts: start: updatesptrs["<<t<<"].offset: "<<updatesptrs[t].offset<<", updatesptrs["<<t<<"].size: "<<updatesptrs[t].size<<endl; }
 		#endif 
-		LOAD_UPDATEPTRS_lOOP1B: for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; t++){	
-		#pragma HLS PIPELINE II=1
-			updatesptrs[fpga][t] = load_vupdate_map(globalparams[GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS], (fpga * MAX_NUM_LLPSETS) + t, {% include '___HBM___ARGS___.template' %});	
-			updatesptrs[fpga][t].offset = 0; // FIXME.
-			if((action.module == ALL_MODULES || action.module == PROCESS_EDGES_MODULE) && (action.start_pu == 0)){ 
-				#ifdef _DEBUGMODE_KERNELPRINTS4
-				if(t==0 && action.fpga < num_prints){ cout << "acts: resetting updates space..." <<endl; }
-				#endif 
-				updatesptrs[fpga][t].size = 0; }				
-			#ifdef _DEBUGMODE_KERNELPRINTS//4
-			if(action.module == ALL_MODULES){ cout<<"acts: updatesptrs["<<fpga<<"]["<<t<<"].offset: "<<updatesptrs[fpga][t].offset<<", updatesptrs["<<fpga<<"]["<<t<<"].size: "<<updatesptrs[fpga][t].size<<endl; }
-			#endif 
-		}
 	}
 	
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
@@ -379,8 +373,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 		action.id_process = p_u; 
 		MASK_CODE_PE = ((1 + GraphIter) * MAX_NUM_UPARTITIONS) + p_u;
 		if(p_u >= globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]){ continue; } 
-		if(all_vertices_active_in_all_iterations == false){ if(mask[local_pu - action.start_pu] == 0){ continue; } }
-		
+	
 		#ifdef _DEBUGMODE_KERNELPRINTS4 
 		if(action.fpga < num_prints){ cout<<"### processing edges in upartition "<<local_pu<<" (global: "<<p_u<<"): [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]<<"]"<<endl; }
 		#endif 
@@ -415,7 +408,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	#ifdef ___ENABLE___APPLYUPDATESMODULE___ 
 	if(action.module == APPLY_UPDATES_MODULE || action.module == ALL_MODULES){
 	APPLY_UPDATES_MODULE_LOOP: for(unsigned int p_v=action.start_pv; p_v<action.start_pv + action.size_pv; p_v++){
-		if(updatesptrs[0][p_v].size == 0 || p_v >= globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]){ continue; } 
+		if(updatesptrs[p_v].size == 0 || p_v >= globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]){ continue; } 
 		
 		#ifndef FPGA_IMPL
 		checkoutofbounds("acts_kernel::ERROR 862::", p_v, globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS] * action.numfpgas, p_v, globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS], NAp);
@@ -423,49 +416,47 @@ MY_IFDEF_TOPLEVELFUNC(){
 		unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_v * MAX_APPLYPARTITION_VECSIZE);
 		
 		#ifdef _DEBUGMODE_KERNELPRINTS4 
-		if(action.fpga < num_prints){ cout<<"### applying vertex updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]<<", "<<updatesptrs[0][p_v].size<<"]"<<endl; } 
+		if(action.fpga < num_prints){ cout<<"### applying vertex updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]<<", "<<updatesptrs[p_v].size<<"]"<<endl; } 
 		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
 		if(action.fpga < num_prints){ cout<<"### applying edge updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"]"<<endl; } 
 		#endif 
-		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<0<<"]["<<p_v<<"].size: "<<updatesptrs[0][p_v].size<<" ((((((((((((((((((((((( "<<endl; }
+		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<p_v<<"].size: "<<updatesptrs[p_v].size<<" ((((((((((((((((((((((( "<<endl; }
 		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
 		#endif 
 		
-		if(vpartition_vertices[0][p_v].count > 0 || all_vertices_active_in_all_iterations == true){ 
-			// read destination properties
-			#ifdef ___ENABLE___READ_DEST_PROPERTIES___
-			if(___ENABLE___READ_DEST_PROPERTIES___BOOL___ == 1){
-				{% include '___ENABLE___READ_DEST_PROPERTIES___.template' %}	
-			}
-			#endif
-			
-			// apply updates
-			#ifdef ___ENABLE___APPLYUPDATES___II1___ 
-			if(___ENABLE___APPLYUPDATES___BOOL___ == 1){
-				{% include '___ENABLE___APPLY_VERTEXUPDATES___.template' %}			
-			}	
-			#endif 
-			
-			#ifdef ___ENABLE___APPLYVERTEXUPDATES_AND_APPLYEDGES___II1___ 
-			if(___ENABLE___APPLYUPDATES___BOOL___ == 1){
-				{% include '___ENABLE___APPLY_ALLUPDATES___.template' %}	
-			}
-			#endif 
-			
-			// collect and save frontiers
-			#ifdef ___ENABLE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___XXX // FIXME.
-			if(___ENABLE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___BOOL___ == 1){
-				{% include '___ENABLE___COLLECT_AND_SAVE_FRONTIERS___.template' %}	
-			}
-			#endif 
-			
-			// save destination properties
-			#ifdef ___ENABLE___SAVE_DEST_PROPERTIES___
-			if(___ENABLE___SAVE_DEST_PROPERTIES___BOOL___ == 1){	
-				{% include '___ENABLE___SAVE_DEST_PROPERTIES___.template' %}	
-			}
-			#endif 
+		// read destination properties
+		#ifdef ___ENABLE___READ_DEST_PROPERTIES___
+		if(___ENABLE___READ_DEST_PROPERTIES___BOOL___ == 1){
+			{% include '___ENABLE___READ_DEST_PROPERTIES___.template' %}	
 		}
+		#endif
+		
+		// apply updates
+		#ifdef ___ENABLE___APPLYUPDATES___II1___ 
+		if(___ENABLE___APPLYUPDATES___BOOL___ == 1){
+			{% include '___ENABLE___APPLY_VERTEXUPDATES___.template' %}			
+		}	
+		#endif 
+		
+		#ifdef ___ENABLE___APPLYVERTEXUPDATES_AND_APPLYEDGES___II1___ 
+		if(___ENABLE___APPLYUPDATES___BOOL___ == 1){
+			{% include '___ENABLE___APPLY_ALLUPDATES___.template' %}	
+		}
+		#endif 
+		
+		// collect and save frontiers
+		#ifdef ___ENABLE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___XXX // FIXME.
+		if(___ENABLE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___BOOL___ == 1){
+			{% include '___ENABLE___COLLECT_AND_SAVE_FRONTIERS___.template' %}	
+		}
+		#endif 
+		
+		// save destination properties
+		#ifdef ___ENABLE___SAVE_DEST_PROPERTIES___
+		if(___ENABLE___SAVE_DEST_PROPERTIES___BOOL___ == 1){	
+			{% include '___ENABLE___SAVE_DEST_PROPERTIES___.template' %}	
+		}
+		#endif 
 	} 
 	}
 	#endif
@@ -499,17 +490,13 @@ MY_IFDEF_TOPLEVELFUNC(){
 	
 	// save state
 	if(action.module == PROCESS_EDGES_MODULE){ 
-		SAVE_UPDATEPTRS_lOOP1: for(unsigned int fpga=0; fpga<action.numfpgas; fpga++){
-			unsigned int offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS] + (fpga * MAX_NUM_LLPSETS);
-			unsigned int offset2 = fpga * MAX_NUM_LLPSETS;
-			SAVE_UPDATEPTRS_lOOP1B: for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; t++){	
-			#pragma HLS PIPELINE II=1
-				map_t map_data; map_data.offset = updatesptrs[fpga][t].offset; map_data.size = updatesptrs[fpga][t].size; 
-				save_vupdate_map(globalparams[GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS], offset2 + t, map_data, {% include '___HBM___ARGS___.template' %}); 			
-				#ifdef _DEBUGMODE_KERNELPRINTS//4
-				cout<<"finish: updatesptrs["<<fpga<<"]["<<t<<"].offset: "<<updatesptrs[fpga][t].offset<<", updatesptrs["<<fpga<<"]["<<t<<"].size: "<<updatesptrs[fpga][t].size<<endl;
-				#endif 
-			}
+		SAVE_UPDATEPTRS_lOOP1B: for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; t++){	
+		#pragma HLS PIPELINE II=1
+			map_t map_data; map_data.offset = updatesptrs[t].offset; map_data.size = updatesptrs[t].size; 
+			save_vupdate_map(globalparams[GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS], t, map_data, {% include '___HBM___ARGS___.template' %}); 			
+			#ifdef _DEBUGMODE_KERNELPRINTS//4
+			if(action.fpga < num_prints){ cout<<"finish: updatesptrs["<<t<<"].offset: "<<updatesptrs[t].offset<<", updatesptrs["<<t<<"].size: "<<updatesptrs[t].size<<endl; }
+			#endif 
 		}
 	}
 	

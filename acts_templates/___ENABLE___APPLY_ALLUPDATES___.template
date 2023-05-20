@@ -168,8 +168,8 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 	#pragma HLS ARRAY_PARTITION variable=updates_vecs complete
 	APPLY_UPDATES_LOOP: for(unsigned int it=0; it<(max_limit + BLOCKRAM_SIZE - 1) / BLOCKRAM_SIZE; it++){
 		unsigned int sz = BLOCKRAM_SIZE; if((it + 1) * BLOCKRAM_SIZE > max_limit){ sz = max_limit - (it * BLOCKRAM_SIZE); }
-		unsigned int updates_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][p_v].offset + (it * BLOCKRAM_SIZE);
-		unsigned int edges_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][p_v].offset + (it * BLOCKRAM_SIZE);
+		unsigned int updates_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[p_v].offset + (it * BLOCKRAM_SIZE);
+		unsigned int edges_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[p_v].offset + (it * BLOCKRAM_SIZE);
 		
 		APPLY_VERTEX_UPDATES_LOOP: for(unsigned int t=0; t<sz; t++){				
 		#pragma HLS PIPELINE II={{context['II_APPLY_UPDATES_LOOP1']}}
@@ -282,7 +282,7 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 	// exit(EXIT_SUCCESS);	
 	
 	// *** (1) EDGE INSERTIONS ***; (2) reset URAM buffers
-	unsigned int edges_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[0][p_v].offset;// + (it * BLOCKRAM_SIZE);
+	unsigned int edges_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[p_v].offset;// + (it * BLOCKRAM_SIZE);
 	EDGE_INSERTIONS_LOOP: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
 	#pragma HLS PIPELINE II={{context['II_APPLY_EDGEUPDATES_RESETURAMBUFFERS_MAINLOOP1']}}
 		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){

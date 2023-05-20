@@ -1,6 +1,6 @@
 MY_LOOP201: for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int p=0; p<MAX_NUM_UPARTITIONS; p++){ nfrontier_dram___size[i][p] = 0; }}
 MY_LOOP205: for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int p=0; p<__NUM_APPLYPARTITIONS; p++){ vpartition_vertices[i][p].offset = 0; vpartition_vertices[i][p].size = 0; vpartition_vertices[i][p].count = 0; }}					
-for(unsigned int fpga=0; fpga<action.numfpgas; fpga++){ for(unsigned int p=0; p<__NUM_APPLYPARTITIONS; p++){ updatesptrs[fpga][p].size = 0; }}
+for(unsigned int p=0; p<__NUM_APPLYPARTITIONS; p++){ updatesptrs[p].size = 0; }
 MY_LOOP207: for(unsigned int i=0; i<NUM_VALID_PEs; i++){ vptrbuffer___size[i] = 0; }
 MY_LOOP208: for(unsigned int i=0; i<NUM_VALID_PEs; i++){ edges_buffer___size[i] = 0; }
 #ifndef HW
