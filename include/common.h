@@ -2,6 +2,12 @@
 #define COMMON_H
 #include <string.h> 
 #include <cmath> 
+#include <ap_int.h>
+// #include "ap_fixed.h"	
+#include <vector> 
+#include<hls_vector.h> 
+#include<hls_stream.h> 
+#include <iostream> 
  
 
  
@@ -46,7 +52,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define SW // SWEMU, HW, *SW
+#define HW // SWEMU, HW, *SW
 #if (defined(SWEMU) || defined(HW)) 
 #define FPGA_IMPL
 #endif 
@@ -208,6 +214,7 @@
 	#endif 
 
 #define EDGE_UPDATES_PTR_MAXSIZE 2048
+#define EDGE_UPDATES_CHUNKSZ 512 // 8192 
 
 // #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 64) 
 #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 128) 
@@ -311,6 +318,20 @@
 #define __READY__FOR__TRANSPORT__ 4
 #define __UNIDENTIFIED__STATUS__ 0
 
+// https://stackoverflow.com/questions/11815894/how-to-read-write-arbitrary-bits-in-c-c
+
+#define BitVal(data,y) ( (data>>y) & 1)      /** Return Data.Y value   **/
+#define SetBit(data,y)    data |= (1 << y)    /** Set Data.Y   to 1    **/
+#define ClearBit(data,y)  data &= ~(1 << y)   /** Clear Data.Y to 0    **/
+#define TogleBit(data,y)     (data ^=BitVal(y))     /** Togle Data.Y  value  **/
+#define Togle(data)   (data =~data )         /** Togle Data value     **/
+
+/** uint8_t number = 0x05; //0b00000101
+uint8_t bit_2 = BitVal(number,2); // bit_2 = 1
+uint8_t bit_1 = BitVal(number,1); // bit_1 = 0
+SetBit(number,1); // number =  0x07 => 0b00000111
+ClearBit(number,2); // number =0x03 => 0b0000011 */
+
 typedef unsigned int vertex_t;
 typedef unsigned int edge_t;
 
@@ -371,7 +392,7 @@ typedef struct {
 } uint512_axivec_dt;
 
 typedef struct {
-	int data[HBM_AXI_PACK_SIZE]; // 16
+	int data[HBM_AXI_PACK_SIZE]; // 16 
 } uint512_axiswvec_dt;
 
 typedef struct {
@@ -387,6 +408,11 @@ typedef struct {
     unsigned int B;
 } tuple_t;
 
+typedef struct {
+	unsigned int local_id;
+    unsigned int global_id;
+} translator_t;
+
 typedef unsigned int vdata_t;
 
 typedef struct {
@@ -394,6 +420,11 @@ typedef struct {
 	// unsigned int mask;
 	unsigned int degree;
 } vprop_t;
+
+typedef struct {
+	unsigned int prop;
+	unsigned int gvid;
+} vprop_dest_t;
 
 typedef struct {
 	vprop_t data[EDGE_PACK_SIZE];
@@ -414,23 +445,7 @@ typedef struct {
 	unsigned int NUM_APPLYPARTITIONS; // NUM_PEs
 	
 	unsigned int NUM_PARTITIONS;
-
-	// unsigned int AU_BATCHV_SIZE; // FIXME.
-	// unsigned int GF_BATCHV_SIZE;
-	// unsigned int IMPORT_BATCHV_SIZE;
-	// unsigned int PE_BATCHV_SIZE;
-	// unsigned int EXPORT_BATCHV_SIZE;
-	// unsigned int IMPORT_EXPORT_GRANULARITYV_VECSIZE; 
 } universalparams_t;
-
-// typedef struct {
-	// unsigned int AU_BATCHV_SIZE; // FIXME.
-	// unsigned int GF_BATCHV_SIZE;
-	// unsigned int IMPORT_BATCHV_SIZE;
-	// unsigned int PE_BATCHV_SIZE;
-	// unsigned int EXPORT_BATCHV_SIZE;
-	// unsigned int IMPORT_EXPORT_GRANULARITYV_VECSIZE; 
-// } async_params_t;
 
 typedef struct {
 	unsigned int BASEOFFSET_VPROP;

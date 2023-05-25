@@ -364,6 +364,15 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	
 	vector<edge3_type> edgedatabuffer;
 	vector<edge_t> vertexptrbuffer;
+	
+	/* vprop_dest_t * local_vertex_properties[64]; 
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ local_vertex_properties[i] = new vprop_dest_t[universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_]; } 
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ 
+		for(unsigned int t=0; t<universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_; t++){
+			local_vertex_properties[i][t].prop = 0; 
+			local_vertex_properties[i][t].gvid = 0; 
+		}
+	} */
 
 	HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs]; 
 	HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS]; 
@@ -402,6 +411,15 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 
 	long double edges_processed[128];
 	long double vertices_processed[128];
+	
+	vprop_dest_t * local_vertex_properties[64]; 
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ local_vertex_properties[i] = new vprop_dest_t[universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_]; } 
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ 
+		for(unsigned int t=0; t<universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_; t++){
+			local_vertex_properties[i][t].prop = 0; 
+			local_vertex_properties[i][t].gvid = 0; 
+		}
+	}
 
 	unsigned int __NUM_UPARTITIONS = (universalparams.NUM_VERTICES + (MAX_UPARTITION_SIZE - 1)) /  MAX_UPARTITION_SIZE;
 	unsigned int __NUM_APPLYPARTITIONS = ((universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_) + (MAX_APPLYPARTITION_SIZE - 1)) /  MAX_APPLYPARTITION_SIZE; // universalparams.GLOBAL_NUM_PEs_
@@ -457,8 +475,11 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	size_u32 = 0;
 	vector<edge3_type> partitioned_edges[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS];
 	unsigned int * final_edge_updates_offsets[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ final_edge_updates_offsets[i] = new unsigned int[MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS]; for(unsigned int t=0; t<MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS; t++){ final_edge_updates_offsets[i][t] = 0; } }
+
 	act_pack * pack = new act_pack(universalparams);
-	pack->load_edgeupdates(vertexptrbuffer, edgedatabuffer, partitioned_edges);	
+	pack->load_edges(vertexptrbuffer, edgedatabuffer, partitioned_edges);	
+	// pack->load_edges_new(vertexptrbuffer, edgedatabuffer, partitioned_edges, local_vertex_properties);	// FIXME.
+	// exit(EXIT_SUCCESS);//////////////////////////////////////////////////
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
 		for(unsigned int p_u=0; p_u<MAX_NUM_UPARTITIONS; p_u++){ 
 			for(unsigned int llp_set=0; llp_set<MAX_NUM_LLPSETS; llp_set++){ 

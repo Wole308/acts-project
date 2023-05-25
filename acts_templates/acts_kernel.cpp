@@ -2205,11 +2205,59 @@ CLEAR_COUNTERS_LOOP1: for(unsigned int p_v=0; p_v<__NUM_APPLYPARTITIONS; p_v++){
 	}
 	#endif
 	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// load edge updates to BRAM buffer
+	for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }	
+	unsigned int offset2 = 0; // FIXME. // ((p_v * globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]) + p_u) * 512;
+	unsigned int padding_factor = 1;
+	
+	edge_update_vec_dt tmp_buffer[NUM_VALID_PEs][BLOCKRAM_SIZE];	
+	#pragma HLS ARRAY_PARTITION variable=tmp_buffer complete dim=1
+
+	COLLECTSTATS_EDGEUPDATES_LOOP1: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
+	#pragma HLS PIPELINE II=2
+		dretrievemany_edges(globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES] + offset2 + t, offsets, t, edge3_vecs,  HBM_channelA0, HBM_channelB0);
+				
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+		#pragma HLS UNROLL
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL
+				edge_update_type edge_update = edge3_vecs[inst].data[v];
+				#ifdef _DEBUGMODE_KERNELPRINTS//4
+				cout<<"acts-apply: t: "<<t<<", edge_update.srcvid: "<<edge_update.srcvid<<", edge_update.dstvid: "<<edge_update.dstvid<<endl;
+				#endif 
+				tmp_buffer[inst][t].data[v] = edge_update;
+				unsigned int incr = 0; unsigned int index = 0; 
+				if(edge_update.srcvid < EDGE_UPDATES_DRAMBUFFER_SIZE){ incr = 1; index = edge_update.srcvid; } else { incr = 0; index = 0; }	
+				URAM_map[inst][v][index].size += incr;								
+			}
+		}
+	}
+	// exit(EXIT_SUCCESS);	
+
+	// calculate edge updates stats
+	COLLECTSTATS_EDGEUPDATES_LOOP2: for(unsigned int t=1; t<EDGE_UPDATES_DRAMBUFFER_SIZE; t++){ // EDGE_UPDATES_DRAMBUFFER_SIZE. FIXME./////////////////////////////////
+	#pragma HLS PIPELINE II=2
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){	
+		#pragma HLS UNROLL
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL
+				URAM_map[inst][v][t].offset = URAM_map[inst][v][t-1].offset + (URAM_map[inst][v][t-1].size * padding_factor); 
+			}
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	// process-edges and partition-updates 
 	#ifdef ___ENABLE___PROCESSEDGES___
 	if(action.module == PROCESS_EDGES_MODULE || action.module == ALL_MODULES){
 	PROCESS_EDGES_MODULE_LOOP1B: for(unsigned int local_pu=action.start_pu; local_pu<action.start_pu + action.size_pu; local_pu+=action.skip_pu){
-
+		
+		#ifdef __NOT_YET_IMPL__
+		unsigned int bit_2 = BitVal(mask[local_pu / 32], local_pu % 32);
+		cout<<"### processing edges in upartition ---------------------------+++++++++++++++++++++++++++-------------------------------------  "<<bit_2<<endl;
+		#endif
+		
 		unsigned int p_u = local_pu; 
 		action.id_process = p_u; 
 		MASK_CODE_PE = ((1 + GraphIter) * MAX_NUM_UPARTITIONS) + p_u;
@@ -2666,8 +2714,6 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 #define _DEBUGMODE_APPLYEDGEUPDATES_PRINTS4
 #endif
 
-#define EDGE_UPDATES_CHUNKSZ 512 // 8192 
-
 edge_update_type MISSBUFFER_edgeupdates[NUM_VALID_PEs][EDGE_PACK_SIZE][BLOCKRAM_SIZE];
 #pragma HLS ARRAY_PARTITION variable=MISSBUFFER_edgeupdates complete dim=1	
 #pragma HLS ARRAY_PARTITION variable=MISSBUFFER_edgeupdates complete dim=2	
@@ -2685,8 +2731,8 @@ unsigned int MISSBUFFER_edges_index[NUM_VALID_PEs][EDGE_PACK_SIZE];
 unsigned int max_sz_eus[NUM_VALID_PEs][EDGE_PACK_SIZE];
 #pragma HLS ARRAY_PARTITION variable=MISSBUFFER_edgeupdates_index complete
 
-edge_update_vec_dt tmp_buffer[NUM_VALID_PEs][BLOCKRAM_SIZE];	
-#pragma HLS ARRAY_PARTITION variable=tmp_buffer complete dim=1
+// edge_update_vec_dt tmp_buffer[NUM_VALID_PEs][BLOCKRAM_SIZE];	
+// #pragma HLS ARRAY_PARTITION variable=tmp_buffer complete dim=1
 edge3_vec_dt tmp_buffer2[NUM_VALID_PEs][BLOCKRAM_SIZE];	
 #pragma HLS ARRAY_PARTITION variable=tmp_buffer2 complete dim=1
 
@@ -2706,8 +2752,8 @@ unsigned int offset2 = 0; // FIXME. // ((p_v * globalparams[GLOBALPARAMSCODE__PA
 unsigned int padding_factor = 1;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LOAD_EDGEUPDATES_LOOP1: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
+/** ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+COLLECTSTATS_EDGEUPDATES_LOOP1: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
 #pragma HLS PIPELINE II=2
 	dretrievemany_edges(globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES] + offset2 + t, offsets, t, edge3_vecs,  HBM_channelA0, HBM_channelB0);
 			
@@ -2716,7 +2762,6 @@ LOAD_EDGEUPDATES_LOOP1: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 		#pragma HLS UNROLL
 			edge_update_type edge_update = edge3_vecs[inst].data[v];
-			// edge_update.srcvid = rand() % EDGE_UPDATES_DRAMBUFFER_SIZE; edge_update.dstvid = rand() % EDGE_UPDATES_DRAMBUFFER_SIZE; // FIXME.
 			#ifdef _DEBUGMODE_KERNELPRINTS//4
 			cout<<"acts-apply: t: "<<t<<", edge_update.srcvid: "<<edge_update.srcvid<<", edge_update.dstvid: "<<edge_update.dstvid<<endl;
 			#endif 
@@ -2740,7 +2785,7 @@ COLLECTSTATS_EDGEUPDATES_LOOP2: for(unsigned int t=1; t<EDGE_UPDATES_DRAMBUFFER_
 		}
 	}
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
 TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]; p_u++){
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
@@ -2756,7 +2801,7 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 	// clear indices
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 	#pragma HLS UNROLL
-		MY_LOOP12746: for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 		#pragma HLS UNROLL
 			MISSBUFFER_edgeupdates_index[inst][v] = 0;
 			MISSBUFFER_edges_index[inst][v] = 0;
@@ -2770,12 +2815,18 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 	cout<<"acts-apply: summary: used "<<tots_<<" slots (of 8192 slots). tots2: "<<tots2_<<endl;
 	#endif 	
 	// exit(EXIT_SUCCESS); 
+	
+	/////////////////////////////////////////////////////
+	// formerly defined here
+	// LOAD_EDGEUPDATES_LOOP1
+	// COLLECTSTATS_EDGEUPDATES_LOOP2
+	/////////////////////////////////////////////////////
 
 	// map edge updates to URAM
 	unsigned int batch_sz = 256; // 128; 
-	LOAD_EDGEUPDATES_LOOP2: for(unsigned int t1=0; t1<(EDGE_UPDATES_CHUNKSZ + (batch_sz-1)) / batch_sz; t1++){
+	LOAD_EDGEUPDATES_LOOP1: for(unsigned int t1=0; t1<(EDGE_UPDATES_CHUNKSZ + (batch_sz-1)) / batch_sz; t1++){
 		LOAD_EDGEUPDATES_LOOP1B: for(unsigned int t2=0; t2<batch_sz; t2++){ // FIXHANG.
-		#pragma HLS PIPELINE II=4
+		#pragma HLS PIPELINE II=1 // <<<FIXME. II too long>>>
 			unsigned int t = (t1 * batch_sz) + t2;
 			for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 			#pragma HLS UNROLL
@@ -2790,7 +2841,7 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 					map_t map; map.size = 0;
 					if(edge_update.srcvid < EDGE_UPDATES_DRAMBUFFER_SIZE){ map = URAM_map[inst][v][edge_update.srcvid]; }
 					
-					if(map.size > 0 && t < EDGE_UPDATES_CHUNKSZ){	
+					/** if(map.size > 0 && t < EDGE_UPDATES_CHUNKSZ){	
 						unsigned int edge_hashid = hash2_edge(map, edge_update.srcvid, edge_update.dstvid, padding_factor); 
 
 						#ifdef _DEBUGMODE_KERNELPRINTS//4 
@@ -2800,7 +2851,6 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 						edge_update_type former_edge_update = URAM_edgeupdates[inst][v][edge_hashid];
 						edge_update_type new_edge_update;
 						if(former_edge_update.srcvid == INVALIDDATA){ new_edge_update = edge_update; } else { new_edge_update = former_edge_update; }
-						
 						URAM_edgeupdates[inst][v][edge_hashid] = new_edge_update;
 						edgeupdates_hash_ids[inst][v][t] = edge_hashid;
 						
@@ -2810,7 +2860,15 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 							#endif
 							MISSBUFFER_edgeupdates[inst][v][MISSBUFFER_edgeupdates_index[inst][v]] = edge_update;
 							MISSBUFFER_edgeupdates_index[inst][v] += 1; 
-						}
+						}		
+					} */			
+					if(map.size > 0 && t < EDGE_UPDATES_CHUNKSZ){	
+						unsigned int edge_hashid = hash2_edge(map, edge_update.srcvid, edge_update.dstvid, padding_factor); 
+						#ifdef _DEBUGMODE_KERNELPRINTS//4 
+						if(inst==0 && p_u==0 && llp_set==0 && t<2){ cout<<"$$$ load-edge-updates::["<<inst<<"]["<<t<<"]["<<v<<"]: [edge_update-update: srcvid: "<<edge_update.srcvid<<", dstvid: "<<edge_update.dstvid<<"]---[edge_hashid: "<<edge_hashid<<"]"<<endl; }								
+						#endif	
+						URAM_edgeupdates[inst][v][edge_hashid] = edge_update; // FIXME.
+						edgeupdates_hash_ids[inst][v][t] = edge_hashid;	
 					}
 				}
 			}
@@ -2836,7 +2894,7 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 		unsigned int edges_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[p_v].offset + (it * BLOCKRAM_SIZE);
 		
 		APPLY_VERTEX_UPDATES_LOOP: for(unsigned int t=0; t<sz; t++){				
-		#pragma HLS PIPELINE II=3
+		#pragma HLS PIPELINE II=3 // <<<FIXME. II too long>>>
 			dretrievemany_udatesdram(updates_offset + t, updates_vecs,  HBM_channelA0, HBM_channelB0); // NEW
 			
 			for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
@@ -2887,7 +2945,7 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 		}
 		
 		APPLY_EDGE_UPDATES_LOOP: for(unsigned int t=0; t<sz; t++){
-		#pragma HLS PIPELINE II=2
+		#pragma HLS PIPELINE II=1
 			for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 			#pragma HLS UNROLL
 				edge3_vecs[inst] = tmp_buffer2[inst][t];
@@ -2911,7 +2969,8 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 						
 						edge_update_type edge_update = URAM_edgeupdates[inst][v][edge_hashid];
 						if(edge.srcvid == edge_update.srcvid && edge.dstvid == edge_update.dstvid){
-							edge3_vecs[inst].data[v].weight += eu_weight;									
+							// edge3_vecs[inst].data[v].weight += eu_weight;		
+							edge3_vecs[inst].data[v].weight = eu_weight; // <<<FIXME. II too long>>>		
 							#ifdef _DEBUGMODE_CHECKS3
 							if(inst==0){ num_hits += 1; }
 							if(inst==0 && false){ cout<<"[process-edge-updates:: hit seen @ ["<<inst<<"]["<<t<<"]["<<v<<"]: srcvid: "<<edge.srcvid<<", dstvid: "<<edge.dstvid<<", edge_hashid: "<<edge_hashid<<"]"<<endl; }
@@ -2948,18 +3007,18 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 	// *** (1) EDGE INSERTIONS ***; (2) reset URAM buffers
 	unsigned int edges_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[p_v].offset;// + (it * BLOCKRAM_SIZE);
 	EDGE_INSERTIONS_LOOP: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
-	#pragma HLS PIPELINE II=2
+	#pragma HLS PIPELINE II=1
 		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 		#pragma HLS UNROLL
 			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 			#pragma HLS UNROLL
 				edge_update_type edge_update = tmp_buffer[inst][t].data[v];
 				if(edge_update.srcvid < EDGE_UPDATES_DRAMBUFFER_SIZE){ 
-					unsigned int edge_hashid = edgeupdates_hash_ids[inst][v][t];
-					edge3_vecs[inst].data[v] = URAM_edgeupdates[inst][v][edge_hashid];
+					unsigned int edge_hashid = edgeupdates_hash_ids[inst][v][t];	
+					edge3_vecs[inst].data[v] = URAM_edgeupdates[inst][v][edge_hashid];	
 					 
-					// URAM_map[inst][v][edge_update.srcvid].offset = 0; 
-					// URAM_map[inst][v][edge_update.srcvid].size = 0;
+					/** URAM_map[inst][v][edge_update.srcvid].offset = 0; 
+					URAM_map[inst][v][edge_update.srcvid].size = 0; */
 					URAM_edgeupdates[inst][v][edge_hashid].srcvid = INVALIDDATA; //
 					URAM_edgeupdates[inst][v][edge_hashid].dstvid = INVALIDDATA; //
 
@@ -2980,29 +3039,15 @@ TOP_APPLY_VERTE_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOBA
 	#endif 
 	// exit(EXIT_SUCCESS);	
 
-	/* // reset URAM buffers
-	RESET_URAMS: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
-	#pragma HLS PIPELINE II=2
-		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
-		#pragma HLS UNROLL
-			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-			#pragma HLS UNROLL
-				edge_update_type edge_update = tmp_buffer[inst][t].data[v];
-				if(edge_update.srcvid < EDGE_UPDATES_DRAMBUFFER_SIZE){ 
-					unsigned int edge_hashid = edgeupdates_hash_ids[inst][v][t];
-					URAM_map[inst][v][edge_update.srcvid].offset = 0; 
-					URAM_map[inst][v][edge_update.srcvid].size = 0;
-					URAM_edgeupdates[inst][v][edge_hashid].srcvid = INVALIDDATA; //
-					URAM_edgeupdates[inst][v][edge_hashid].dstvid = INVALIDDATA; //
-				}
-			}
-		}
-	}	 */
+	/////////////////////////////////////////////////////
+	// formerly defined here
+	// RESET_URAMS
+	/////////////////////////////////////////////////////
 }
 
 // reset URAM buffers
-RESET_URAMS: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
-#pragma HLS PIPELINE II=2
+APPLY_EDGEUPDATES_RESETURAMBUFFERS_MAINLOOP1: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
+#pragma HLS PIPELINE II=1
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 	#pragma HLS UNROLL
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){

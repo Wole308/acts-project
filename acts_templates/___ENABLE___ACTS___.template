@@ -364,11 +364,59 @@ MY_IFDEF_TOPLEVELFUNC(){
 	}
 	#endif
 	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// load edge updates to BRAM buffer
+	for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }	
+	unsigned int offset2 = 0; // FIXME. // ((p_v * globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]) + p_u) * 512;
+	unsigned int padding_factor = 1;
+	
+	edge_update_vec_dt tmp_buffer[NUM_VALID_PEs][BLOCKRAM_SIZE];	
+	#pragma HLS ARRAY_PARTITION variable=tmp_buffer complete dim=1
+
+	COLLECTSTATS_EDGEUPDATES_LOOP1: for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){
+	#pragma HLS PIPELINE II={{context['II_COLLECTSTATS_EDGEUPDATES_LOOP1']}}
+		dretrievemany_edges(globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES] + offset2 + t, offsets, t, edge3_vecs, {% include '___HBM___ARGS___.template' %});
+				
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+		#pragma HLS UNROLL
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL
+				edge_update_type edge_update = edge3_vecs[inst].data[v];
+				#ifdef _DEBUGMODE_KERNELPRINTS//4
+				cout<<"acts-apply: t: "<<t<<", edge_update.srcvid: "<<edge_update.srcvid<<", edge_update.dstvid: "<<edge_update.dstvid<<endl;
+				#endif 
+				tmp_buffer[inst][t].data[v] = edge_update;
+				unsigned int incr = 0; unsigned int index = 0; 
+				if(edge_update.srcvid < EDGE_UPDATES_DRAMBUFFER_SIZE){ incr = 1; index = edge_update.srcvid; } else { incr = 0; index = 0; }	
+				URAM_map[inst][v][index].size += incr;								
+			}
+		}
+	}
+	// exit(EXIT_SUCCESS);	
+
+	// calculate edge updates stats
+	COLLECTSTATS_EDGEUPDATES_LOOP2: for(unsigned int t=1; t<EDGE_UPDATES_DRAMBUFFER_SIZE; t++){ // EDGE_UPDATES_DRAMBUFFER_SIZE. FIXME./////////////////////////////////
+	#pragma HLS PIPELINE II={{context['II_COLLECTSTATS_EDGEUPDATES_LOOP2']}}
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){	
+		#pragma HLS UNROLL
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL
+				URAM_map[inst][v][t].offset = URAM_map[inst][v][t-1].offset + (URAM_map[inst][v][t-1].size * padding_factor); 
+			}
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	// process-edges and partition-updates 
 	#ifdef ___ENABLE___PROCESSEDGES___
 	if(action.module == PROCESS_EDGES_MODULE || action.module == ALL_MODULES){
 	PROCESS_EDGES_MODULE_LOOP1B: for(unsigned int local_pu=action.start_pu; local_pu<action.start_pu + action.size_pu; local_pu+=action.skip_pu){
-
+		
+		#ifdef __NOT_YET_IMPL__
+		unsigned int bit_2 = BitVal(mask[local_pu / 32], local_pu % 32);
+		cout<<"### processing edges in upartition ---------------------------+++++++++++++++++++++++++++-------------------------------------  "<<bit_2<<endl;
+		#endif
+		
 		unsigned int p_u = local_pu; 
 		action.id_process = p_u; 
 		MASK_CODE_PE = ((1 + GraphIter) * MAX_NUM_UPARTITIONS) + p_u;
