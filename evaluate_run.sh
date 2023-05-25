@@ -47,45 +47,27 @@
 # make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
 # make host PLATFORM=/opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm
 		
-# DATSETS=(
-		# kron_g500-logn20 
-		# rmat_16m_256m 
-		# flickr
-		# soc-sinaweibo
-		
-		# uk-2005 
-		# it-2004 
-		# twitter7 
-		# GAP-twitter
-		# com-Friendster
-		
-		# rmat_8m_512m
-		# rmat_16m_1024m
-		# rmat_32m_2048m 
-		# )
-		
 DATSETS=(
 		# kron_g500-logn20 
-		rmat_16m_256m 
+		# rmat_16m_256m 
 		# it-2004 
 		# GAP-twitter
 		
-		indochina-2004 
-		twitter7 
-		uk-2005 
-		soc-sinaweibo
+		# indochina-2004 
+		# twitter7 
+		# uk-2005 
+		# soc-sinaweibo
 		# webbase-2001
-		uk-2005 
-		rmat_8m_1024m
+		# rmat_8m_1024m
 		rmat_16m_1024m
-		rmat_32m_1024m
+		# rmat_32m_1024m
 		)
 		
 NUM_FPGAS=(
 		# 1
 		# 2
-		3
-		# 4
+		# 3
+		4
 		# 8
 		)
 		
@@ -97,16 +79,17 @@ NUM_PES=(
 XCLBINS=(
 		"outputs/vector_addition_static_x1.xclbin"
 		# "outputs/vector_addition_dynamic_x1.xclbin"	
+		# "outputs/vector_addition_static_1fpga_x1.xclbin"	
 		# "outputs/vector_addition.xclbin"	
 		)
 		
 RUN_IN_ASYNC_MODE=(
-		1
+		1	
 		# 0
 		)
 	
-XWARE_ID=0 # 0, 1
-MAX_NUM_ITERATIONS=1 #16
+XWARE_ID=1 # 0, 1
+MAX_NUM_ITERATIONS=16
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do	
@@ -127,7 +110,7 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 				# ./host sssp ${NUM_FPGAS[c]} 13 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_sssp/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out			
 				# sleep 2
 				# cp -rf summary.csv results/results_sssp/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				# exit
+				# exit 
 			# done
 
 			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do

@@ -223,11 +223,22 @@ MY_IFDEF_TOPLEVELFUNC(){
 #pragma HLS INTERFACE s_axilite port = return
 
 	#ifdef _DEBUGMODE_KERNELPRINTS4	
+	unsigned int _K0 = 1; // <lowerlimit:1, upperlimit:_GF_BATCH_SIZE>
+	unsigned int _K1 = 2; // NUM_FPGAS // <lowerlimit:1, upperlimit:NUM_FPGAS*>
+	unsigned int _AU_BATCH_SIZE = 2; 
+	unsigned int _GF_BATCH_SIZE = _AU_BATCH_SIZE * universalparams.GLOBAL_NUM_PEs_; // 6 (i.e., 24 upartitions)
+	unsigned int _IMPORT_BATCH_SIZE = (_GF_BATCH_SIZE / _K0); // 6
+	unsigned int _PE_BATCH_SIZE = _IMPORT_BATCH_SIZE; // 6
+	unsigned int _EXPORT_BATCH_SIZE = _IMPORT_BATCH_SIZE; // (_GF_BATCH_SIZE * _K1); // 24
+	unsigned int _IMPORT_EXPORT_GRANULARITY_VECSIZE = 8184;
+	#endif 
+	
+	#ifdef _DEBUGMODE_KERNELPRINTS4	
 	if(start_pu != NAp && fpga < num_prints) { cout<<"acts started [processing stage]: fpga: "<<fpga<<", start_pu: "<<start_pu<<", size_pu: "<<size_pu<<", start_pv_fpga: "<<start_pv_fpga<<", start_pv: "<<start_pv<<", size_pv: "<<size_pv<<", start_gv_fpga: "<<start_gv_fpga<<", start_gv: "<<start_gv<<", size_gv: "<<size_gv<<endl; }
 	if(start_pv != NAp && fpga < num_prints) { cout<<"acts started [applying stage]: fpga: "<<fpga<<", start_pu: "<<start_pu<<", size_pu: "<<size_pu<<", start_pv_fpga: "<<start_pv_fpga<<", start_pv: "<<start_pv<<", size_pv: "<<size_pv<<", start_gv_fpga: "<<start_gv_fpga<<", start_gv: "<<start_gv<<", size_gv: "<<size_gv<<endl; }
 	if(start_gv != NAp && fpga < num_prints) { cout<<"acts started [gathering stage]: fpga: "<<fpga<<", start_pu: "<<start_pu<<", size_pu: "<<size_pu<<", start_pv_fpga: "<<start_pv_fpga<<", start_pv: "<<start_pv<<", size_pv: "<<size_pv<<", start_gv_fpga: "<<start_gv_fpga<<", start_gv: "<<start_gv<<", size_gv: "<<size_gv<<endl; }			
-	if(id_import != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "acts started [importing stage]: --> importing upartition: "<<id_import<<" to "<<id_import + MAX_IMPORT_BATCH_SIZE<<"..." <<endl; }
-	if(id_export != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "acts started [exporting stage]: <-- exporting vpartition: "<<id_export<<" to "<<id_export + MAX_EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<numfpgas; n++){ cout<<n<<", "; } cout<<"]..." <<endl; }				
+	if(id_import != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "### acts started [importing stage]: --> importing upartition: "<<id_import<<" to "<<id_import + _IMPORT_BATCH_SIZE<<"..." <<endl; }
+	if(id_export != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "### acts started [exporting stage]: <-- exporting vpartition: "<<id_export<<" to "<<id_export + _EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<numfpgas; n++){ cout<<n<<", "; } cout<<"]..." <<endl; }				
 	#endif 
 	
 	// commands from host 
@@ -304,7 +315,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	
 	// load vertex-updates map 
 	#ifdef _DEBUGMODE_KERNELPRINTS4
-	if((action.module == ALL_MODULES || action.module == PROCESS_EDGES_MODULE) && (action.start_pu == 0)){ cout << "acts: resetting updates space..." <<endl; }
+	if((action.module == ALL_MODULES || action.module == PROCESS_EDGES_MODULE) && (action.start_pu == 0)){ if(action.fpga < num_prints){ cout << "acts: resetting updates space..." <<endl; }}
 	#endif 
 	LOAD_UPDATEPTRS_lOOP1B: for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; t++){	
 	#pragma HLS PIPELINE II=1

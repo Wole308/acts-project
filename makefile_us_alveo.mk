@@ -48,6 +48,7 @@ HOST_SRCS_ACTS += $(RELREF)host_srcs/hostprocess.cpp
 HOST_SRCS_ACTS += $(RELREF)host_srcs/prepare_graph.cpp
 # HOST_SRCS_ACTS += $(RELREF)host_srcs/make_graph.cpp
 HOST_SRCS_ACTS += $(RELREF)host_srcs/act_pack.cpp
+# HOST_SRCS_ACTS += $(RELREF)host_srcs/act_pack_new.cpp
 HOST_SRCS_ACTS += $(RELREF)host_srcs/create_act_pack.cpp
 # HOST_SRCS_ACTS += $(RELREF)acts_templates/transform_to_actpack.cpp
 HOST_SRCS_ACTS += $(RELREF)host_srcs/app.cpp

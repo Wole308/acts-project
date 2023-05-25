@@ -224,8 +224,10 @@
 
 ////////////////
 
-#define MAX_IMPORT_BATCH_SIZE 64
-#define MAX_EXPORT_BATCH_SIZE NAp
+// #define MAX_IMPORT_BATCH_SIZE 64
+// #define MAX_EXPORT_BATCH_SIZE NAp
+#define MAX_IMPORT_BATCH_SIZE 96
+#define MAX_EXPORT_BATCH_SIZE 192
 // IMPORT_BATCH_SIZE
 
 ////////////////
