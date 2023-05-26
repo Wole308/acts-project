@@ -24,16 +24,16 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 			#ifdef _DEBUGMODE_CHECKS3
 			if(t < limits[inst]){ checkoutofbounds("acts_kernel::ERROR 727a::", dstvid_lp, MAX_APPLYPARTITION_SIZE, NAp, inst, update.key); checkoutofbounds("acts_kernel::ERROR 727b::", dstvid_lpv, MAX_APPLYPARTITION_VECSIZE, NAp, inst, update.key); }					
 			#endif
-			vprop_t vprop = URAM_vprop[inst][v][dstvid_lpv];
-			vprop_t newprop; newprop.prop = INVALIDDATA; newprop.degree = INVALIDDATA;
+			vprop_dest_t vprop = URAM_vprop[inst][v][dstvid_lpv];
+			vprop_dest_t newprop; newprop.prop = INVALIDDATA; 
 			unsigned int new_vprop = reduce_funcG(vprop, update.value, globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM]);
 			if(t < limits[inst]){ 
 				#ifdef _DEBUGMODE_KERNELPRINTS_TRACE3
-				std::cout<<"APPLY (ACT-PACK) UPDATE SEEN @: t: "<<t<<", inst: ["<<inst<<"]: dstvid_lp: "<<dstvid_lp<<", dstvid_lpv: "<<dstvid_lpv<<", new_vprop: "<<new_vprop<<", vid: "<<update.key<<std::endl;
+				if(t < 1024){ std::cout<<"APPLY (ACT-PACK) UPDATE SEEN @: t: "<<t<<", inst: ["<<inst<<"], v: ["<<v<<"]: dstvid_lp: "<<dstvid_lp<<", dstvid_lpv: "<<dstvid_lpv<<", new_vprop: "<<new_vprop<<", update.key: "<<update.key<<", update.value: "<<update.value<<std::endl; }						
 				#endif
-				newprop.prop = new_vprop; newprop.degree = MASK_CODE_AU;
+				newprop.prop = new_vprop; 
 			}
-			URAM_vprop[inst][v][dstvid_lpv] = newprop; 
+			URAM_vprop[inst][v][dstvid_lpv].prop = newprop.prop; 
 			#ifdef _DEBUGMODE_CHECKS3
 			if(inst==0 && v==0){ update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___APPLYUPDATES___, 1); }
 			#endif 

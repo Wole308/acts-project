@@ -1,16 +1,19 @@
-for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }
+vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
+#pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
 
 SAVE_DEST_PROPERTIES_LOOP2: for(unsigned int t=0; t<MAX_APPLYPARTITION_VECSIZE; t++){
 #pragma HLS PIPELINE II={{context['II_READ_DEST_PROPERTIES_LOOP2B']}}
 	SAVE_DEST_PROPERTIES_LOOP2B: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL
-		retrieveandresetvec_vdatabuffer(t, datas[inst], URAM_vprop[inst]);
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+		#pragma HLS UNROLL
+			#ifdef _DEBUGMODE_CHECKS3
+			checkoutofbounds("acts_kernel::ERROR 105::", t, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+			#endif 
+			vprop[inst][v] = URAM_vprop[inst][v][t];
+		}
 	}
-	MY_LOOP10202: for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
-	#pragma HLS UNROLL
-		offsets2[n] = voffset + offsets[n] + t; 
-	}
-	dinsertmany_vdatadram(voffset, offsets2, t, datas, {% include '___HBM___ARGS___.template' %});
+	dinsertmany_vdatadram(voffset, t, vprop, {% include '___HBM___ARGS___.template' %});
 	
 	update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___SAVE_DEST_PROPERTIES___, 1);
 }

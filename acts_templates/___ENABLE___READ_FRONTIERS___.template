@@ -1,12 +1,11 @@
 // broadcast active frontiers [done]
-unsigned int uoffset = p_u * MAX_UPARTITION_VECSIZE; 
-unsigned int data[HBM_CHANNEL_PACK_SIZE];
+unsigned int uoffset = p_u * MAX_UPARTITION_VECSIZE; 		
+unsigned int data[HBM_CHANNEL_PACK_SIZE];	
 #pragma HLS ARRAY_PARTITION variable=data complete
-unsigned int ens34[NUM_VALID_PEs];
-#pragma HLS ARRAY_PARTITION variable=ens34 complete
+keyvalue_t kvdatas[NUM_VALID_PEs][EDGE_PACK_SIZE];	
+#pragma HLS ARRAY_PARTITION variable = kvdatas complete dim=0
 unsigned int offset_c = globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP];
 
-for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }
 #ifdef _DEBUGMODE_CHECKS3
 checkoutofbounds("acts_kernel::ERROR 12073::", cfrontier_dram___size[p_u], MAX_APPLYPARTITION_VECSIZE+1, NAp, NAp, NAp);
 #endif 
@@ -31,20 +30,18 @@ READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<cfrontier_dram___size[p_u]; t++){
 }
 
 // parallel-read and map active frontiers [done]
-for(unsigned int n=0; n<NUM_VALID_PEs; n++){ offsets[n] = 0; }
 READ_FRONTIERS_LOOP2: for(unsigned int t=0; t<cfrontier_dram___size[p_u]; t++){ 
 #pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1B']}}	
-	dretrievemany_cfrontierdram_tmp(globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], offsets, t, kvdatas, {% include '___HBM___ARGS___.template' %});
+	dretrievemany_cfrontierdram_tmp(globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], t, kvdatas, {% include '___HBM___ARGS___.template' %});
 	insertvec_cfrontierbuffer_tmp(t, kvdatas[0], URAM_frontiers); // NEW
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 	#pragma HLS UNROLL 
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 		#pragma HLS UNROLL
-			unsigned int srcvid_lpv__ = (kvdatas[inst][v].key - uoffset) >> EDGE_PACK_SIZE_POW;
-			if(kvdatas[inst][v].key != INVALIDDATA && srcvid_lpv__ < MAX_UPARTITION_VECSIZE){
-				unsigned int srcvid_lpv = srcvid_lpv__; 
-				vprop_t tmp; tmp.prop = kvdatas[inst][v].value; tmp.degree = MASK_CODE_PE;
-				insert_vdatabuffer(v, srcvid_lpv, tmp, URAM_vprop[inst]); 
+			unsigned int srcvid_lpv = (kvdatas[inst][v].key - uoffset) >> EDGE_PACK_SIZE_POW;
+			if(kvdatas[inst][v].key != INVALIDDATA && srcvid_lpv < MAX_UPARTITION_VECSIZE){
+				vprop_dest_t tmp; tmp.prop = kvdatas[inst][v].value; tmp.gvid = kvdatas[inst][v].key; 
+				URAM_vprop[inst][v][srcvid_lpv] = tmp; 
 			}
 		}
 	}

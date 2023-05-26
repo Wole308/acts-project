@@ -1,9 +1,18 @@
+vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
+#pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
+
 READ_DEST_PROPERTIES_LOOP2B: for(unsigned int t=0; t<MAX_APPLYPARTITION_VECSIZE; t++){
 #pragma HLS PIPELINE II={{context['II_READ_DEST_PROPERTIES_LOOP2B']}}
-	dretrievemany_vdatadram(voffset, offsets, t, datas, {% include '___HBM___ARGS___.template' %});
+	dretrievemany_vdatadram(voffset, t, vprop, {% include '___HBM___ARGS___.template' %});
 	READ_DEST_PROPERTIES_LOOP2C: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL
-		insertvec_vdatabuffer(t, datas[inst], URAM_vprop[inst]);
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+		#pragma HLS UNROLL
+			#ifdef _DEBUGMODE_CHECKS3
+			checkoutofbounds("acts_kernel::ERROR 104::", t, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+			#endif 
+			URAM_vprop[inst][v][t] = vprop[inst][v];
+		}
 	}
 	
 	#ifdef ___ENABLE___IMPORT_EXPORT___

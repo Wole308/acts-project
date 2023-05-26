@@ -159,7 +159,7 @@
 	#endif 
 #define HBM_CENTER_SIZE ((HBM_CHANNEL_BYTESIZE / 4) / EDGE_PACK_SIZE) // {4194304 EDGE_PACK_SIZEs, 67108864 uints, 256MB}
 #define FOLD_SIZE 1
-#define MAX_NUM_UPARTITIONS 512		
+#define MAX_NUM_UPARTITIONS 1024 // 512	// NEWCHANGE.	
 #if NUM_PEs==1
 	#define MAX_NUM_APPLYPARTITIONS (48 * MAX_NUM_PEs)
 	#else 
@@ -424,7 +424,6 @@ typedef unsigned int vdata_t;
 
 typedef struct {
 	unsigned int prop;
-	// unsigned int mask;
 	unsigned int degree;
 } vprop_t;
 

@@ -365,15 +365,6 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	vector<edge3_type> edgedatabuffer;
 	vector<edge_t> vertexptrbuffer;
 	
-	/* vprop_dest_t * local_vertex_properties[64]; 
-	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ local_vertex_properties[i] = new vprop_dest_t[universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_]; } 
-	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ 
-		for(unsigned int t=0; t<universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_; t++){
-			local_vertex_properties[i][t].prop = 0; 
-			local_vertex_properties[i][t].gvid = 0; 
-		}
-	} */
-
 	HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs]; 
 	HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS]; 
 	unsigned int globalparams[1024];
