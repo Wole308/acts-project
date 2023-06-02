@@ -93,7 +93,7 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 	
 	// decide whether to use directed or graphisundirected (FIXME.)
 	unsigned int mult_factor = 0;
-	if(num_edges > 200000000){ cout<<"************* prepare_graph::[OVERRIDING...] Undirected graph too large to fit in memory. using directed graph instead"<<endl; graphisundirected = false; }
+	// if(num_edges > 200000000){ cout<<"************* prepare_graph::[OVERRIDING...] Undirected graph too large to fit in memory. using directed graph instead"<<endl; graphisundirected = false; }
 	if(graphisundirected==true){ mult_factor = 2; } else { mult_factor = 1; }
 	
 	cout<<"prepare_graph: assigning variables..."<<endl;

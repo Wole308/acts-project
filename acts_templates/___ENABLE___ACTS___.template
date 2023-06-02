@@ -84,11 +84,11 @@ unsigned int owner_vpartition(unsigned int dstvid, unsigned int msg){
 	return msg; // FIXME.
 }
 
-void import_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_import, action_t action, unsigned int _NUMCLOCKCYCLES_[2][32]){
+void import_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_import, action_t action, unsigned int globalparams[GLOBALBUFFER_SIZE], unsigned int _NUMCLOCKCYCLES_[2][32]){
 	#ifdef _DEBUGMODE_KERNELPRINTS4
 	cout<<"acts_kernel::run:: importing "<<action.size_import_export<<" 32bit-integers (Host -> FPGA)..."<<endl;
 	#endif 
-	unsigned int import_offset = action.id_import * action.size_import_export * MAX_UPARTITION_VECSIZE;
+	unsigned int import_offset = action.id_import * action.size_import_export * MAX_UPARTITION_VECSIZE; // globalparams[GLOBALPARAMSCODE__PARAM__MAX_UPARTITION_VECSIZE]
 	IMPORT_LOOP1: for(unsigned int t=0; t<action.size_import_export; t++){ 
 	#pragma HLS PIPELINE II={{context['II_TRANSPORT_FRONTIER_PROPERTIES_LOOP1B']}}
 		#ifdef _DEBUGMODE_CHECKS3
@@ -100,7 +100,7 @@ void import_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_ch
 	}
 }	
 
-void export_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_export, action_t action, unsigned int _NUMCLOCKCYCLES_[2][32]){	
+void export_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_export, action_t action, unsigned int globalparams[GLOBALBUFFER_SIZE], unsigned int _NUMCLOCKCYCLES_[2][32]){	
 	#ifdef _DEBUGMODE_KERNELPRINTS4
 	cout<<"acts_kernel::run:: exporting "<<action.size_import_export<<" 32bit-integers (FPGA -> Host)..."<<endl;
 	#endif 
@@ -240,7 +240,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	if(id_import != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "### acts started [importing stage]: --> importing upartition: "<<id_import<<" to "<<id_import + _IMPORT_BATCH_SIZE<<"..." <<endl; }
 	if(id_export != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "### acts started [exporting stage]: <-- exporting vpartition: "<<id_export<<" to "<<id_export + _EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<numfpgas; n++){ cout<<n<<", "; } cout<<"]..." <<endl; }				
 	#endif 
-	
+
 	// commands from host 
 	action_t action;
 	action.fpga = fpga; 
@@ -304,6 +304,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 		#endif 
 	}
 	
+	unsigned int algo = globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM];
 	unsigned int import_offset = action.id_import * action.size_import_export;
 	unsigned int export_offset = action.id_export * action.size_import_export;
 	unsigned int vdata_subpartition_vecsize = MAX_UPARTITION_VECSIZE / globalparams[GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs];
@@ -397,7 +398,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 		// read & map frontier properties 
 		#ifdef ___ENABLE___READ_FRONTIER_PROPERTIES___
 		#if NUM_PEs==1
-		unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * MAX_APPLYPARTITION_VECSIZE);
+		unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
 		{% include '___ENABLE___READ_DEST_PROPERTIES_SINGLEFPGA___.template' %}	
 		#else 
 		{% include '___ENABLE___READ_FRONTIERS___.template' %}		
@@ -436,8 +437,8 @@ MY_IFDEF_TOPLEVELFUNC(){
 		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
 		if(action.fpga < num_prints){ cout<<"### applying edge updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"]"<<endl; } 
 		#endif 
-		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<p_v<<"].size: "<<updatesptrs[p_v].size<<" ((((((((((((((((((((((( "<<endl; }
-		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
+		if(true && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<p_v<<"].size: "<<updatesptrs[p_v].size<<" ("<<updatesptrs[p_v].size * EDGE_PACK_SIZE<<") ((((((((((((((((((((((( "<<endl; }
+		if(true && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
 		#endif 
 		
 		// read destination properties

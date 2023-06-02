@@ -23,7 +23,45 @@ rm -rf ./host /{*sw_emu*,*hw_emu*}
 rm -rf profile_* TempConfig system_estimate.xtxt *.rpt *.csv 
 rm -rf src/*.ll *v++* .Xil emconfig.json dltmp* xmltmp* *.log *.jou *.wcfg *.wdb
 g++ host_srcs/hostprocess.cpp host_srcs/prepare_graph.cpp host_srcs/act_pack.cpp host_srcs/create_act_pack.cpp host_srcs/app.cpp host_srcs/utility.cpp host_srcs/algorithm.cpp host_srcs/host.cpp acts_templates/acts_kernel.cpp -std=c++11 -pthread -march=native -lrt -o host
-pagerank algorithm running...: dataset: twitter7, num fpgas: 4, xclbin: outputs/vector_addition_static_x1.xclbin num_iterations: 16
+hits algorithm running...: dataset: rmat_16m_256m, num fpgas: 4, xclbin: outputs/vector_addition_static_x1.xclbin num_iterations: 1
 Hostprocess:: Graph Analytics Started...
-app::run:: app algo started. (algo: pr, numiterations: 16, rootvid: 1, graph path: /home/oj2zf/Documents/dataset/twitter7/twitter7.mtx, graph dir: 0, _binaryFile1: outputs/vector_addition_static_x1.xclbin)
+app::run:: app algo started. (algo: hits, numiterations: 1, rootvid: 1, graph path: /home/oj2zf/Documents/dataset/rmat_16m_256m/rmat_16m_256m.mtx, graph dir: 1, _binaryFile1: outputs/vector_addition_static_x1.xclbin)
 app: initializing HBM_axichannels...
+app: initializing HBM_axicenters
+prepare_graph:: preparing graph @ /home/oj2zf/Documents/dataset/rmat_16m_256m/rmat_16m_256m.mtx...
+prepare_graph:: dataset header: num_vertices: 16778216, num_vertices2: 16778216, num_edges: 268436456
+prepare_graph:: edge: srcv: 10975719, dstv: 12106048, weight: 0
+prepare_graph:: edge: srcv: 16284243, dstv: 7194194, weight: 0
+prepare_graph:: edge: srcv: 5580278, dstv: 3133714, weight: 0
+prepare_graph:: edge: srcv: 4523514, dstv: 4600791, weight: 0
+prepare_graph:: edge: srcv: 435768, dstv: 2718683, weight: 0
+prepare_graph:: edge: srcv: 5505973, dstv: 6939365, weight: 0
+prepare_graph:: edge: srcv: 12717283, dstv: 2841061, weight: 0
+prepare_graph:: edge: srcv: 13268671, dstv: 1173030, weight: 0
+prepare_graph:: edge: srcv: 16085039, dstv: 14632382, weight: 0
+prepare_graph:: edge: srcv: 9566872, dstv: 15620799, weight: 0
+prepare_graph:: edge: srcv: 12164740, dstv: 13689632, weight: 0
+prepare_graph:: edge: srcv: 2646825, dstv: 16005870, weight: 0
+prepare_graph:: edge: srcv: 16480466, dstv: 10380056, weight: 0
+prepare_graph:: edge: srcv: 10266186, dstv: 10305585, weight: 0
+prepare_graph:: edge: srcv: 4667365, dstv: 11295200, weight: 0
+prepare_graph:: edge: srcv: 6081344, dstv: 14398093, weight: 0
+prepare_graph: loading edges 100000000
+prepare_graph: loading edges 200000000
+SUMMARY: linecount: 268435457, edgesbuffer.size(): 268435456
+prepare_graph:: Finished Stage 1: Buffering edges of /home/oj2zf/Documents/dataset/rmat_16m_256m/rmat_16m_256m.mtx (num_vertices: 16778216, num_vertices2: 16778216, num_edges: 268436456)
+prepare_graph: assigning variables...
+prepare_graph: creating buffers...
+prepare_graph: creating buffers(2)...
+prepare_graph: populating inout degrees of all vertices...
+prepare_graph: creating vertex pointers...
+prepare_graph::start:: vptr_dup[1]: 0
+prepare_graph::start:: vptr_dup[2]: 49
+prepare_graph::start:: vptr_dup[3]: 77
+prepare_graph::start:: vptr_dup[16777213]: 536870825
+prepare_graph::start:: vptr_dup[16777214]: 536870853
+prepare_graph::start:: vptr_dup[16777215]: 536870887
+prepare_graph::start:: last: vptr_dup[16777215]: 536870887
+prepare_graph: checking new vertex pointers created...
+prepare_graph::start:: checking...
+prepare_graph::start:: finished checking.

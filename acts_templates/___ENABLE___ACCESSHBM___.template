@@ -256,7 +256,8 @@ void dinsertmany_vdatadram(unsigned int offset__, unsigned int t, vprop_dest_t d
 	#pragma HLS INLINE // FIXME_HARDWARE
 	#ifdef _DEBUGMODE_CHECKS3
 	unsigned int wwsize = globalparams_debug[GLOBALPARAMSCODE__WWSIZE__VDATAS];
-	checkoutofbounds("acts_kernel::ERROR 711b::", offset__, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], NAp, NAp, NAp);
+	// checkoutofbounds("acts_kernel::ERROR 711b::", offset__, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], NAp, NAp, NAp);
+	checkoutofbounds("acts_kernel::ERROR 711b::", offset__, HBM_CHANNEL_SIZE, NAp, NAp, NAp);
 	#endif 
 	
 	unsigned int data_[NUM_VALID_PEs][HBM_CHANNEL_PACK_SIZE]; // NEW

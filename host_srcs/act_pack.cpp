@@ -40,10 +40,6 @@ unsigned int get_H7(unsigned int vid, unsigned int ping_pong, universalparams_t 
 	return ping_pong; // FIXME
 }
 
-unsigned int get_local_to_upartitionn(unsigned int lvid){
-	return lvid % MAX_UPARTITION_SIZE;
-}
-
 void getXYLayoutV(unsigned int s, unsigned int depths[EDGE_PACK_SIZE]){
 	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 		depths[v] = (EDGE_PACK_SIZE + v - s) % EDGE_PACK_SIZE; 
@@ -70,10 +66,10 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 	cout<<"=== act_pack: HBM_AXI_PACK_SIZE: "<<HBM_AXI_PACK_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_AXI_PACK_BITSIZE: "<<HBM_AXI_PACK_BITSIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_CHANNEL_BYTESIZE: "<<HBM_CHANNEL_BYTESIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_APPLYPARTITION_VECSIZE: "<<MAX_APPLYPARTITION_VECSIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_APPLYPARTITION_SIZE: "<<MAX_APPLYPARTITION_SIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_UPARTITION_VECSIZE: "<<MAX_UPARTITION_VECSIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_UPARTITION_SIZE: "<<MAX_UPARTITION_SIZE<<" ==="<<endl;
+	cout<<"=== act_pack: universalparams._MAX_APPLYPARTITION_VECSIZE: "<<universalparams._MAX_APPLYPARTITION_VECSIZE<<" ==="<<endl;
+	cout<<"=== act_pack: _MAX_APPLYPARTITION_SIZE: "<<universalparams._MAX_APPLYPARTITION_SIZE<<" ==="<<endl;
+	cout<<"=== act_pack: universalparams._MAX_UPARTITION_VECSIZE: "<<universalparams._MAX_UPARTITION_VECSIZE<<" ==="<<endl;
+	cout<<"=== act_pack: universalparams._MAX_UPARTITION_SIZE: "<<universalparams._MAX_UPARTITION_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_CHANNEL_BYTESIZE: "<<HBM_CHANNEL_BYTESIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_CHANNEL_SIZE: "<<HBM_CHANNEL_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: MAX_NUM_LLPSETS: "<<MAX_NUM_LLPSETS<<" ==="<<endl;
@@ -106,7 +102,7 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 				if(tryy==0){ H = get_H2(edge.dstvid, universalparams); } 
 				else if(tryy==1){ H = get_H4(edge.dstvid, universalparams); }
 				else { H = get_H7(edge.dstvid, ping_pong, universalparams); ping_pong+=1; if(ping_pong >= universalparams.GLOBAL_NUM_PEs_){ ping_pong = 0; } }	// FIXME.				
-				utilityobj->checkoutofbounds("loadedges::ERROR 223::", H, universalparams.GLOBAL_NUM_PEs_, edge.srcvid, edge.dstvid, MAX_UPARTITION_SIZE);
+				utilityobj->checkoutofbounds("loadedges::ERROR 223::", H, universalparams.GLOBAL_NUM_PEs_, edge.srcvid, edge.dstvid, universalparams._MAX_UPARTITION_SIZE);
 				
 				edges_in_channel[H].push_back(edge);
 			}
@@ -139,11 +135,11 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 		for(unsigned int t=0; t<edges_in_channel[i].size(); t++){
 			edge3_type edge = edges_in_channel[i][t];
 	
-			unsigned int p_u = (edge.srcvid / MAX_UPARTITION_SIZE);
+			unsigned int p_u = (edge.srcvid / universalparams._MAX_UPARTITION_SIZE);
 			if(p_u >= universalparams.NUM_UPARTITIONS){ p_u = universalparams.NUM_UPARTITIONS-1; } 
 	
 			#ifdef _DEBUGMODE_HOSTCHECKS3
-			utilityobj->checkoutofbounds("act_pack::ERROR 22c::", p_u, universalparams.NUM_UPARTITIONS, edge.srcvid, edge.srcvid, MAX_UPARTITION_SIZE);
+			utilityobj->checkoutofbounds("act_pack::ERROR 22c::", p_u, universalparams.NUM_UPARTITIONS, edge.srcvid, edge.srcvid, universalparams._MAX_UPARTITION_SIZE);
 			#endif 
 			edgesin_srcvp[p_u].push_back(edge);
 		}
@@ -154,9 +150,9 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 				edge3_type edge = edgesin_srcvp[p_u][t];
 				unsigned int local_dstvid = get_local(tryy, edge.dstvid, universalparams); // FIXME.
 				#ifdef _DEBUGMODE_HOSTCHECKS3
-				utilityobj->checkoutofbounds("act_pack::ERROR 2234c::", local_dstvid, universalparams.NUM_APPLYPARTITIONS * MAX_APPLYPARTITION_SIZE, edge.srcvid, edge.srcvid, local_dstvid);
+				utilityobj->checkoutofbounds("act_pack::ERROR 2234c::", local_dstvid, universalparams.NUM_APPLYPARTITIONS * universalparams._MAX_APPLYPARTITION_SIZE, edge.srcvid, edge.srcvid, local_dstvid);
 				#endif 
-				unsigned int llp_set = local_dstvid / MAX_APPLYPARTITION_SIZE;
+				unsigned int llp_set = local_dstvid / universalparams._MAX_APPLYPARTITION_SIZE;
 				llp_set = 0; // FIXME.
 				edge.dstvid = local_dstvid; 
 				final_edge_updates[i][p_u][llp_set].push_back(edge);
@@ -181,10 +177,10 @@ void act_pack::load_edges_new(vector<edge_t> &vertexptrbuffer, vector<edge3_type
 	cout<<"=== act_pack: HBM_AXI_PACK_SIZE: "<<HBM_AXI_PACK_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_AXI_PACK_BITSIZE: "<<HBM_AXI_PACK_BITSIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_CHANNEL_BYTESIZE: "<<HBM_CHANNEL_BYTESIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_APPLYPARTITION_VECSIZE: "<<MAX_APPLYPARTITION_VECSIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_APPLYPARTITION_SIZE: "<<MAX_APPLYPARTITION_SIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_UPARTITION_VECSIZE: "<<MAX_UPARTITION_VECSIZE<<" ==="<<endl;
-	cout<<"=== act_pack: MAX_UPARTITION_SIZE: "<<MAX_UPARTITION_SIZE<<" ==="<<endl;
+	cout<<"=== act_pack: universalparams._MAX_APPLYPARTITION_VECSIZE: "<<universalparams._MAX_APPLYPARTITION_VECSIZE<<" ==="<<endl;
+	cout<<"=== act_pack: _MAX_APPLYPARTITION_SIZE: "<<universalparams._MAX_APPLYPARTITION_SIZE<<" ==="<<endl;
+	cout<<"=== act_pack: universalparams._MAX_UPARTITION_VECSIZE: "<<universalparams._MAX_UPARTITION_VECSIZE<<" ==="<<endl;
+	cout<<"=== act_pack: _MAX_UPARTITION_SIZE: "<<universalparams._MAX_UPARTITION_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_CHANNEL_BYTESIZE: "<<HBM_CHANNEL_BYTESIZE<<" ==="<<endl;
 	cout<<"=== act_pack: HBM_CHANNEL_SIZE: "<<HBM_CHANNEL_SIZE<<" ==="<<endl;
 	cout<<"=== act_pack: MAX_NUM_LLPSETS: "<<MAX_NUM_LLPSETS<<" ==="<<endl;
@@ -236,15 +232,15 @@ void act_pack::load_edges_new(vector<edge_t> &vertexptrbuffer, vector<edge3_type
 	// max_edges_size = max_edges_size / 2; //////////////
 	cout<<"----- act-pack:: max_degree_vertex: "<<max_degree_vertex<<", max_edges_size:: "<<max_edges_size<<" ----- "<<endl;
 	
-	for(unsigned int n=0; n<universalparams.NUM_VERTICES / MAX_UPARTITION_SIZE; n++){		
-		for(unsigned int lvid=0; lvid<MAX_UPARTITION_SIZE; lvid++){
-			unsigned int gvid = (n * MAX_UPARTITION_SIZE) + lvid;			
+	for(unsigned int n=0; n<universalparams.NUM_VERTICES / universalparams._MAX_UPARTITION_SIZE; n++){		
+		for(unsigned int lvid=0; lvid<universalparams._MAX_UPARTITION_SIZE; lvid++){
+			unsigned int gvid = (n * universalparams._MAX_UPARTITION_SIZE) + lvid;			
 			edge_t vptr_begin = vertexptrbuffer[gvid];
 			edge_t vptr_end = vertexptrbuffer[gvid+1];
 			edge_t edges_size = vptr_end - vptr_begin;
 			if(vptr_end < vptr_begin){ edges_size = 0; }
 			unsigned int index = ((edges_size * 100) / max_edges_size); if(index >= 100){ index = index % 100; } 
-			utilityobj->checkoutofbounds("loadedges::ERROR 1143::", index, 101, edges_size, max_edges_size, MAX_UPARTITION_SIZE);
+			utilityobj->checkoutofbounds("loadedges::ERROR 1143::", index, 101, edges_size, max_edges_size, universalparams._MAX_UPARTITION_SIZE);
 			distr_vertices[index].push_back(gvid);
 			for(unsigned int i=0; i<edges_size; i++){		
 				edge3_type this_edge = edgedatabuffer[vptr_begin + i];
@@ -274,7 +270,7 @@ void act_pack::load_edges_new(vector<edge_t> &vertexptrbuffer, vector<edge3_type
 					unsigned int H = get_H1(edge.dstvid, universalparams);
 					// unsigned int H = get_H2(edge.dstvid, universalparams);
 					// unsigned int H = get_H7(edge.dstvid, ping_pong, universalparams); ping_pong+=1; if(ping_pong >= universalparams.GLOBAL_NUM_PEs_){ ping_pong = 0; }
-					utilityobj->checkoutofbounds("loadedges::ERROR 223::", H, universalparams.GLOBAL_NUM_PEs_, edge.srcvid, edge.dstvid, MAX_UPARTITION_SIZE);
+					utilityobj->checkoutofbounds("loadedges::ERROR 223::", H, universalparams.GLOBAL_NUM_PEs_, edge.srcvid, edge.dstvid, universalparams._MAX_UPARTITION_SIZE);
 					
 					if(vertex_translator[H][edge.dstvid].local_id == INVALIDDATA){ 
 						vertex_translator[H][edge.dstvid].local_id = next_index[H]; 
@@ -325,11 +321,11 @@ void act_pack::load_edges_new(vector<edge_t> &vertexptrbuffer, vector<edge3_type
 		for(unsigned int t=0; t<edges_in_channel[i].size(); t++){
 			edge3_type edge = edges_in_channel[i][t];
 	
-			unsigned int p_u = (edge.srcvid / MAX_UPARTITION_SIZE);
+			unsigned int p_u = (edge.srcvid / universalparams._MAX_UPARTITION_SIZE);
 			if(p_u >= universalparams.NUM_UPARTITIONS){ p_u = universalparams.NUM_UPARTITIONS-1; } 
 	
 			#ifdef _DEBUGMODE_HOSTCHECKS3
-			utilityobj->checkoutofbounds("act_pack::ERROR 22c::", p_u, universalparams.NUM_UPARTITIONS, edge.srcvid, edge.srcvid, MAX_UPARTITION_SIZE);
+			utilityobj->checkoutofbounds("act_pack::ERROR 22c::", p_u, universalparams.NUM_UPARTITIONS, edge.srcvid, edge.srcvid, universalparams._MAX_UPARTITION_SIZE);
 			#endif 
 			edgesin_srcvp[p_u].push_back(edge);
 		}
@@ -343,9 +339,9 @@ void act_pack::load_edges_new(vector<edge_t> &vertexptrbuffer, vector<edge3_type
 				unsigned int local_dstvid = vertex_translator[i][edge.dstvid].local_id;
 				
 				#ifdef _DEBUGMODE_HOSTCHECKS3
-				utilityobj->checkoutofbounds("act_pack::ERROR 2234c::", local_dstvid, universalparams.NUM_APPLYPARTITIONS * MAX_APPLYPARTITION_SIZE, edge.srcvid, edge.srcvid, local_dstvid);
+				utilityobj->checkoutofbounds("act_pack::ERROR 2234c::", local_dstvid, universalparams.NUM_APPLYPARTITIONS * universalparams._MAX_APPLYPARTITION_SIZE, edge.srcvid, edge.srcvid, local_dstvid);
 				#endif 
-				unsigned int llp_set = 0; // local_dstvid / MAX_APPLYPARTITION_SIZE; // FIXME.
+				unsigned int llp_set = 0; // local_dstvid / universalparams._MAX_APPLYPARTITION_SIZE; // FIXME.
 				edge.dstvid = local_dstvid; 
 				final_edge_updates[i][p_u][llp_set].push_back(edge);
 			}

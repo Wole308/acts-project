@@ -68,6 +68,13 @@ universalparams_t get_universalparams(std::string algo, unsigned int num_fpgas, 
 	universalparams_t universalparams;
 	algorithm * algorithmobj = new algorithm();
 	
+	unsigned int div = 1; if(algorithmobj->get_algorithm_id(algo) == HITS){ div = 2; } else { div = 1; }
+	
+	universalparams._MAX_UPARTITION_VECSIZE = MAX_UPARTITION_VECSIZE / div;
+	universalparams._MAX_UPARTITION_SIZE = MAX_UPARTITION_SIZE / div;
+	universalparams._MAX_APPLYPARTITION_VECSIZE = MAX_APPLYPARTITION_VECSIZE / div;
+	universalparams._MAX_APPLYPARTITION_SIZE = MAX_APPLYPARTITION_SIZE / div;
+	
 	universalparams.ALGORITHM = algorithmobj->get_algorithm_id(algo);
 	universalparams.NUM_FPGAS_ = num_fpgas;
 	universalparams.GLOBAL_NUM_PEs_ = num_fpgas * NUM_PEs;
@@ -77,12 +84,11 @@ universalparams_t get_universalparams(std::string algo, unsigned int num_fpgas, 
 	universalparams.NUM_VERTICES = num_vertices; 
 	universalparams.NUM_EDGES = num_edges; 
 
-	universalparams.NUM_UPARTITIONS = (universalparams.NUM_VERTICES + (MAX_UPARTITION_SIZE - 1)) /  MAX_UPARTITION_SIZE;
+	universalparams.NUM_UPARTITIONS = (universalparams.NUM_VERTICES + (universalparams._MAX_UPARTITION_SIZE - 1)) /  universalparams._MAX_UPARTITION_SIZE;
 	if(universalparams.NUM_UPARTITIONS > MAX_NUM_UPARTITIONS){ cout<<"app: ERROR 234. universalparams.NUM_UPARTITIONS ("<<universalparams.NUM_UPARTITIONS<<") > MAX_NUM_UPARTITIONS ("<<MAX_NUM_UPARTITIONS<<"). EXITING..."<<endl; } 
-	universalparams.NUM_APPLYPARTITIONS = ((universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_) + (MAX_APPLYPARTITION_SIZE - 1)) /  MAX_APPLYPARTITION_SIZE; // universalparams.GLOBAL_NUM_PEs_
+	universalparams.NUM_APPLYPARTITIONS = ((universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_) + (universalparams._MAX_APPLYPARTITION_SIZE - 1)) /  universalparams._MAX_APPLYPARTITION_SIZE; // universalparams.GLOBAL_NUM_PEs_
 	
 	universalparams.NUM_PARTITIONS = 16;
-
 	return universalparams; 
 }
 
@@ -122,8 +128,8 @@ void print_globalparams(unsigned int globalparams[1024], universalparams_t unive
 	cout<<"app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS: "<<globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS]<<endl;
 	unsigned int lastww_addr = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS];
 	cout<<"app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__END: "<<lastww_addr<<" (of "<< HBM_CHANNEL_SIZE <<" wide-words) ("<<lastww_addr * HBM_CHANNEL_PACK_SIZE * 4<<" bytes)"<<endl;
-	// utilityobj->checkoutofbounds("app::ERROR 2234::", lastww_addr, ((1 << 28) / 4 / HBM_AXI_PACK_SIZE), universalparams.NUM_APPLYPARTITIONS, MAX_APPLYPARTITION_VECSIZE, NAp);
-	utilityobj->checkoutofbounds("app::ERROR 2234::", lastww_addr, HBM_CHANNEL_SIZE, universalparams.NUM_APPLYPARTITIONS, MAX_APPLYPARTITION_VECSIZE, NAp);
+	// utilityobj->checkoutofbounds("app::ERROR 2234::", lastww_addr, ((1 << 28) / 4 / HBM_AXI_PACK_SIZE), universalparams.NUM_APPLYPARTITIONS, universalparams._MAX_APPLYPARTITION_VECSIZE, NAp);
+	utilityobj->checkoutofbounds("app::ERROR 2234::", lastww_addr, HBM_CHANNEL_SIZE, universalparams.NUM_APPLYPARTITIONS, universalparams._MAX_APPLYPARTITION_VECSIZE, NAp);
 	cout<<"app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_VERTICES: "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_VERTICES]<<endl;
 	cout<<"app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_EDGES: "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_EDGES]<<endl;
 	#endif 
@@ -184,7 +190,10 @@ unsigned int load_globalparams2(HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBA
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEDSTVID].data[0] = 16;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__NUM_RUNS].data[0] = 1; // 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs].data[0] = universalparams.GLOBAL_NUM_PEs_; // 
-		// HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs].data[0] = NUM_PEs; // FIXMEEEEEEEEEEEEEEEEEEEEEEE //////////////////////////////////////////
+		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAX_UPARTITION_VECSIZE].data[0] = universalparams._MAX_UPARTITION_VECSIZE;
+		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAX_UPARTITION_SIZE].data[0] = universalparams._MAX_UPARTITION_SIZE;
+		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE].data[0] = universalparams._MAX_APPLYPARTITION_VECSIZE;
+		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_SIZE].data[0] = universalparams._MAX_APPLYPARTITION_SIZE;
 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___RESETBUFFERSATSTART].data[0] = 1; // FIXME.
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PREPAREEDGEUPDATES].data[0] = 1; //
@@ -231,7 +240,7 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 	
 	map_t * edge_maps[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ edge_maps[i] = new map_t[MAX_NUM_UPARTITIONS * MAX_NUM_LLP_PER_UPARTITION]; }
 	map_t * edge_maps_large[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ edge_maps_large[i] = new map_t[MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS]; }
-	map_t * vu_map[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ vu_map[i] = new map_t[MAX_NUM_LLPSETS]; } // universalparams.NUM_APPLYPARTITIONS
+	map_t * vu_map[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ vu_map[i] = new map_t[MAX_NUM_LLPSETS]; } 
 
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
 		for(unsigned int t=0; t<MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS; t++){
@@ -354,6 +363,8 @@ void write2_to_hbmchannel(unsigned int i, HBM_channelAXISW_t * HBM_axichannel[2]
 }
 
 void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, int graphisundirected, unsigned int numiterations, string graph_path, std::string _binaryFile1){
+	if(algo == "hits"){ graphisundirected = 1; }
+	
 	cout<<"app::run:: app algo started. (algo: "<<algo<<", numiterations: "<<numiterations<<", rootvid: "<<rootvid<<", graph path: "<<graph_path<<", graph dir: "<<graphisundirected<<", _binaryFile1: "<<_binaryFile1<<")"<<endl;
 	
 	NUM_FPGAS = num_fpgas;
@@ -368,7 +379,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs]; 
 	HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS]; 
 	unsigned int globalparams[1024];
-
+	
 	// allocate AXI HBM memory
 	cout<<"app: initializing HBM_axichannels..."<<endl;
 	for(unsigned int i=0; i<mock_universalparams.GLOBAL_NUM_PEs_; i++){ 
@@ -412,9 +423,9 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 		}
 	}
 
-	unsigned int __NUM_UPARTITIONS = (universalparams.NUM_VERTICES + (MAX_UPARTITION_SIZE - 1)) /  MAX_UPARTITION_SIZE;
-	unsigned int __NUM_APPLYPARTITIONS = ((universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_) + (MAX_APPLYPARTITION_SIZE - 1)) /  MAX_APPLYPARTITION_SIZE; // universalparams.GLOBAL_NUM_PEs_
-	unsigned int vdata_subpartition_vecsize = MAX_UPARTITION_VECSIZE / universalparams.GLOBAL_NUM_PEs_;
+	unsigned int __NUM_UPARTITIONS = (universalparams.NUM_VERTICES + (universalparams._MAX_UPARTITION_SIZE - 1)) / universalparams._MAX_UPARTITION_SIZE;
+	unsigned int __NUM_APPLYPARTITIONS = ((universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_) + (universalparams._MAX_APPLYPARTITION_SIZE - 1)) /  universalparams._MAX_APPLYPARTITION_SIZE; // universalparams.GLOBAL_NUM_PEs_
+	unsigned int vdata_subpartition_vecsize = universalparams._MAX_UPARTITION_VECSIZE / universalparams.GLOBAL_NUM_PEs_;
 	unsigned int num_subpartition_per_partition = universalparams.GLOBAL_NUM_PEs_;
 	
 	cout<<"app::run::  vdata_subpartition_vecsize: "<<vdata_subpartition_vecsize<<endl;
@@ -423,8 +434,8 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	// load globalparams: {vptrs, edges, updatesptrs, updates, vertexprops, frontiers}
 	cout<<"app: loading global addresses: {vptrs, edges, updates, vertexprops, frontiers}..."<<endl;
 
-	unsigned int vdatasz_u32 = __NUM_APPLYPARTITIONS * MAX_APPLYPARTITION_VECSIZE * EDGE_PACK_SIZE * 2;
-	unsigned int cfrontiersz_u32 = 1 * MAX_APPLYPARTITION_VECSIZE * EDGE_PACK_SIZE * 2;
+	unsigned int vdatasz_u32 = __NUM_APPLYPARTITIONS * universalparams._MAX_APPLYPARTITION_VECSIZE * EDGE_PACK_SIZE * 2;
+	unsigned int cfrontiersz_u32 = 1 * universalparams._MAX_APPLYPARTITION_VECSIZE * EDGE_PACK_SIZE * 2;
 	unsigned int nfrontiersz_u32 = (__NUM_APPLYPARTITIONS * vdata_subpartition_vecsize * num_subpartition_per_partition * EDGE_PACK_SIZE) * 2;
 	#ifdef _DEBUGMODE_HOSTPRINTS4
 	cout<<"--_________________________--------------------- nfrontiersz_u32: "<<nfrontiersz_u32<<", vdatasz_u32: "<<vdatasz_u32<<", globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS] = "<<((nfrontiersz_u32 / (HBM_CHANNEL_PACK_SIZE / 2)) + 16)<<" "<<endl;
@@ -437,10 +448,10 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	cout<<"app: HBM_AXI_PACK_SIZE: "<<HBM_AXI_PACK_SIZE<<endl;
 	cout<<"app: HBM_AXI_PACK_BITSIZE: "<<HBM_AXI_PACK_BITSIZE<<endl;
 	cout<<"app: HBM_CHANNEL_BYTESIZE: "<<HBM_CHANNEL_BYTESIZE<<endl;
-	cout<<"app: MAX_APPLYPARTITION_VECSIZE: "<<MAX_APPLYPARTITION_VECSIZE<<endl;
-	cout<<"app: MAX_APPLYPARTITION_SIZE: "<<MAX_APPLYPARTITION_SIZE<<endl;
-	cout<<"app: MAX_UPARTITION_VECSIZE: "<<MAX_UPARTITION_VECSIZE<<endl;
-	cout<<"app: MAX_UPARTITION_SIZE: "<<MAX_UPARTITION_SIZE<<endl;
+	cout<<"app: universalparams._MAX_APPLYPARTITION_VECSIZE: "<<universalparams._MAX_APPLYPARTITION_VECSIZE<<endl;
+	cout<<"app: _MAX_APPLYPARTITION_SIZE: "<<universalparams._MAX_APPLYPARTITION_SIZE<<endl;
+	cout<<"app: universalparams._MAX_UPARTITION_VECSIZE: "<<universalparams._MAX_UPARTITION_VECSIZE<<endl;
+	cout<<"app: _MAX_UPARTITION_SIZE: "<<universalparams._MAX_UPARTITION_SIZE<<endl;
 	cout<<"app: HBM_CHANNEL_BYTESIZE: "<<HBM_CHANNEL_BYTESIZE<<endl;
 	cout<<"app: HBM_CHANNEL_SIZE: "<<HBM_CHANNEL_SIZE<<endl;
 	cout<<"app: UPDATES_BUFFER_PACK_SIZE: "<<UPDATES_BUFFER_PACK_SIZE<<endl;
@@ -619,12 +630,12 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
 		unsigned int base_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS];
 		for(unsigned int p=0; p<__NUM_APPLYPARTITIONS; p++){ 
-			for(unsigned int t=0; t<MAX_APPLYPARTITION_VECSIZE; t++){ 
+			for(unsigned int t=0; t<universalparams._MAX_APPLYPARTITION_VECSIZE; t++){ 
 				for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-					unsigned int index = p*MAX_APPLYPARTITION_VECSIZE*EDGE_PACK_SIZE + t*EDGE_PACK_SIZE + v;
-					utilityobj->checkoutofbounds("app::ERROR 21211::", base_offset + (p * MAX_APPLYPARTITION_VECSIZE + t), HBM_CHANNEL_SIZE, NAp, NAp, NAp);
-					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * MAX_APPLYPARTITION_VECSIZE + t), 2 * v, algorithmobj->vertex_initdata(universalparams.ALGORITHM, index), universalparams);
-					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * MAX_APPLYPARTITION_VECSIZE + t), 2 * v + 1, 0, universalparams);
+					unsigned int index = p*universalparams._MAX_APPLYPARTITION_VECSIZE*EDGE_PACK_SIZE + t*EDGE_PACK_SIZE + v;
+					utilityobj->checkoutofbounds("app::ERROR 21211::", base_offset + (p * universalparams._MAX_APPLYPARTITION_VECSIZE + t), HBM_CHANNEL_SIZE, NAp, NAp, NAp);
+					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * universalparams._MAX_APPLYPARTITION_VECSIZE + t), 2 * v, algorithmobj->vertex_initdata(universalparams.ALGORITHM, index), universalparams);
+					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * universalparams._MAX_APPLYPARTITION_VECSIZE + t), 2 * v + 1, 0, universalparams);
 					if(i==0){ size_u32 += 2; }
 				}
 			}

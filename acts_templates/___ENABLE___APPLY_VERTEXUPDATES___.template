@@ -11,14 +11,17 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 #pragma HLS PIPELINE II={{context['II_APPLY_UPDATES_LOOP1']}}
 	dretrievemany_udatesdram(updates_offset + t, updates_vecs, {% include '___HBM___ARGS___.template' %}); // NEW
 
+	unsigned int edge_dir = 1;
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL
 		uint512_vec_dt updates_vec = updates_vecs[inst];
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){		
 		#pragma HLS UNROLL
 			keyvalue_t update = updates_vec.data[v];
-			unsigned int dstvid_lp = update.key; 
-			if(update.key >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
+			// unsigned int dstvid_lp = update.key; 
+			// if(update.key >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
+			unsigned int dstvid_lp; if(algo == HITS && edge_dir == 1){ dstvid_lp = update.key * 2; } else { dstvid_lp = update.key; }
+			if(dstvid_lp >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
 			unsigned int dstvid_lpv = dstvid_lp / EDGE_PACK_SIZE;	
 			
 			#ifdef _DEBUGMODE_CHECKS3

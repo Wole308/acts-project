@@ -506,8 +506,8 @@ unsigned int create_act_pack::create_actpack(
 					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
 						for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 							if(c==0){
-								edges_vec[n].data[v].srcvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].srcvid % MAX_UPARTITION_SIZE; // NOTE: converted vid to local partition vid 
-								edges_vec[n].data[v].dstvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].dstvid % MAX_UPARTITION_SIZE; // NOTE: converted vid to local partition vid
+								edges_vec[n].data[v].srcvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].srcvid % universalparams._MAX_UPARTITION_SIZE; // NOTE: converted vid to local partition vid 
+								edges_vec[n].data[v].dstvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].dstvid % universalparams._MAX_UPARTITION_SIZE; // NOTE: converted vid to local partition vid
 							} else {
 								edges_vec[n].data[v] = HBM_channelTmp[n][t].data[v]; 
 							}
@@ -564,8 +564,8 @@ unsigned int create_act_pack::create_actpack(
 					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
 						for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 							if(c==0){
-								edges_vec[n].data[v].srcvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].srcvid % MAX_UPARTITION_SIZE; 
-								edges_vec[n].data[v].dstvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].dstvid % MAX_UPARTITION_SIZE; 
+								edges_vec[n].data[v].srcvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].srcvid % universalparams._MAX_UPARTITION_SIZE; 
+								edges_vec[n].data[v].dstvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].dstvid % universalparams._MAX_UPARTITION_SIZE; 
 							} else {
 								edges_vec[n].data[v] = HBM_channelTmp[n][t].data[v]; 
 							}

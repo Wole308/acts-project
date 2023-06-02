@@ -396,12 +396,12 @@ void run_traversal_algorithm_in_software(unsigned int GraphIter, vector<value_t>
 		edge_t edges_size = vptr_end - vptr_begin;
 		if(vptr_end < vptr_begin){ continue; } // FIXME.
 		#ifdef _DEBUGMODE_CHECKS3
-		if(vid / MAX_UPARTITION_SIZE >= MAX_NUM_UPARTITIONS){ cout<<"ERROR: vid("<<vid<<") / MAX_UPARTITION_SIZE("<<MAX_UPARTITION_SIZE<<") >= MAX_NUM_UPARTITIONS("<<MAX_NUM_UPARTITIONS<<"). exiting..."<<endl; exit(EXIT_FAILURE); }
+		if(vid / universalparams._MAX_UPARTITION_SIZE >= MAX_NUM_UPARTITIONS){ cout<<"ERROR: vid("<<vid<<") / _MAX_UPARTITION_SIZE("<<universalparams._MAX_UPARTITION_SIZE<<") >= MAX_NUM_UPARTITIONS("<<MAX_NUM_UPARTITIONS<<"). exiting..."<<endl; exit(EXIT_FAILURE); }
 		if(vptr_end < vptr_begin){ cout<<"ERROR: vptr_end("<<vptr_end<<") < vptr_begin("<<vptr_begin<<"). exiting..."<<endl; exit(EXIT_FAILURE); }
 		#endif
 		vertices_processed[GraphIter] += 1; 
-		vpartition_stats[vid / MAX_UPARTITION_SIZE].A += 1; 
-		vpartition_stats[vid / MAX_UPARTITION_SIZE].B += edges_size; // 
+		vpartition_stats[vid / universalparams._MAX_UPARTITION_SIZE].A += 1; 
+		vpartition_stats[vid / universalparams._MAX_UPARTITION_SIZE].B += edges_size; // 
 	
 		for(unsigned int k=0; k<edges_size; k++){
 			unsigned int dstvid = edgedatabuffer[vptr_begin + k].dstvid;
@@ -413,9 +413,9 @@ void run_traversal_algorithm_in_software(unsigned int GraphIter, vector<value_t>
 			if(vtemp != vprop){ 
 				actvvs_nextit.push_back(dstvid);
 				#ifdef _DEBUGMODE_CHECKS3
-				if(dstvid / MAX_UPARTITION_SIZE >= universalparams.NUM_UPARTITIONS){ cout<<"ERROR 232. dstvid ("<<dstvid<<") / MAX_UPARTITION_SIZE ("<<MAX_UPARTITION_SIZE<<") >= universalparams.NUM_UPARTITIONS ("<<universalparams.NUM_UPARTITIONS<<"). vid: "<<vid<<". EXITING..."<<endl; exit(EXIT_FAILURE); }	
+				if(dstvid / universalparams._MAX_UPARTITION_SIZE >= universalparams.NUM_UPARTITIONS){ cout<<"ERROR 232. dstvid ("<<dstvid<<") / _MAX_UPARTITION_SIZE ("<<universalparams._MAX_UPARTITION_SIZE<<") >= universalparams.NUM_UPARTITIONS ("<<universalparams.NUM_UPARTITIONS<<"). vid: "<<vid<<". EXITING..."<<endl; exit(EXIT_FAILURE); }	
 				#endif 
-				vertex_properties_map[dstvid / MAX_UPARTITION_SIZE] += 1;
+				vertex_properties_map[dstvid / universalparams._MAX_UPARTITION_SIZE] += 1;
 			}
 			edges_processed[GraphIter] += 1; 
 		}
@@ -826,7 +826,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	
 	std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
 	
-	// sparse processing		
+	// ===== sparse processing ===== 	
 	#ifdef RUN_SW_KERNEL 
 	bool en = true;
 	unsigned int iteration_idx = 0;
@@ -853,7 +853,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	}
 	#endif 
 	
-	// dense processing 
+	// ===== dense processing =====  
 	#ifdef RUN_FPGA_KERNEL
 	std::cout << endl << TIMINGRESULTSCOLOR <<"#################################################################### ACTS in FPGA mode ["<<num_iterations_dense<<" iterations] ####################################################################"<< RESET << std::endl;
 	std::chrono::steady_clock::time_point begin_time1 = std::chrono::steady_clock::now();
@@ -866,7 +866,9 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		unsigned int export_pointer[MAX_NUM_FPGAS];
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga] = actions[fpga][launch_idx]; }
 		
-		if(iters_idx[0][0] >= num_iterations_dense){ cout<<"host: FINISH: maximum iteration reached. breaking out..."<<endl; break; }
+		cout<<"---------------------------------------------------------------------- iters_idx[0][0]: "<<iters_idx[0][0]<<", action[0].module: "<<action[0].module<<endl;
+		
+		if(iters_idx[0][0] >= num_iterations_dense && action[0].module == PROCESS_EDGES_MODULE){ cout<<"host: FINISH: maximum iteration reached. breaking out..."<<endl; break; }
 		
 		int flag = run_idx % 2; 
 		#ifdef FPGA_IMPL
@@ -959,7 +961,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		double end_time2 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time2).count()) / 1000;	
 		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::pre-run time elapsed : "<<end_time2<<" ms, "<<(end_time2 * 1000)<<" microsecs, "<< RESET << std::endl; }
 	
-		// Allocate Buffer in Global Memory
+		// setup import and export variables
 		std::chrono::steady_clock::time_point begin_time3 = std::chrono::steady_clock::now();
 		size_t import_sz = 0; size_t export_sz = 0; size_t num_import_partitions = 0; size_t num_export_partitions = 0;
 		for(unsigned int fpga=0; fpga<device_count; fpga++){ 
@@ -993,8 +995,10 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			#endif 
 
 			#ifdef FPGA_IMPL
-			inBufExt_input[fpga].obj = &vertex_properties[0];//import_id * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE];
-			inBufExt_output[fpga].obj = &vertex_properties[0];//[export_id * ((MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_)];
+			inBufExt_input[fpga].obj = &vertex_properties[import_id * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE];
+			inBufExt_output[fpga].obj = &vertex_properties[export_id * ((MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_)];
+			// inBufExt_input[fpga].obj = &vertex_properties[0];
+			// inBufExt_output[fpga].obj = &vertex_properties[0];
 
 			if(import_sz < 64){
 				if(true || profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
@@ -1203,11 +1207,18 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 					if(universalparams.NUM_FPGAS_ > 1){ import_Queue[fpga][upartition_id].iteration = iters_idx[fpga][launch_idx] + 1; }
 				}
 			}
+		}	
+
+		// post import: update iters_idx
+		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
+			if(import_pointer[fpga] != INVALID_IOBUFFER_ID){ 
+				for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){ 
+					if(import_pointer[fpga] + k < universalparams.NUM_UPARTITIONS){ iters_idx[fpga][import_pointer[fpga] + k] += 1; }
+				}
+			}
 		}		
 		
-		// update launch_idx, iters_idx
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ if(import_pointer[fpga] != INVALID_IOBUFFER_ID){ for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){ if(import_pointer[fpga] + k < universalparams.NUM_UPARTITIONS){ iters_idx[fpga][import_pointer[fpga] + k] += 1; }}}}		
-		// if(import_pointer[0] != INVALID_IOBUFFER_ID){ cout<<"---------------------------------------------------------- host:: incremented iters_idx[0]["<<import_pointer[0] + 0<<"] to "<<iters_idx[0][import_pointer[0] + 0]<<endl; }	
+		// update launch_idx	
 		if(process_pointer[0] != INVALID_IOBUFFER_ID){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
 		if(action[0].start_pv != NAp){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
 		if(action[0].module == GATHER_FRONTIERS_MODULE){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
@@ -1329,7 +1340,8 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	
 	if(all_vertices_active_in_all_iterations == true){ 
 		std::cout << endl << TIMINGRESULTSCOLOR << ">>> "<<": Total # edges processed: " << universalparams.NUM_EDGES << ", time elapsed per iteration = " << end_time / num_iterations << " ms "<< RESET << std::endl;			
-		std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Throughput (MTEPS) = " << (universalparams.NUM_EDGES / (end_time / num_iterations)) / 1000 << " MTEPS, Throughput (BTEPS) = " << (universalparams.NUM_EDGES / (end_time / num_iterations)) / 1000000 << " BTEPS "<< RESET << std::endl;			
+		unsigned int num_trav_edges = universalparams.NUM_EDGES; if(universalparams.ALGORITHM == HITS){ num_trav_edges = universalparams.NUM_EDGES / 2; } else { num_trav_edges = universalparams.NUM_EDGES; }
+		std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Throughput (MTEPS) = " << (num_trav_edges / (end_time / num_iterations)) / 1000 << " MTEPS, Throughput (BTEPS) = " << (num_trav_edges / (end_time / num_iterations)) / 1000000 << " BTEPS "<< RESET << std::endl; 
 	} else {
 		std::cout << endl << TIMINGRESULTSCOLOR << ">>> "<<": Total # edges processed: " << total_edges_traversed << ", time elapsed = " << total_time_elapsed << " ms "<< RESET << std::endl;			
 		std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Throughput (MTEPS) = " << (total_edges_traversed / total_time_elapsed) / 1000 << " MTEPS, Throughput (BTEPS) = " << (double)(total_edges_traversed / total_time_elapsed) / 1000000 << " BTEPS "<< RESET << std::endl;			

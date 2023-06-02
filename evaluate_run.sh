@@ -49,18 +49,18 @@
 		
 DATSETS=(
 		# kron_g500-logn20 
-		# rmat_16m_256m 
+		rmat_16m_256m 
 		# it-2004 
 		# GAP-twitter
 		
-		# indochina-2004 
+		indochina-2004 
 		# twitter7 
-		# uk-2005 
+		uk-2005 
 		# soc-sinaweibo
-		# webbase-2001
+		webbase-2001
 		# rmat_8m_1024m
-		rmat_16m_1024m
-		# rmat_32m_1024m
+		# rmat_16m_1024m
+		rmat_32m_1024m
 		)
 		
 NUM_FPGAS=(
@@ -88,7 +88,7 @@ RUN_IN_ASYNC_MODE=(
 		# 0
 		)
 	
-XWARE_ID=1 # 0, 1
+XWARE_ID=0 # 0, 1
 MAX_NUM_ITERATIONS=16
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
@@ -97,11 +97,19 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 		for ((k = 0; k < ${#NUM_PES[@]}; k++)) do	
 			./evaluate_datasets.sh $XWARE_ID ${NUM_PES[k]} ${RUN_IN_ASYNC_MODE[n]}
 			
+			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
+				# echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
+				# ./host pr ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_pr/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				# sleep 2
+				# cp -rf summary.csv results/results_pr/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				# exit
+			# done	
+			
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
-				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host pr ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_pr/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				echo hits algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
+				./host hits ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_hits/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				sleep 2
-				cp -rf summary.csv results/results_pr/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				cp -rf summary.csv results/results_hits/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				exit
 			done
 			
@@ -111,14 +119,6 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 				# sleep 2
 				# cp -rf summary.csv results/results_sssp/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				# exit 
-			# done
-
-			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
-				# echo bfs algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				# ./host bfs ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_bfs/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
-				# sleep 2
-				# cp -rf summary.csv results/results_bfs/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				# exit
 			# done
 		done 
 	done

@@ -274,6 +274,10 @@
 #define GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEDSTVID 50
 #define GLOBALPARAMSCODE__PARAM__NUM_RUNS 51
 #define GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs 52
+#define GLOBALPARAMSCODE__PARAM__MAX_UPARTITION_VECSIZE 53 ////
+#define GLOBALPARAMSCODE__PARAM__MAX_UPARTITION_SIZE 54
+#define GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE 55
+#define GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_SIZE 56
 
 #define GLOBALPARAMSCODE___ENABLE___RESETBUFFERSATSTART 60
 #define GLOBALPARAMSCODE___ENABLE___PREPAREEDGEUPDATES 61
@@ -413,7 +417,7 @@ typedef unsigned int vdata_t;
 
 typedef struct {
 	unsigned int prop;
-	unsigned int degree;
+	unsigned int degree; 
 } vprop_t;
 
 typedef struct {
@@ -440,6 +444,11 @@ typedef struct {
 	unsigned int NUM_APPLYPARTITIONS; // NUM_PEs
 	
 	unsigned int NUM_PARTITIONS;
+	
+	unsigned int _MAX_UPARTITION_VECSIZE;
+	unsigned int _MAX_UPARTITION_SIZE;
+	unsigned int _MAX_APPLYPARTITION_VECSIZE;
+	unsigned int _MAX_APPLYPARTITION_SIZE;
 } universalparams_t;
 
 typedef struct {

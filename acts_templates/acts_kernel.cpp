@@ -1261,7 +1261,8 @@ void dinsertmany_vdatadram(unsigned int offset__, unsigned int t, vprop_dest_t d
 	#pragma HLS INLINE // FIXME_HARDWARE
 	#ifdef _DEBUGMODE_CHECKS3
 	unsigned int wwsize = globalparams_debug[GLOBALPARAMSCODE__WWSIZE__VDATAS];
-	checkoutofbounds("acts_kernel::ERROR 711b::", offset__, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], NAp, NAp, NAp);
+	// checkoutofbounds("acts_kernel::ERROR 711b::", offset__, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], NAp, NAp, NAp);
+	checkoutofbounds("acts_kernel::ERROR 711b::", offset__, HBM_CHANNEL_SIZE, NAp, NAp, NAp);
 	#endif 
 	
 	unsigned int data_[NUM_VALID_PEs][HBM_CHANNEL_PACK_SIZE]; // NEW
@@ -1516,11 +1517,11 @@ unsigned int owner_vpartition(unsigned int dstvid, unsigned int msg){
 	return msg; // FIXME.
 }
 
-void import_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_import, action_t action, unsigned int _NUMCLOCKCYCLES_[2][32]){
+void import_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_import, action_t action, unsigned int globalparams[GLOBALBUFFER_SIZE], unsigned int _NUMCLOCKCYCLES_[2][32]){
 	#ifdef _DEBUGMODE_KERNELPRINTS4
 	cout<<"acts_kernel::run:: importing "<<action.size_import_export<<" 32bit-integers (Host -> FPGA)..."<<endl;
 	#endif 
-	unsigned int import_offset = action.id_import * action.size_import_export * MAX_UPARTITION_VECSIZE;
+	unsigned int import_offset = action.id_import * action.size_import_export * MAX_UPARTITION_VECSIZE; // globalparams[GLOBALPARAMSCODE__PARAM__MAX_UPARTITION_VECSIZE]
 	IMPORT_LOOP1: for(unsigned int t=0; t<action.size_import_export; t++){ 
 	#pragma HLS PIPELINE II=1
 		#ifdef _DEBUGMODE_CHECKS3
@@ -1546,7 +1547,7 @@ void import_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_ch
 	}
 }	
 
-void export_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_export, action_t action, unsigned int _NUMCLOCKCYCLES_[2][32]){	
+void export_frontiers(unsigned int chunk, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_export, action_t action, unsigned int globalparams[GLOBALBUFFER_SIZE], unsigned int _NUMCLOCKCYCLES_[2][32]){	
 	#ifdef _DEBUGMODE_KERNELPRINTS4
 	cout<<"acts_kernel::run:: exporting "<<action.size_import_export<<" 32bit-integers (FPGA -> Host)..."<<endl;
 	#endif 
@@ -1750,7 +1751,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	if(id_import != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "### acts started [importing stage]: --> importing upartition: "<<id_import<<" to "<<id_import + _IMPORT_BATCH_SIZE<<"..." <<endl; }
 	if(id_export != INVALID_IOBUFFER_ID && fpga < num_prints){ cout << "### acts started [exporting stage]: <-- exporting vpartition: "<<id_export<<" to "<<id_export + _EXPORT_BATCH_SIZE<<"  [FPGAs "; for(unsigned int n=0; n<numfpgas; n++){ cout<<n<<", "; } cout<<"]..." <<endl; }				
 	#endif 
-	
+
 	// commands from host 
 	action_t action;
 	action.fpga = fpga; 
@@ -2073,6 +2074,7 @@ for(unsigned int i=0; i<MAXNUMGRAPHITERATIONS; i++){ for(unsigned int t=0; t<MAX
 		#endif 
 	}
 	
+	unsigned int algo = globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM];
 	unsigned int import_offset = action.id_import * action.size_import_export;
 	unsigned int export_offset = action.id_export * action.size_import_export;
 	unsigned int vdata_subpartition_vecsize = MAX_UPARTITION_VECSIZE / globalparams[GLOBALPARAMSCODE__PARAM__GLOBAL_NUM_PEs];
@@ -2178,7 +2180,7 @@ CLEAR_COUNTERS_LOOP1: for(unsigned int p_v=0; p_v<__NUM_APPLYPARTITIONS; p_v++){
 		// read & map frontier properties 
 		#ifdef ___ENABLE___READ_FRONTIER_PROPERTIES___
 		#if NUM_PEs==1
-		unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * MAX_APPLYPARTITION_VECSIZE);
+		unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
 vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
 #pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
 
@@ -2536,8 +2538,8 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
 		if(action.fpga < num_prints){ cout<<"### applying edge updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"]"<<endl; } 
 		#endif 
-		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<p_v<<"].size: "<<updatesptrs[p_v].size<<" ((((((((((((((((((((((( "<<endl; }
-		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
+		if(true && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<p_v<<"].size: "<<updatesptrs[p_v].size<<" ("<<updatesptrs[p_v].size * EDGE_PACK_SIZE<<") ((((((((((((((((((((((( "<<endl; }
+		if(true && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
 		#endif 
 		
 		// read destination properties
@@ -2591,14 +2593,17 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 #pragma HLS PIPELINE II=3
 	dretrievemany_udatesdram(updates_offset + t, updates_vecs,  HBM_channelA0, HBM_channelB0); // NEW
 
+	unsigned int edge_dir = 1;
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL
 		uint512_vec_dt updates_vec = updates_vecs[inst];
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){		
 		#pragma HLS UNROLL
 			keyvalue_t update = updates_vec.data[v];
-			unsigned int dstvid_lp = update.key; 
-			if(update.key >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
+			// unsigned int dstvid_lp = update.key; 
+			// if(update.key >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
+			unsigned int dstvid_lp; if(algo == HITS && edge_dir == 1){ dstvid_lp = update.key * 2; } else { dstvid_lp = update.key; }
+			if(dstvid_lp >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
 			unsigned int dstvid_lpv = dstvid_lp / EDGE_PACK_SIZE;	
 			
 			#ifdef _DEBUGMODE_CHECKS3
