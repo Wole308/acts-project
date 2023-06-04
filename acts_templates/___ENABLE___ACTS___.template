@@ -437,8 +437,8 @@ MY_IFDEF_TOPLEVELFUNC(){
 		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
 		if(action.fpga < num_prints){ cout<<"### applying edge updates in vpartition "<<p_v<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"]"<<endl; } 
 		#endif 
-		if(true && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<p_v<<"].size: "<<updatesptrs[p_v].size<<" ("<<updatesptrs[p_v].size * EDGE_PACK_SIZE<<") ((((((((((((((((((((((( "<<endl; }
-		if(true && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
+		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", updatesptrs["<<p_v<<"].size: "<<updatesptrs[p_v].size<<" ("<<updatesptrs[p_v].size * EDGE_PACK_SIZE<<") ((((((((((((((((((((((( "<<endl; }
+		if(false && action.fpga < num_prints){ cout<<"APPLY_UPDATES_MODULE_LOOP: action.start_pv_fpga: "<<action.start_pv_fpga<<", vpartition_vertices[0]["<<p_v<<"].count (ww): "<<vpartition_vertices[0][p_v].count<<" ((((((((((((((((((((((( "<<endl; }
 		#endif 
 		
 		// read destination properties

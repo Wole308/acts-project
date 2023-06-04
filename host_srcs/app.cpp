@@ -184,7 +184,7 @@ unsigned int load_globalparams2(HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBA
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__NUM_ITERATIONS].data[0] = 1;//universalparams.NUM_ITERATIONS; // FIXME.
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEFRONTIERSFORCONTROLSWITCH].data[0] = 128;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAXDEGREE].data[0] = max_degree;
-		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__ALGORITHM].data[0] = universalparams.ALGORITHM;
+		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__ALGORITHM].data[0] = universalparams.ALGORITHM; // PAGERANK;//universalparams.ALGORITHM; // REMOVEME. ....................................
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__ROOTVID].data[0] = rootvid;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__RANGEPERCHANNEL].data[0] = universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEDSTVID].data[0] = 16;
@@ -313,10 +313,11 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 	for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u+=1){
 		for(unsigned int llp_set=0; llp_set<num_llpset; llp_set++){ 
 			unsigned int index = ((p_u * MAX_NUM_LLPSETS) + llp_set) * 2; // '*2' because data is dual: i.e., offset and size
-			for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
+			for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){	
 				map_t edge_map = edge_maps_large[i][p_u*MAX_NUM_LLPSETS + llp_set];
 				HBM_axichannel[0][i][globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)] = edge_map.offset;
 				HBM_axichannel[0][i][globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)] = edge_map.size;
+				// HBM_axichannel[0][i][globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)] = 0; // REMOVEME.
 			}
 		}
 	}

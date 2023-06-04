@@ -2,6 +2,12 @@
 #define COMMON_H
 #include <string.h> 
 #include <cmath> 
+#include <ap_int.h>
+// #include "ap_fixed.h"	
+#include <vector> 
+#include<hls_vector.h> 
+#include<hls_stream.h> 
+#include <iostream> 
  
 
  
@@ -46,7 +52,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define SW // SWEMU, HW, *SW
+#define HW // SWEMU, HW, *SW
 #if (defined(SWEMU) || defined(HW)) 
 #define FPGA_IMPL
 #endif 
@@ -149,6 +155,7 @@
 #define HBM_CENTER_SIZE ((HBM_CHANNEL_BYTESIZE / 4) / EDGE_PACK_SIZE) // {4194304 EDGE_PACK_SIZEs, 67108864 uints, 256MB}
 #define FOLD_SIZE 1
 #define MAX_NUM_UPARTITIONS 1024 // 512	// NEWCHANGE.	
+// #define MAX_NUM_UPARTITIONS 512	
 #if NUM_PEs==1
 	#define MAX_NUM_APPLYPARTITIONS (48 * MAX_NUM_PEs)
 	#else 
