@@ -397,12 +397,16 @@ MY_IFDEF_TOPLEVELFUNC(){
 		
 		// read & map frontier properties 
 		#ifdef ___ENABLE___READ_FRONTIER_PROPERTIES___
-		#if NUM_PEs==1
-		unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
-		{% include '___ENABLE___READ_DEST_PROPERTIES_SINGLEFPGA___.template' %}	
-		#else 
-		{% include '___ENABLE___READ_FRONTIERS___.template' %}		
-		#endif 
+		if(___ENABLE___READ_FRONTIER_PROPERTIES___BOOL___ == 1){ 
+			if(p_u % 2==0){
+				#if NUM_PEs==1
+				unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
+				{% include '___ENABLE___READ_DEST_PROPERTIES_SINGLEFPGA___.template' %}	
+				#else 
+				{% include '___ENABLE___READ_FRONTIERS___.template' %}		
+				#endif 
+			}
+		}
 		#endif
 		
 		// process-edges and partition-updates

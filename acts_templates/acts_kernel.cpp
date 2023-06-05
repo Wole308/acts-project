@@ -2179,8 +2179,10 @@ CLEAR_COUNTERS_LOOP1: for(unsigned int p_v=0; p_v<__NUM_APPLYPARTITIONS; p_v++){
 		
 		// read & map frontier properties 
 		#ifdef ___ENABLE___READ_FRONTIER_PROPERTIES___
-		#if NUM_PEs==1
-		unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
+		if(___ENABLE___READ_FRONTIER_PROPERTIES___BOOL___ == 1){ 
+			if(p_u % 2==0){
+				#if NUM_PEs==1
+				unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
 vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
 #pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
 
@@ -2214,7 +2216,7 @@ for(unsigned int remote_fpga=0; remote_fpga<action.numfpgas; remote_fpga++){
 
 
 					
-		#else 
+				#else 
 // broadcast active frontiers [done]
 unsigned int uoffset = p_u * MAX_UPARTITION_VECSIZE; 		
 unsigned int data[HBM_CHANNEL_PACK_SIZE];	
@@ -2327,7 +2329,9 @@ READ_FRONTIERS_LOOP2: for(unsigned int t=0; t<cfrontier_dram___size[p_u]; t++){
 
 
 						
-		#endif 
+				#endif 
+			}
+		}
 		#endif
 		
 		// process-edges and partition-updates

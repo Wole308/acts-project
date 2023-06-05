@@ -184,7 +184,7 @@ unsigned int load_globalparams2(HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBA
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__NUM_ITERATIONS].data[0] = 1;//universalparams.NUM_ITERATIONS; // FIXME.
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEFRONTIERSFORCONTROLSWITCH].data[0] = 128;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAXDEGREE].data[0] = max_degree;
-		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__ALGORITHM].data[0] = universalparams.ALGORITHM; // PAGERANK;//universalparams.ALGORITHM; // REMOVEME. ....................................
+		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__ALGORITHM].data[0] = universalparams.ALGORITHM; 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__ROOTVID].data[0] = rootvid;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__RANGEPERCHANNEL].data[0] = universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__THRESHOLD__ACTIVEDSTVID].data[0] = 16;
@@ -195,11 +195,11 @@ unsigned int load_globalparams2(HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBA
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE].data[0] = universalparams._MAX_APPLYPARTITION_VECSIZE;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_SIZE].data[0] = universalparams._MAX_APPLYPARTITION_SIZE;
 
-		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___RESETBUFFERSATSTART].data[0] = 1; // FIXME.
+		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___RESETBUFFERSATSTART].data[0] = 1; // 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PREPAREEDGEUPDATES].data[0] = 1; //
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PROCESSEDGEUPDATES].data[0] = 1; //
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PROCESSEDGES].data[0] = 1; //
-		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___READ_FRONTIER_PROPERTIES].data[0] = 1;
+		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___READ_FRONTIER_PROPERTIES].data[0] = 1; // 1; REMOVEME
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___VCPROCESSEDGES].data[0] = 1; 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___ECUPDATEEDGES].data[0] = 1; 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___SAVEVCUPDATES].data[0] = 1; // FIXME? CAUSE OF HANGING?
