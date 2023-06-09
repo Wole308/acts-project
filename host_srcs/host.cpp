@@ -505,14 +505,14 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
     auto devices = xcl::get_xil_devices();
     bool valid_device = false;
 	device_count = devices.size(); // FIXME.
-	unsigned int num_u280_devices = 0; 
+	unsigned int num_fpga_devices = 0; 
 
 	for(unsigned int fpga=0; fpga<devices.size(); fpga++){  
 		cout<<"host:: FPGA "<<fpga<<" device name: "<<devices[fpga].getInfo<CL_DEVICE_NAME>()<<endl;
-		if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_gen3x16_xdma_base_1"){ num_u280_devices += 1; } // xilinx_u280_xdma_201920_3
+		if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_gen3x16_xdma_base_1" || devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u55c_gen3x16_xdma_base_3"){ num_fpga_devices += 1; } // xilinx_u280_xdma_201920_3
 	} 
 
-	device_count = num_u280_devices;
+	device_count = num_fpga_devices;
 	cout<<"------------------------------------------- host: "<<device_count<<" devices found. -------------------------------------------"<<endl;
 	if(device_count==0){ cout<<"host: ERROR 234. no FPGA devices found. EXITING..."<<endl; exit(EXIT_FAILURE); }
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ // device_count
@@ -1246,6 +1246,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		}	
 		
 		run_idx += 1;
+		if(universalparams.NUM_FPGAS_ == 1){ break; }
 		// break; // REMOVEME.....................................................................
 		// exit(EXIT_SUCCESS);
 	} // epoch
@@ -1318,7 +1319,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		tmp += active_vertices_in_iteration[1][t].B;
 		cout<<"--- "<<active_vertices_in_iteration[1][t].A<<" active vertices processed in iteration "<<t<<" in "<<active_vertices_in_iteration[1][t].B<<" ms  [FPGA]"<<endl; 
 	}	
-	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<tmp<<" ms, "<<(tmp * 1000)<<" microsecs, "<< RESET << std::endl;
+	if(all_vertices_active_in_all_iterations == false){ std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<tmp<<" ms, "<<(tmp * 1000)<<" microsecs, "<< RESET << std::endl; }
 	
 	if(all_vertices_active_in_all_iterations == false){ 
 		cout<<"host:: Software-Only mode"<<endl;

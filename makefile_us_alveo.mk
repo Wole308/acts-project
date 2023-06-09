@@ -121,9 +121,6 @@ $(BUILD_DIR)/vector_addition.xclbin: $(TEMP_DIR)/vadd.xo
 	v++ -p $(LINK_OUTPUT) $(VPP_FLAGS) -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) -o $(BUILD_DIR)/vector_addition.xclbin
 
 ############################## Setting Rules for Host (Building Host Executable) ##############################
-# LDFLAGS += -I/opt/xilinx/xrt/include/ -I/tools/Xilinx/./Vitis_HLS/2021.2/include/ -I/tools/Xilinx/Vitis/2021.2/runtime/ -I/tools/Xilinx/Vivado/2021.2/include/ -pthread -march=native -lrt xcl.c -L/opt/Xilinx/SDx/2021.2/runtime/lib/x86_64 -lOpenCL -pthread -lrt 			
-# $(EXECUTABLE): $(HOST_SRCS) $(KERNEL_TOP_ALL) | check-xrt
-		# g++ -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
 LDFLAGS += -I/opt/xilinx/xrt/include/ -I/tools/Xilinx/./Vitis_HLS/2021.2/include/ -I/tools/Xilinx/Vitis/2021.2/runtime/ -I/tools/Xilinx/Vivado/2021.2/include/ -pthread -march=native -lrt xcl.c -L/opt/Xilinx/SDx/2021.2/runtime/lib/x86_64 -lOpenCL -pthread -lrt 			
 $(EXECUTABLE): $(HOST_SRCS) | check-xrt
 		g++ -o $@ $^ $(CXXFLAGS) $(LDFLAGS)

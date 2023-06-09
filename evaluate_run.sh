@@ -16,6 +16,15 @@
 
 # https://networkrepository.com/soc-sinaweibo.php
 
+# make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
+# make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u55c_gen3x16_xdma_3_202210_1/xilinx_u55c_gen3x16_xdma_3_202210_1.xpfm
+# make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm
+
+# make host PLATFORM=/opt/xilinx/platforms/xilinx_u55c_gen3x16_xdma_3_202210_1/xilinx_u55c_gen3x16_xdma_3_202210_1.xpfm
+# make host PLATFORM=/opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm
+# ./overlap build_dir.hw.xilinx_u280_xdma_201920_3/vector_addition.xclbin
+# ./overlap vector_addition.xclbin
+
 # rmat_16_1024: 16778216 vertices, 1073742824 edges
 # rmat_32_2048: 33555432 vertices, 2147484648 edges
 # uk-2005: 39460925 vertices, 936365282 edges
@@ -46,21 +55,24 @@
 
 # make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
 # make host PLATFORM=/opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm
+
+# DATASET_BASEDIR="/home/oj2zf/dataset"
+DATASET_BASEDIR="/home/oj2zf/Documents/dataset"
 		
 DATSETS=(
-		# kron_g500-logn20 
-		rmat_16m_256m 
+		kron_g500-logn20 
+		# rmat_16m_256m 
 		# it-2004 
 		# GAP-twitter
 		
-		indochina-2004 
+		# indochina-2004 
 		# twitter7 
-		uk-2005 
+		# uk-2005 
 		# soc-sinaweibo
-		webbase-2001
+		# webbase-2001
 		# rmat_8m_1024m
 		# rmat_16m_1024m
-		rmat_32m_1024m
+		# rmat_32m_1024m
 		)
 		
 NUM_FPGAS=(
@@ -77,10 +89,11 @@ NUM_PES=(
 		)
 		
 XCLBINS=(
-		"outputs/vector_addition_static_x1.xclbin"
+		# "outputs/vector_addition_static_x1.xclbin"
 		# "outputs/vector_addition_dynamic_x1.xclbin"	
 		# "outputs/vector_addition_static_1fpga_x1.xclbin"	
-		# "outputs/vector_addition.xclbin"	
+		"outputs/vector_addition_vtx16.xclbin"	
+		# "outputs/vector_addition_vtx32.xclbin"	
 		)
 		
 RUN_IN_ASYNC_MODE=(
@@ -88,7 +101,7 @@ RUN_IN_ASYNC_MODE=(
 		# 0
 		)
 	
-XWARE_ID=0 # 0, 1
+XWARE_ID=1 # 0, 1
 MAX_NUM_ITERATIONS=16
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
@@ -97,29 +110,37 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 		for ((k = 0; k < ${#NUM_PES[@]}; k++)) do	
 			./evaluate_datasets.sh $XWARE_ID ${NUM_PES[k]} ${RUN_IN_ASYNC_MODE[n]}
 			
-			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
-				# echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				# ./host pr ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_pr/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
-				# sleep 2
-				# cp -rf summary.csv results/results_pr/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				# exit
-			# done	
+			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
+				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
+				./host pr ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				sleep 2
+				cp -rf summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				exit
+			done	
+			
+			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
+				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
+				./host spmv ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_spmv/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				sleep 2
+				cp -rf summary.csv results/results_spmv/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				exit
+			done	
 			
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				echo hits algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host hits ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_hits/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				./host hits ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				sleep 2
-				cp -rf summary.csv results/results_hits/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				exit
+				cp -rf summary.csv results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				# exit
 			done
 			
 			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				# echo sssp algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				# ./host sssp ${NUM_FPGAS[c]} 13 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_sssp/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out			
+				# ./host sssp ${NUM_FPGAS[c]} 13 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out			
 				# sleep 2
-				# cp -rf summary.csv results/results_sssp/${NUM_FPGAS[c]}_fpgas/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				# cp -rf summary.csv results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				# exit 
-			# done
+			# done	
 		done 
 	done
 done

@@ -380,11 +380,12 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs]; 
 	HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS]; 
 	unsigned int globalparams[1024];
-	
+
 	// allocate AXI HBM memory
 	cout<<"app: initializing HBM_axichannels..."<<endl;
 	for(unsigned int i=0; i<mock_universalparams.GLOBAL_NUM_PEs_; i++){ 
 		for(unsigned int n=0; n<2; n++){
+			cout<<"app: *** initializing HBM_axichannels... i: "<<i<<", n: "<<n<<endl;
 			HBM_axichannel[n][i] = new HBM_channelAXISW_t[HBM_CHANNEL_SIZE]; 
 			for(unsigned int t=0; t<HBM_CHANNEL_SIZE; t++){ for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axichannel[n][i][t].data[v] = 0; }}
 		}
@@ -393,6 +394,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	cout<<"app: initializing HBM_axicenters"<<endl;
 	for(unsigned int i=0; i<MAX_NUM_FPGAS; i++){ 
 		for(unsigned int n=0; n<2; n++){
+			cout<<"app: --- initializing HBM_axichannels... i: "<<i<<", n: "<<n<<endl;
 			HBM_axicenter[n][i] = new HBM_channelAXISW_t[HBM_CENTER_SIZE]; 
 			for(unsigned int t=0; t<HBM_CENTER_SIZE; t++){ for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axicenter[n][i][t].data[v] = 0; }}
 		}
@@ -571,11 +573,11 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
 		unsigned int base_offset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES];
 		for(unsigned int p=0; p<__NUM_UPARTITIONS * __NUM_APPLYPARTITIONS; p++){ 
-			for(unsigned int t=0; t<512; t++){ 
+			for(unsigned int t=0; t<EDGE_UPDATES_CHUNKSZ; t++){ 
 				for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-					utilityobj->checkoutofbounds("app::ERROR 71711::", base_offset + (p * 512 + t), HBM_CHANNEL_SIZE, NAp, NAp, NAp);
-					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * 512 + t), 2 * v, rand() % EDGE_UPDATES_DRAMBUFFER_SIZE, universalparams);
-					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * 512 + t), 2 * v + 1, rand() % EDGE_UPDATES_DRAMBUFFER_SIZE, universalparams);
+					utilityobj->checkoutofbounds("app::ERROR 71711::", base_offset + (p * EDGE_UPDATES_CHUNKSZ + t), HBM_CHANNEL_SIZE, NAp, NAp, NAp);
+					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * EDGE_UPDATES_CHUNKSZ + t), 2 * v, rand() % EDGE_UPDATES_DRAMBUFFER_SIZE, universalparams);
+					write2_to_hbmchannel(i, HBM_axichannel, base_offset + (p * EDGE_UPDATES_CHUNKSZ + t), 2 * v + 1, rand() % EDGE_UPDATES_DRAMBUFFER_SIZE, universalparams);
 					if(i==0){ size_u32 += 2; }
 				}
 			}

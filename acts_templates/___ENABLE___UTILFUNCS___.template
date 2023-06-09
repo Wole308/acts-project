@@ -7,24 +7,18 @@ void checkoutofbounds(string message, unsigned int data, unsigned int upper_boun
 }	
 #endif 
 
-unsigned int hash_edge(unsigned int srcvid, unsigned int dstvid, unsigned int index, unsigned int motion){
-	// return ((srcvid % EDGE_UPDATES_DRAMBUFFER_SIZE) + (dstvid % EDGE_UPDATES_DRAMBUFFER_SIZE)) / 2;
-	// return index; // REMOVEME.
+unsigned int hash_edge(unsigned int srcvid, unsigned int dstvid, unsigned int index){
 	
-	unsigned int edge_hashid = ((srcvid / 16) * 14) + (((dstvid / 16) % 16) + (dstvid % 16));
+	unsigned int group = dstvid % 512;
+	// unsigned int edge_hashid = (group * 16) + (dstvid % 16);
+	unsigned int edge_hashid = (group * 16) + (srcvid % 16);
+	
 	#ifdef _DEBUGMODE_CHECKS3
 	checkoutofbounds("utility::ERROR 25133::", edge_hashid, EDGE_UPDATES_DRAMBUFFER_SIZE, srcvid, dstvid, NAp);
 	#endif
-	
-	return edge_hashid; // ((srcvid / 16) * 14) + (((dstvid / 16) % 16) + (dstvid % 16)); // original
-	// return ((srcvid / 16) * (12 + motion)) + (((dstvid / 16) % 16) + (dstvid % 16));
-	
-	// return (srcvid + dstvid) % (EDGE_UPDATES_DRAMBUFFER_SIZE;
-	// return ((srcvid % (EDGE_UPDATES_DRAMBUFFER_SIZE / 16)) * 16) + (dstvid % 16);	
-	// return ((dstvid % (EDGE_UPDATES_DRAMBUFFER_SIZE / 16)) * 16) + (srcvid % 16);
-	// return srcvid; //*
-	// return dstvid;
-}
+
+	return edge_hashid; 
+}	
 
 unsigned int hash2_edge(map_t URAM_map, unsigned int srcvid, unsigned int dstvid, unsigned int padding_factor){
 #pragma HLS INLINE
