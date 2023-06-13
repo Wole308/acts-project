@@ -1,9 +1,9 @@
 // reset temp stats buffer [done]
 MY_LOOP170: for(unsigned int t=0; t<BLOCKRAM_SIZE; t++){ 
 #pragma HLS PIPELINE II=1
-	MY_LOOP171: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
+	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL
-		MY_LOOP172: for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
 		#pragma HLS UNROLL
 			insert_statstmpbuffer(t, v, 0, statsbuffer_maskbased_tmp[inst]); 
 		}
@@ -13,7 +13,7 @@ MY_LOOP170: for(unsigned int t=0; t<BLOCKRAM_SIZE; t++){
 // reset updates tmpbuffer [done]
 MY_LOOP168: for(unsigned int j=0; j<NUM_VALID_PEs; j++){ 
 #pragma HLS PIPELINE II=1
-	MY_LOOP169: for(unsigned int i=0; i<NUM_VALID_PEs; i++){ 
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ 
 	#pragma HLS UNROLL
 		updates_tmpbuffer___size[i][j] = 0; 
 	} 

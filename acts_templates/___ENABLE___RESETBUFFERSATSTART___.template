@@ -6,3 +6,35 @@ MY_LOOP208: for(unsigned int i=0; i<NUM_VALID_PEs; i++){ edges_buffer___size[i] 
 #ifndef HW
 for(unsigned int i=0; i<MAXNUMGRAPHITERATIONS; i++){ for(unsigned int t=0; t<MAX_NUM_UPARTITIONS; t++){ hybrid_map[i][t] = 1; }}
 #endif
+#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+for(unsigned int p=0; p<MAX_NUM_UPARTITIONS; p++){
+	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ 
+	#pragma HLS UNROLL	
+		edge_maps_buffer[i][p].offset = 0; edge_maps_buffer[i][p].size = 0; 
+	}
+}
+#endif 
+#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+MY_LOOP1580: for(unsigned int t=0; t<EDGE_UPDATES_DRAMBUFFER_SIZE; t++){ 
+#pragma HLS PIPELINE II=1
+	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+	#pragma HLS UNROLL
+		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+		#pragma HLS UNROLL		
+			URAM_map[inst][v][t].offset = 0; 
+			URAM_map[inst][v][t].size = 0;	
+			URAM_edgeupdates[inst][v][t].srcvid = INVALIDDATA; 
+			URAM_edgeupdates[inst][v][t].dstvid = INVALIDDATA; 
+		}
+	}
+}
+#endif
+#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+for(unsigned int t=0; t<1024; t++){
+	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 	
+		#pragma HLS UNROLL
+		edgeupdatesptrs[inst][t].offset = 0; 
+		edgeupdatesptrs[inst][t].size = 0;
+	}
+}
+#endif 

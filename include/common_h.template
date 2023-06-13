@@ -222,7 +222,7 @@
 	#endif 
 
 #define EDGE_UPDATES_PTR_MAXSIZE 2048
-#define EDGE_UPDATES_CHUNKSZ 1024 // 512, 1024, 8192  
+#define EDGE_UPDATES_CHUNKSZ 512 // 512, 1024, 8192  
 
 // #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 64) 
 #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 128) 
@@ -230,7 +230,7 @@
 #define EDGE_UPDATES_WORKBUFFER_SIZE 7000 // 7200
 #define EDGE_LLPUPDATES_DRAMBUFFER_SIZE 512
 
-////////////////
+//////////////// 
 
 // #define MAX_IMPORT_BATCH_SIZE 64
 // #define MAX_EXPORT_BATCH_SIZE NAp
@@ -392,6 +392,12 @@ typedef struct {
 	unsigned int offset;
 	unsigned int size;
 } map_t;
+
+typedef struct {
+	unsigned int offset;
+	unsigned int size;
+	unsigned int tmp_size;
+} map2_t;
 
 typedef struct {
 	keyvalue_t data[EDGE_PACK_SIZE];

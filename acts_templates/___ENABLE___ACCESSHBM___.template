@@ -100,7 +100,10 @@ void load_edgemaps(unsigned int index, unsigned int base_offset, map_t edge_map[
 }
 void save_edgemaps(unsigned int index, unsigned int base_offset, map_t edge_map[NUM_VALID_PEs], {% include '___HBM___PARAMS___.template' %}){
 #pragma HLS INLINE
-	index = index * 2; // '*2' because data is dual: i.e., offset and size
+	index = index * 2; // '*2' because data is dual: i.e., offset and size	
+	#ifdef _DEBUGMODE_CHECKS3
+	checkoutofbounds("acts_kernel::ERROR 9602::", base_offset + (index / HBM_AXI_PACK_SIZE), ((1 << 28)/4)/16, index, HBM_CHANNEL_PACK_SIZE, NAp);
+	#endif 	
 	{%for n in context['NUM_VALID_PEs_seq']%}
 	HBM_channelA{{n}}[base_offset + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)] = edge_map[{{n}}].offset;
 	{%endfor%}

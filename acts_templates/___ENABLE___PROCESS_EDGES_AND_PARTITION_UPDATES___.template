@@ -14,10 +14,6 @@ keyvalue_t update_out2[NUM_VALID_PEs][EDGE_PACK_SIZE];
 bool ens2[NUM_VALID_PEs];
 #pragma HLS ARRAY_PARTITION variable = ens2 complete
 			
-#ifdef _DEBUGMODE_KERNELPRINTS//4 
-cout<<"### processing edges in upartition "<<p_u<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; 
-#endif 
-
 unsigned int import_offset = id_import * action.size_import_export;
 unsigned int export_offset = id_export * action.size_import_export;
 
@@ -26,18 +22,9 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 	load_edgemaps((p_u * MAX_NUM_LLPSETS) + llp_set, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], edge_maps, {% include '___HBM___ARGS___.template' %}); // FIXME.
 		
 	EC_PROCESS_EDGES_LOOP1B: for(unsigned int llp_id=0; llp_id<1; llp_id++){ // NUM_LLP_PER_LLPSET
-		// load edges map
-		#ifdef ___NOT_YET_IMPLEMENTED___ 
-		load_edgemaps((p_u * MAX_NUM_LLP_PER_UPARTITION) + (llp_set * NUM_LLP_PER_LLPSET) + llp_id, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS2], edge_maps, {% include '___HBM___ARGS___.template' %});
-		#endif 
-		
-		#ifdef _DEBUGMODE_KERNELPRINTS//4
-		cout<<"------------------- process edges: ["<<action.fpga<<", "<<p_u<<", "<<llp_set<<", "<<llp_id<<", "<<edge_maps[0].size<<"] [importing and exporting "<<action.size_import_export<<" 32bit-integers] -------------------"<<endl; 
-		#endif 
-		
-		#ifdef _DEBUGMODE_KERNELPRINTS//4
-		for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"process-edges: edge_maps["<<n<<"]["<<llp_id<<"].offset: "<<edge_maps[n].offset<<", edge_maps["<<n<<"]["<<llp_id<<"].size: "<<edge_maps[n].size<<endl; }
-		#endif 
+		#ifdef _DEBUGMODE_KERNELPRINTS4 
+		if(action.fpga < num_prints){ cout<<"+++ processing "<<edge_maps[0].size<<" edges in upartition "<<p_u<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; }
+		#endif
 		
 		// prepare maps, offsets, variables 
 		max_sz = 0; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ limits[n] = edge_maps[n].size; } for(unsigned int n=0; n<NUM_VALID_PEs; n++){ if(max_sz < limits[n]){ max_sz = limits[n]; }}			
@@ -49,9 +36,6 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){	// gl
 		// process edges and save vertex updates 
 		unsigned int batch_size = 4096; // 512;
 		unsigned int packsz = 2; 
-		// #if NUM_PEs==1
-		// packsz = 1; 
-		// #endif 
 		PROCESS_EDGES_MAINLOOP1C: for(unsigned int t1=0; t1<(max_sz + batch_size - 1) / batch_size; t1++){ 
 			// resets 		
 			for(unsigned int partition=0; partition<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; partition++){ 
