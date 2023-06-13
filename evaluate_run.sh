@@ -69,17 +69,17 @@ DATSETS=(
 		# twitter7 
 		# uk-2005 
 		# soc-sinaweibo
-		# webbase-2001
+		webbase-2001
 		# rmat_8m_1024m
 		# rmat_16m_1024m
 		# rmat_32m_1024m
 		)
 		
 NUM_FPGAS=(
-		# 1
+		1
 		# 2
 		# 3
-		4
+		# 4
 		# 8
 		)
 		
@@ -101,8 +101,8 @@ RUN_IN_ASYNC_MODE=(
 		# 0
 		)
 	
-XWARE_ID=1 # 0, 1
-MAX_NUM_ITERATIONS=16
+XWARE_ID=0 # 0, 1
+MAX_NUM_ITERATIONS=1
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do	

@@ -14,10 +14,11 @@
 {%if(context['RUNNING_SYNTHESIS'] == "1")%}
 #define ___RUNNING_FPGA_SYNTHESIS___
 {%endif%} 
-// #define ___ENABLE___DYNAMICGRAPHANALYTICS___
+#define ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifndef ___RUNNING_FPGA_SYNTHESIS___
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 
+// #define PROOF_OF_CONCEPT_RUN ///////////////.............................................................
 
 #define MAX_NUM_FPGAS 8
 #define RUN_IN_ASYNC_MODE {{context['RUN_IN_ASYNC_MODE']}}
@@ -159,7 +160,8 @@
 	#endif 
 #define HBM_CENTER_SIZE ((HBM_CHANNEL_BYTESIZE / 4) / EDGE_PACK_SIZE) // {4194304 EDGE_PACK_SIZEs, 67108864 uints, 256MB}
 #define FOLD_SIZE 1
-#define MAX_NUM_UPARTITIONS 1024 // 512	// NEWCHANGE.	
+// #define MAX_NUM_UPARTITIONS 512 // 1024 // 512	// NEWCHANGE.
+#define MAX_NUM_UPARTITIONS 1024 	
 // #define MAX_NUM_UPARTITIONS 512	
 #if NUM_PEs==1
 	#define MAX_NUM_APPLYPARTITIONS (48 * MAX_NUM_PEs)

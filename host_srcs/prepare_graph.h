@@ -33,7 +33,7 @@ public:
 	~prepare_graph();
 	
 	void create_graph(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup);
-	void start(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup, bool graphisundirected);	
+	tuple_t start(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup, bool graphisundirected);	
 	
 private:
 };

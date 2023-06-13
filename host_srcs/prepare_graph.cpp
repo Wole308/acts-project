@@ -4,6 +4,14 @@ using namespace std;
 prepare_graph::prepare_graph(){}
 prepare_graph::~prepare_graph(){}
 
+bool is_valid2(unsigned int i){
+	#ifdef PROOF_OF_CONCEPT_RUN
+	return (i % NUM_PEs == 0); // FIXME.
+	#else 
+	return true;
+	#endif 
+}
+
 void prepare_graph::create_graph(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup){
 	cout<<">>> prepare_graph::create_graph: STARTED."<<endl;
 	
@@ -46,7 +54,7 @@ void prepare_graph::create_graph(string graphpath, vector<edge3_type> &edgesbuff
 	exit(EXIT_SUCCESS);
 }
 
-void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup, bool graphisundirected){
+tuple_t prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup, bool graphisundirected){
 	cout<<"prepare_graph:: preparing graph @ "<<graphpath<<"..."<<endl;
 	unsigned int srcv = 0;
 	unsigned int dstv = 0;
@@ -77,10 +85,10 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 			if(srcv > max_vertex){ max_vertex = srcv; }
 			if(dstv > max_vertex){ max_vertex = dstv; }
 			
-			if (edgesbuffer.size() < 16){ cout<<"prepare_graph:: edge: srcv: "<<srcv<<", dstv: "<<dstv<<", weight: "<<weight<<endl; } 
+			if (edgesbuffer.size() < 16 && is_valid2(linecount)){ cout<<"prepare_graph:: edge: srcv: "<<srcv<<", dstv: "<<dstv<<", weight: "<<weight<<endl; } 
 			
 			edge3_type edge; edge.srcvid = srcv; edge.dstvid = dstv; edge.weight = rand() % 10 - 1;
-			edgesbuffer.push_back(edge);
+			if(is_valid2(linecount)){ edgesbuffer.push_back(edge); } // FIXME................................................
 		
 			linecount += 1;
 			// if(linecount){}
@@ -91,6 +99,15 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 	cout<<"prepare_graph:: Finished Stage 1: Buffering edges of "<<graphpath<<" (num_vertices: "<<num_vertices<<", num_vertices2: "<<num_vertices2<<", num_edges: "<<num_edges<<")"<<endl;
 	// exit(EXIT_SUCCESS);
 	
+	tuple_t graph_size;
+	graph_size.A = num_vertices + 1000;
+	graph_size.B = num_edges + 1000;
+	// graph_size.B = edgesbuffer.size() + 1000;
+	
+	// #ifdef PROOF_OF_CONCEPT_RUN
+	// num_edges = edgesbuffer.size();
+	// #endif 
+	
 	// decide whether to use directed or graphisundirected (FIXME.)
 	unsigned int mult_factor = 0;
 	// if(num_edges > 200000000){ cout<<"************* prepare_graph::[OVERRIDING...] Undirected graph too large to fit in memory. using directed graph instead"<<endl; graphisundirected = false; }
@@ -99,7 +116,8 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 	cout<<"prepare_graph: assigning variables..."<<endl;
 	num_vertices = max_vertex + 1;
 	unsigned int padded_num_vertices = num_vertices + 1000;
-	unsigned int padded_num_edges = num_edges + 1000;
+	// unsigned int padded_num_edges = num_edges + 1000;
+	unsigned int padded_num_edges = edgesbuffer.size() + 1000;
 	
 	cout<<"prepare_graph: creating buffers..."<<endl;
 	edgesbuffer_dup.resize((mult_factor * padded_num_edges));
@@ -112,7 +130,7 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 	
 	// populate inout degrees of all vertices 
 	cout<<"prepare_graph: populating inout degrees of all vertices..."<<endl;
-	for(unsigned int i=0; i<edgesbuffer.size(); i++){ // num_edges
+	for(unsigned int i=0; i<edgesbuffer.size(); i++){
 		if(edgesbuffer[i].srcvid >= padded_num_vertices || edgesbuffer[i].dstvid >= padded_num_vertices){ cout<<"prepare_graph::start(21):: edgesbuffer[i].srcvid("<<edgesbuffer[i].srcvid<<") >= padded_num_vertices("<<padded_num_vertices<<") || edgesbuffer[i].dstvid("<<edgesbuffer[i].dstvid<<") >= padded_num_vertices("<<padded_num_vertices<<"). EXITING... "<<endl; exit(EXIT_FAILURE); }	
 		outdegree[edgesbuffer[i].srcvid] += 1;
 		if(graphisundirected==true){ outdegree[edgesbuffer[i].dstvid] += 1; }
@@ -142,7 +160,7 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 	
 	unsigned int edgesbuffer_dup_size = 0;
 	for(unsigned int i=0; i<num_vertices; i++){ outdegree[i] = 0; }
-	for(unsigned int i=0; i<edgesbuffer.size(); i++){ // num_edges
+	for(unsigned int i=0; i<edgesbuffer.size(); i++){ 
 		srcv = edgesbuffer[i].srcvid;
 		dstv = edgesbuffer[i].dstvid;
 		weight = edgesbuffer[i].weight;
@@ -192,7 +210,7 @@ void prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup,
 	edgesbuffer.clear();
 	delete [] outdegree;
 	// exit(EXIT_SUCCESS);
-	return;
+	return graph_size;
 }
 
 

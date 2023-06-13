@@ -187,12 +187,10 @@ void _set_args___actions(cl::Kernel * kernels, action_t action, unsigned int mas
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 2, int(action.graph_iteration)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 3, int(action.start_pu)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 4, int(action.size_pu)));
-	// OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 4, int(0))); /////////////
-	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 5, int(action.skip_pu))); // REMOVEME.	
+	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 5, int(action.skip_pu))); 
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 6, int(action.start_pv_fpga)));	
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 7, int(action.start_pv)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 8, int(action.size_pv)));
-	// OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 8, int(0))); // REMOVEME
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 9, int(action.start_llpset)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 10, int(action.size_llpset)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 11, int(action.start_llpid)));
@@ -200,7 +198,6 @@ void _set_args___actions(cl::Kernel * kernels, action_t action, unsigned int mas
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 13, int(action.start_gv_fpga)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 14, int(action.start_gv)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 15, int(action.size_gv)));
-	// OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 15, int(0))); // REMOVEME.
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 16, int(action.id_process)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 17, int(action.id_import)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 18, int(action.id_export)));
@@ -259,7 +256,6 @@ unsigned int load_actions_fine(unsigned int fpga, action_t * actions[MAX_NUM_FPG
 		actions[fpga][index] = action;
 		index += 1;
 	}
-	// return index; // REMOVEME.
 	
 	for(unsigned int apply_id=0; apply_id<universalparams.NUM_APPLYPARTITIONS; apply_id+=apply_skip){ 
 		// apply
@@ -456,7 +452,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	unsigned int report_statistics[64]; for(unsigned int t=0; t<64; t++){ report_statistics[t] = 0; }
 	unsigned int mask_i[MAX_NUM_FPGAS][MAX_IMPORT_BATCH_SIZE]; for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ for(unsigned int t=0; t<MAX_IMPORT_BATCH_SIZE; t++){ mask_i[fpga][t] = 0; }}
 	
-	bool all_vertices_active_in_all_iterations = false; // REMOVEME.
+	bool all_vertices_active_in_all_iterations = false; 
 	if(universalparams.ALGORITHM == PAGERANK || universalparams.ALGORITHM == CF || universalparams.ALGORITHM == HITS || universalparams.ALGORITHM == SPMV){ all_vertices_active_in_all_iterations = true; }
 	
 	// sw sssp
@@ -496,6 +492,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
     vector<cl::Kernel> kernels(16); 
     vector<cl::CommandQueue> q(16); 
     vector<std::string> device_name(16); 
+	vector<cl::Program::Binaries> bins(16);
 	#endif 
 	
     // load binary to FPGA 
@@ -504,21 +501,36 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
     std::cout << "Creating Context..." << std::endl;
     auto devices = xcl::get_xil_devices();
     bool valid_device = false;
-	device_count = devices.size(); // FIXME.
-	unsigned int num_fpga_devices = 0; 
+	device_count = 0; // devices.size(); 
 
 	for(unsigned int fpga=0; fpga<devices.size(); fpga++){  
 		cout<<"host:: FPGA "<<fpga<<" device name: "<<devices[fpga].getInfo<CL_DEVICE_NAME>()<<endl;
-		if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_gen3x16_xdma_base_1" || devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u55c_gen3x16_xdma_base_3"){ num_fpga_devices += 1; } // xilinx_u280_xdma_201920_3
+		if(devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u280_gen3x16_xdma_base_1" || devices[fpga].getInfo<CL_DEVICE_NAME>() == "xilinx_u55c_gen3x16_xdma_base_3"){ device_count += 1; } // xilinx_u280_xdma_201920_3
 	} 
 
-	device_count = num_fpga_devices;
 	cout<<"------------------------------------------- host: "<<device_count<<" devices found. -------------------------------------------"<<endl;
 	if(device_count==0){ cout<<"host: ERROR 234. no FPGA devices found. EXITING..."<<endl; exit(EXIT_FAILURE); }
-	for(unsigned int fpga=0; fpga<device_count; fpga++){ // device_count
-        auto device = devices[fpga];
-        // Creating Context and Command Queue for selected Device
-        OCL_CHECK(err, contexts[fpga] = cl::Context(device, nullptr, nullptr, nullptr, &err));
+    std::vector<unsigned char> fileBuf[device_count];
+    std::cout << "Initializing OpenCL objects" << std::endl;
+    for (int d = 0; d < (int)device_count; d++){
+        std::cout << "Creating Context[" << d << "]..." << std::endl;
+		OCL_CHECK(err, contexts[d] = cl::Context(devices[d], nullptr, nullptr, nullptr, &err));
+		#ifdef ___SYNC___
+		OCL_CHECK(err, q[d] = cl::CommandQueue(contexts[d], devices[d], CL_QUEUE_PROFILING_ENABLE, &err));
+		#else 
+		OCL_CHECK(err, q[d] = cl::CommandQueue(contexts[d], devices[d], CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err));
+		#endif 
+        OCL_CHECK(err, device_name[d] = devices[d].getInfo<CL_DEVICE_NAME>(&err));
+
+        fileBuf[d] = ((d == 0) ? xcl::read_binary_file(binaryFile__[0]) : xcl::read_binary_file(binaryFile__[0]));
+        bins[d].push_back({fileBuf[d].data(), fileBuf[d].size()});
+		cl::Program program(contexts[d], {devices[d]}, bins[d], nullptr, &err); programs[d] = program;
+        OCL_CHECK(err, kernels[d] = cl::Kernel(programs[d], "top_function", &err));
+    }
+	
+	/* for(unsigned int fpga=0; fpga<device_count; fpga++){ // device_count
+		auto device = devices[fpga];
+		OCL_CHECK(err, contexts[fpga] = cl::Context(device, nullptr, nullptr, nullptr, &err));
 		
 		#ifdef ___SYNC___
 		OCL_CHECK(err, q[fpga] = cl::CommandQueue(contexts[fpga], device, CL_QUEUE_PROFILING_ENABLE, &err)); ////////// FIXME.
@@ -529,26 +541,25 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		auto fileBuf = xcl::read_binary_file(binaryFile__[0]);
 		cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
 
-        std::cout << "Trying to program device[" << fpga << "]: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
-        cl::Program program(contexts[fpga], {device}, bins, nullptr, &err);
+		std::cout << "Trying to program device[" << fpga << "]: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
+		cl::Program program(contexts[fpga], {device}, bins, nullptr, &err);
 		programs[fpga] = program;
 		
 		// programs[fpga] = load_cl2_binary(bins[fpga], devices[fpga], contexts[fpga]); // NEWCHANGE
-        if (err != CL_SUCCESS) {
-            std::cout << "Failed to program device[" << fpga << "] with xclbin file!\n";
-        } else {
-            std::cout << "Device[" << fpga << "]: program successful!\n";
-            OCL_CHECK(err, kernels[fpga] = cl::Kernel(programs[fpga], "top_function", &err));
-            valid_device = true;
-            break; // we break because we found a valid device
-        }
-    }
-    if (!valid_device) {
-        std::cout << "Failed to program any device found, exit!\n";
-        exit(EXIT_FAILURE);
-    }
-	#endif 
-	// exit(EXIT_SUCCESS);/////////////////////////////////
+		if (err != CL_SUCCESS){
+			std::cout << "Failed to program device[" << fpga << "] with xclbin file!\n";
+		} else {
+			std::cout << "Device[" << fpga << "]: program successful!\n";
+			OCL_CHECK(err, kernels[fpga] = cl::Kernel(programs[fpga], "top_function", &err));
+			valid_device = true;
+			// break; // we break because we found a valid device
+		}
+	}
+	if (!valid_device) {
+		std::cout << "Failed to program any device found, exit!\n";
+		exit(EXIT_FAILURE);
+	} */
+	#endif
 
     // variables 
     size_t bytes_per_iteration = ARRAY_SIZE * sizeof(int);
@@ -589,21 +600,9 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	#ifdef FPGA_IMPL
 	std::vector<int, aligned_allocator<int> > vertex_properties((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));  
 	std::vector<int, aligned_allocator<int> > vdatas((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));
-	std::vector<int, aligned_allocator<int> > frontier_properties[MAX_NUM_UPARTITIONS][MAX_NUM_FPGAS]; 
-	for(unsigned int p_u=0; p_u<MAX_NUM_UPARTITIONS; p_u++){ 
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			frontier_properties[p_u][fpga] = std::vector<int, aligned_allocator<int> >(MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE); 
-		}
-	}
 	#else 
 	vector<unsigned int> vertex_properties((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));
 	vector<unsigned int> vdatas((MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE));
-	std::vector<unsigned int> frontier_properties[MAX_NUM_UPARTITIONS][MAX_NUM_FPGAS]; 
-	for(unsigned int p_u=0; p_u<MAX_NUM_UPARTITIONS; p_u++){ 
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			frontier_properties[p_u][fpga] = std::vector<unsigned int>(MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE); 
-		}
-	}
 	#endif
 
 	for(unsigned int i=0; i<universalparams.NUM_VERTICES; i++){ vdatas[i] = 0xFFFFFFFF; } for(unsigned int i=0; i<actvvs.size(); i++){ vdatas[actvvs[i]] = 0; }	
@@ -626,6 +625,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	
 	// attach ext pointers 
 	#ifdef FPGA_IMPL
+	std::cout << "Creating Ext pointers..." << std::endl;
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
 		for (int i = 0; i < NUM_HBM_ARGS; i++) {
 			inBufExt[fpga*NUM_HBM_ARGS + i].obj = HBM_axichannel_vector[fpga][i].data();
@@ -641,12 +641,12 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		}
 	}
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ // FIXME. // NEWCHANGE.
-		inBufExt_input[fpga].obj = frontier_properties[0][0].data(); 
+		// inBufExt_input[fpga].obj = frontier_properties[0][0].data(); 
 		inBufExt_input[fpga].param = 0;
 		inBufExt_input[fpga].flags = pc[NUM_HBM_ARGS + NUM_HBMC_ARGS + 0];
 	}
 	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
-		inBufExt_output[fpga].obj = frontier_properties[0][0].data(); 
+		// inBufExt_output[fpga].obj = frontier_properties[0][0].data(); 
 		inBufExt_output[fpga].param = 0;
 		inBufExt_output[fpga].flags = pc[NUM_HBM_ARGS + NUM_HBMC_ARGS + 1];
 	}
@@ -655,16 +655,11 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	// Allocate Buffer in Global Memory
 	#ifdef FPGA_IMPL
 	std::cout << "Creating Buffers..." << std::endl;
-	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+	for(unsigned int fpga=0; fpga<device_count; fpga++){ // device_count
 		for (int i = 0; i < NUM_HBM_ARGS; i++) {
-			std::cout << "Creating Buffer "<<i<<"..." << std::endl;
-			// #if NUM_PEs==1 // NEWCHANGE.
-			// OCL_CHECK(err, buffer_hbm[fpga*NUM_HBM_ARGS + i] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
-											// bytes_per_iteration, HBM_axichannel_vector[fpga][i].data(), &err));
-			// #else 
+			std::cout << "Creating Buffer "<<i<<" (fpga "<<fpga<<")..." << std::endl;
 			OCL_CHECK(err, buffer_hbm[fpga*NUM_HBM_ARGS + i] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
 											bytes_per_iteration, &inBufExt[fpga*NUM_HBM_ARGS + i], &err));
-			// #endif 
 		}
 	}
 	
@@ -689,8 +684,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			unsigned int export_sz = (_EXPORT_BATCH_SIZE * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_; // NOTE: fewer things to export than to import
 			if(universalparams.NUM_FPGAS_ == 1){ import_sz = 16; export_sz = 16; }
 			
-			// import_sz = 16; 
-			// export_sz = 16;  // REMOVEME.
+			// import_sz = 16; export_sz = 16; // REMOVEME.
 			
 			if(profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
 			OCL_CHECK(err, buffer_import[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
@@ -830,10 +824,13 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	if(all_vertices_active_in_all_iterations == false){ for(unsigned int t = 0; t < num_iterations; t++){ if(active_vertices_in_iteration[0][t].A >= ___hybrid___engine___vertex___threshold___){ num_iterations_dense += 1; }}}
 	else { num_iterations_dense = num_iterations; }
 	// num_iterations_dense = num_iterations;
+	bool valid_devices[16]; 
+	// for(unsigned int t = 0; t < 16; t++){ valid_devices[t] = true; } 
+	for(unsigned int t = 0; t < 16; t++){ if(t>0){ valid_devices[t] = false; } else { valid_devices[t] = true; }} 
 	
 	std::chrono::steady_clock::time_point begin_time = std::chrono::steady_clock::now();
 	
-	// ===== sparse processing ===== 	
+	// ================================================ sparse processing ================================================	
 	#ifdef RUN_SW_KERNEL 
 	bool en = true;
 	unsigned int iteration_idx = 0;
@@ -860,7 +857,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	}
 	#endif 
 	
-	// ===== dense processing =====  
+	// ================================================ dense processing ================================================  
 	#ifdef RUN_FPGA_KERNEL
 	std::cout << endl << TIMINGRESULTSCOLOR <<"#################################################################### ACTS in FPGA mode ["<<num_iterations_dense<<" iterations] ####################################################################"<< RESET << std::endl;
 	std::chrono::steady_clock::time_point begin_time1 = std::chrono::steady_clock::now();
@@ -874,14 +871,13 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga] = actions[fpga][launch_idx]; }
 		
 		if(iters_idx[0][0] >= num_iterations_dense && action[0].module == PROCESS_EDGES_MODULE){ cout<<"host: FINISH: maximum iteration reached. breaking out..."<<endl; break; }
-		// if(iters_idx[0][0] >= num_iterations_dense){ cout<<"host: FINISH: maximum iteration reached. breaking out..."<<endl; break; } // REMOVEME.
-		
+	
 		int flag = run_idx % 2; 
 		#ifdef FPGA_IMPL
 		if (run_idx >= 2) {
-			for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+			for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){
 				if(read_events_bool[fpga][flag] == true){ OCL_CHECK(err, err = read_events[fpga][flag].wait()); }
-			}
+			}}
 		}
 		#endif 
 		
@@ -970,7 +966,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		// setup import and export variables
 		std::chrono::steady_clock::time_point begin_time3 = std::chrono::steady_clock::now();
 		size_t import_sz = 0; size_t export_sz = 0; size_t num_import_partitions = 0; size_t num_export_partitions = 0;
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
 			enable_import = true;
 			enable_export = true;
 			read_events_bool[fpga][flag] = true;
@@ -1016,12 +1012,12 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			}
 			
 			if(export_sz < 64){
-				if(true || profiling0 == true){ std::cout << "Creating Export Buffers..." << std::endl; }
+				if(true || profiling0 == true){ std::cout << "Creating Export Buffers @ fpga "<<fpga<<"..." << std::endl; }
 				OCL_CHECK(err, buffer_export[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
 												(export_sz * sizeof(int)), &inBufExt_output[fpga], &err)); 
 			}
 			#endif 
-		}
+		}}
 		
 		double end_time3 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time3).count()) / 1000;	
 		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::allocate-buffer-in-global-memory time elapsed "<<end_time3<<" ms, "<<(end_time3 * 1000)<<" microsecs, "<< RESET << std::endl; }
@@ -1032,28 +1028,32 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		
 		std::chrono::steady_clock::time_point begin_time4 = std::chrono::steady_clock::now();
 		#ifdef FPGA_IMPL
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
 			if(profiling0 == true){ std::cout << "Setting Import/Export Arguments..." << std::endl; }
 			OCL_CHECK(err, err = kernels[fpga].setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS, buffer_import[fpga][flag]));
 			OCL_CHECK(err, err = kernels[fpga].setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + 1, buffer_export[fpga][flag]));
-		}
+		}}
 		#endif 
 		double end_time4 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time4).count()) / 1000;	
 		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::set-kernel-arguments time elapsed : "<<end_time4<<" ms, "<<(end_time4 * 1000)<<" microsecs, "<< RESET << std::endl; }	
 		
 		// set scalar arguments
 		#ifdef FPGA_IMPL
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ 
-			if(profiling0 == true){ std::cout << "Setting Scalar Arguments..." << std::endl; }
-			_set_args___actions(&kernels[fpga], action[fpga], mask_i[fpga], universalparams, err);
-		}
+		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
+			if(profiling0 == true){ std::cout << "Setting Scalar Arguments..." << std::endl; }	
+			////////////////////////////////////////////////////////////////////////////////////////////////
+			action_t this_action = action[fpga]; 
+			// if(fpga > 0){ this_action.id_process = INVALID_IOBUFFER_ID; this_action.module = 777; } // REMOVEME.
+			/////////////////////////////////////////////////////////////////////////////////////////////////
+			_set_args___actions(&kernels[fpga], this_action, mask_i[fpga], universalparams, err); // action[fpga]
+		}}
 		#endif 
 		
 		// import frontiers
 		std::chrono::steady_clock::time_point begin_time5 = std::chrono::steady_clock::now();
 		#ifdef FPGA_IMPL
 		if(profiling0 == true){ std::cout << "Host to FPGA Transfer..." << std::endl; }
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
 			if(enable_import == true){
 				OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_import[fpga][flag]}, 0, nullptr, &write_event[fpga]));
 				set_callback(write_event[fpga], "ooo_queue");
@@ -1063,7 +1063,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			} else {
 				if(profiling0 == true){ std::cout << "Skipping Host to FPGA Transfer..." << std::endl; }
 			} 
-		}
+		}}
 		#endif
 		double end_time5 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time5).count()) / 1000;	
 		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR <<">>> host::import-frontiers time elapsed : "<<end_time5<<" ms, "<<(end_time5 * 1000)<<" microsecs, "<< RESET << std::endl;	}
@@ -1078,11 +1078,11 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		}
 		std::chrono::steady_clock::time_point begin_time6 = std::chrono::steady_clock::now();
 		#ifdef FPGA_IMPL
-			for(unsigned int fpga=0; fpga<device_count; fpga++){ // device_count universalparams.NUM_FPGAS_
+			for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
 				for(unsigned int sub_kernel=0; sub_kernel<NUM_KERNEL_SUBLAUNCHES_PER_LAUNCH; sub_kernel++){ 
 					#ifdef FPGA_IMPL
 					if(profiling0 == true){ printf("Enqueueing NDRange kernel.\n"); }
-					#endif 				
+					#endif
 					#ifdef ___SYNC___
 					OCL_CHECK(err, err = q[fpga].enqueueNDRangeKernel(kernels[fpga], 0, 1, 1, NULL, &kernel_events[fpga][flag]));
 					set_callback(kernel_events[fpga][flag], "ooo_queue");
@@ -1093,7 +1093,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 					set_callback(kernel_events[fpga][flag], "ooo_queue");
 					#endif 	
 				}
-			}					
+			}}					
 		#else 
 			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
 				for(unsigned int sub_kernel=0; sub_kernel<NUM_KERNEL_SUBLAUNCHES_PER_LAUNCH; sub_kernel++){ 
@@ -1121,7 +1121,8 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 						#endif 
 						#endif 
 						,(HBM_channelAXI_t *)HBM_axicenter[0][fpga], (HBM_channelAXI_t *)HBM_axicenter[1][fpga]
-						,(HBM_channelAXI_t *)&frontier_properties[fpga][action[fpga].id_import][0], (HBM_channelAXI_t *)&frontier_properties[fpga][action[fpga].id_export][0]
+						// ,(HBM_channelAXI_t *)&frontier_properties[fpga][action[fpga].id_import][0], (HBM_channelAXI_t *)&frontier_properties[fpga][action[fpga].id_export][0]
+						,(HBM_channelAXI_t *)&vertex_properties[0], (HBM_channelAXI_t *)&vertex_properties[0]
 						,fpga ,action[fpga].module ,action[fpga].graph_iteration ,action[fpga].start_pu ,action[fpga].size_pu ,action[fpga].skip_pu ,action[fpga].start_pv_fpga ,action[fpga].start_pv ,action[fpga].size_pv ,action[fpga].start_llpset ,action[fpga].size_llpset ,action[fpga].start_llpid ,action[fpga].size_llpid ,action[fpga].start_gv_fpga ,action[fpga].start_gv ,action[fpga].size_gv ,action[fpga].id_process ,action[fpga].id_import ,action[fpga].id_export ,action[fpga].size_import_export ,action[fpga].status ,universalparams.NUM_FPGAS_			
 						,mask_i[fpga][0] ,mask_i[fpga][1] ,mask_i[fpga][2] ,mask_i[fpga][3] ,mask_i[fpga][4] ,mask_i[fpga][5] ,mask_i[fpga][6] ,mask_i[fpga][7]
 						,report_statistics	
@@ -1136,7 +1137,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		std::chrono::steady_clock::time_point begin_time7 = std::chrono::steady_clock::now();
 		#ifdef FPGA_IMPL
 		if(profiling0 == true){ std::cout << "FPGA to Host Transfer..." << std::endl; }
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
 			std::vector<cl::Event> eventList; eventList.push_back(kernel_events[fpga][flag]);
 			if(enable_export == true){
 				OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_export[fpga][flag]}, CL_MIGRATE_MEM_OBJECT_HOST, &eventList,
@@ -1148,7 +1149,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			} else {
 				if(profiling0 == true){ std::cout << "Skipping FPGA to Host Transfer..." << std::endl; }
 			}
-		}
+		}}
 		#endif
 		double end_time7 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time7).count()) / 1000;	
 		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::export-frontiers time elapsed : "<<end_time7<<" ms, "<<(end_time7 * 1000)<<" microsecs, "<< RESET << std::endl; }
@@ -1247,7 +1248,6 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		
 		run_idx += 1;
 		if(universalparams.NUM_FPGAS_ == 1){ break; }
-		// break; // REMOVEME.....................................................................
 		// exit(EXIT_SUCCESS);
 	} // epoch
 	double end_time1 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time1).count()) / 1000;	
@@ -1268,10 +1268,10 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	// Wait for all of the OpenCL operations to complete
     printf("Waiting...\n");
 	#ifdef FPGA_IMPL
-	for(unsigned int fpga=0; fpga<device_count; fpga++){
+	for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
 		OCL_CHECK(err, err = q[fpga].flush());
 		OCL_CHECK(err, err = q[fpga].finish());
-	}
+	}}
 	#endif 
 	
 	double end_time = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time).count()) / 1000;	
@@ -1365,7 +1365,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	
 	// Copy Result from Device Global Memory to Host Local Memory
 	#ifdef FPGA_IMPL
-	for(unsigned int fpga=0; fpga<device_count; fpga++){ 
+	for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
 		std::cout << "Getting Results (Device to Host)..." << std::endl;
 		std::chrono::steady_clock::time_point begin_time2 = std::chrono::steady_clock::now();
 		for (int i = 0; i < NUM_HBMC_ARGS; i++) {
@@ -1379,16 +1379,16 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		#endif 
 		double end_time2 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time2).count()) / 1000;	
 		std::cout <<">>> read-from-FPGA time elapsed : "<<end_time2<<" ms, "<<(end_time2 * 1000)<<" microsecs, "<<std::endl;
-	}	
+	}}
 	#endif 
 	
 	// Wait for all of the OpenCL operations to complete
 	#ifdef FPGA_IMPL
     printf("Waiting...\n");
-	for(unsigned int fpga=0; fpga<device_count; fpga++){
+	for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
 		OCL_CHECK(err, err = q[fpga].flush());
 		OCL_CHECK(err, err = q[fpga].finish());
-	}
+	}}
 	#endif
 	
 	cout<<"host::run:: Graph: "<<graph_path<<" ran successfully."<<endl;
