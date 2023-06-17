@@ -684,7 +684,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			unsigned int export_sz = (_EXPORT_BATCH_SIZE * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_; // NOTE: fewer things to export than to import
 			if(universalparams.NUM_FPGAS_ == 1){ import_sz = 16; export_sz = 16; }
 			
-			// import_sz = 16; export_sz = 16; // REMOVEME.
+			// import_sz = 16; export_sz = 16; 
 			
 			if(profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
 			OCL_CHECK(err, buffer_import[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
@@ -899,128 +899,133 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		}
 		
 		// pre-run
-		std::chrono::steady_clock::time_point begin_time2 = std::chrono::steady_clock::now();
-		#ifdef ___PRE_RUN___
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
-			// pre import 
-			import_pointer[fpga] = INVALID_IOBUFFER_ID;
-			action[fpga].id_import = INVALID_IOBUFFER_ID;
-			for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=_IMPORT_BATCH_SIZE){
-				utilityobj->checkoutofbounds("host::ERROR 2111::", import_Queue[fpga][t].ready_for_import, MAX_NUM_UPARTITIONS, fpga, t, NAp);
-				bool en = true; for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){ if((import_Queue[fpga][t+k].ready_for_import == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS))){ en = false; break; }} // FIXME?
-				if(en == true){ 
-					import_pointer[fpga] = t;
-					action[fpga].id_import = t; 
-					break; 
+		if(universalparams.NUM_FPGAS_>1){
+			std::chrono::steady_clock::time_point begin_time2 = std::chrono::steady_clock::now();
+			#if defined(___PRE_RUN___)
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
+				// pre import 
+				import_pointer[fpga] = INVALID_IOBUFFER_ID;
+				action[fpga].id_import = INVALID_IOBUFFER_ID;
+				for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=_IMPORT_BATCH_SIZE){
+					utilityobj->checkoutofbounds("host::ERROR 2111::", import_Queue[fpga][t].ready_for_import, MAX_NUM_UPARTITIONS, fpga, t, NAp);
+					bool en = true; for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){ if((import_Queue[fpga][t+k].ready_for_import == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS))){ en = false; break; }} // FIXME?
+					if(en == true){ 
+						import_pointer[fpga] = t;
+						action[fpga].id_import = t; 
+						break; 
+					}
 				}
-			}
-			
-			// pre process 
-			process_pointer[fpga] = INVALID_IOBUFFER_ID;
-			action[fpga].id_process = INVALID_IOBUFFER_ID; 
-			if(action[fpga].module != APPLY_UPDATES_MODULE && action[fpga].module != GATHER_FRONTIERS_MODULE){
-				for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=_PE_BATCH_SIZE){
-					utilityobj->checkoutofbounds("host::ERROR 2112::", process_Queue[fpga][t].ready_for_process, MAX_NUM_UPARTITIONS, fpga, t, NAp);
-					bool en = true; for(unsigned int k=0; k<_PE_BATCH_SIZE; k++){ if((process_Queue[fpga][t+k].ready_for_process == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS))){ en = false; break; }} // FIXME?
+				
+				// pre process 
+				process_pointer[fpga] = INVALID_IOBUFFER_ID;
+				action[fpga].id_process = INVALID_IOBUFFER_ID; 
+				if(action[fpga].module != APPLY_UPDATES_MODULE && action[fpga].module != GATHER_FRONTIERS_MODULE){
+					for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=_PE_BATCH_SIZE){
+						utilityobj->checkoutofbounds("host::ERROR 2112::", process_Queue[fpga][t].ready_for_process, MAX_NUM_UPARTITIONS, fpga, t, NAp);
+						bool en = true; for(unsigned int k=0; k<_PE_BATCH_SIZE; k++){ if((process_Queue[fpga][t+k].ready_for_process == 0) && ((t+k) < (universalparams.NUM_UPARTITIONS))){ en = false; break; }} // FIXME?
+						if(en == true){
+							process_pointer[fpga] = t;
+							action[fpga].id_process = t; 
+							action[fpga].start_pu = t; 
+							
+							action[fpga].size_pu = _PE_BATCH_SIZE; 
+							if(universalparams.NUM_FPGAS_==1){ action[fpga].size_pu = universalparams.NUM_UPARTITIONS; }  // NEWCHANGE.
+							if(action[fpga].start_pu + action[fpga].size_pu > universalparams.NUM_UPARTITIONS){ action[fpga].size_pu = universalparams.NUM_UPARTITIONS - action[fpga].start_pu; } // FIXME?
+							action[fpga].skip_pu = 1;
+							
+							break; 
+						}
+					}
+				}
+				
+				// pre export 
+				export_pointer[fpga] = INVALID_IOBUFFER_ID;
+				action[fpga].id_export = INVALID_IOBUFFER_ID;
+				for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=_EXPORT_BATCH_SIZE){ 
+					utilityobj->checkoutofbounds("host::ERROR 2113::", export_Queue[fpga][t].ready_for_export, MAX_NUM_UPARTITIONS, fpga, t, NAp);
+					bool en = true; for(unsigned int k=0; k<_EXPORT_BATCH_SIZE; k++){ if((export_Queue[fpga][t+k].ready_for_export == 0) && ((t+k) < universalparams.NUM_UPARTITIONS)){ en = false; break; }} // FIXME?
 					if(en == true){
-						process_pointer[fpga] = t;
-						action[fpga].id_process = t; 
-						action[fpga].start_pu = t; 
-						
-						action[fpga].size_pu = _PE_BATCH_SIZE; 
-						if(universalparams.NUM_FPGAS_==1){ action[fpga].size_pu = universalparams.NUM_UPARTITIONS; }  // NEWCHANGE.
-						if(action[fpga].start_pu + action[fpga].size_pu > universalparams.NUM_UPARTITIONS){ action[fpga].size_pu = universalparams.NUM_UPARTITIONS - action[fpga].start_pu; } // FIXME?
-						action[fpga].skip_pu = 1;
-						
+						export_pointer[fpga] = t;
+						action[fpga].id_export = t; 
 						break; 
 					}
 				}
 			}
 			
-			// pre export 
-			export_pointer[fpga] = INVALID_IOBUFFER_ID;
-			action[fpga].id_export = INVALID_IOBUFFER_ID;
-			for(unsigned int t=0; t<universalparams.NUM_UPARTITIONS; t+=_EXPORT_BATCH_SIZE){ 
-				utilityobj->checkoutofbounds("host::ERROR 2113::", export_Queue[fpga][t].ready_for_export, MAX_NUM_UPARTITIONS, fpga, t, NAp);
-				bool en = true; for(unsigned int k=0; k<_EXPORT_BATCH_SIZE; k++){ if((export_Queue[fpga][t+k].ready_for_export == 0) && ((t+k) < universalparams.NUM_UPARTITIONS)){ en = false; break; }} // FIXME?
-				if(en == true){
-					export_pointer[fpga] = t;
-					action[fpga].id_export = t; 
-					break; 
+			// set active source partitions 		
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
+				if(all_vertices_active_in_all_iterations == false && action[fpga].id_process != INVALID_IOBUFFER_ID){
+					for(unsigned int t=0; t<_IMPORT_BATCH_SIZE; t++){
+						SetBit(mask_i[fpga][action[fpga].start_pu / 32], action[fpga].start_pu % 32);
+					}
 				}
-			}
+			}				
+			#endif 
+			double end_time2 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time2).count()) / 1000;	
+			if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::pre-run time elapsed : "<<end_time2<<" ms, "<<(end_time2 * 1000)<<" microsecs, "<< RESET << std::endl; }
+		
 		}
 		
-		// set active source partitions 		
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
-			if(all_vertices_active_in_all_iterations == false && action[fpga].id_process != INVALID_IOBUFFER_ID){
-				for(unsigned int t=0; t<_IMPORT_BATCH_SIZE; t++){
-					SetBit(mask_i[fpga][action[fpga].start_pu / 32], action[fpga].start_pu % 32);
-				}
-			}
-		}				
-		#endif 
-		double end_time2 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time2).count()) / 1000;	
-		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::pre-run time elapsed : "<<end_time2<<" ms, "<<(end_time2 * 1000)<<" microsecs, "<< RESET << std::endl; }
-	
 		// setup import and export variables
-		std::chrono::steady_clock::time_point begin_time3 = std::chrono::steady_clock::now();
 		size_t import_sz = 0; size_t export_sz = 0; size_t num_import_partitions = 0; size_t num_export_partitions = 0;
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
-			enable_import = true;
-			enable_export = true;
-			read_events_bool[fpga][flag] = true;
-			
-			size_t import_id = action[fpga].id_import;
-			size_t export_id = action[fpga].id_export;
-			
-			if(import_id == INVALID_IOBUFFER_ID || universalparams.NUM_FPGAS_ == 1){
-				import_id = 0; import_sz = 16; num_import_partitions = 0;
-			} else {
-				num_import_partitions = _IMPORT_BATCH_SIZE; if((num_import_partitions + import_id) >= universalparams.NUM_UPARTITIONS){ num_import_partitions = universalparams.NUM_UPARTITIONS - import_id; }
-				import_sz = num_import_partitions * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; 
-			}
-			
-			if(export_id == INVALID_IOBUFFER_ID || universalparams.NUM_FPGAS_ == 1){
-				export_id = 0; export_sz = 16; num_export_partitions = 0;
-			} else {
-				num_export_partitions = _EXPORT_BATCH_SIZE; if((num_export_partitions + export_id) >= universalparams.NUM_UPARTITIONS){ num_export_partitions = universalparams.NUM_UPARTITIONS - export_id; }
-				export_sz = (num_export_partitions * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_;
-			}
-			
-			// import_id = 0; import_sz = 16; num_import_partitions = 0;
-			// export_id = 0; export_sz = 16; num_export_partitions = 0; // REMOVEME.
-			
-			if(fpga==0){ report_statistics[___CODE___IMPORT_BATCH_SIZE___] += num_import_partitions; report_statistics[___CODE___EXPORT_BATCH_SIZE___] += num_export_partitions; }
-			#ifdef _DEBUGMODE_CHECKS3 
-			utilityobj->checkoutofbounds("host::ERROR 2113c::", import_id, MAX_NUM_UPARTITIONS, import_sz, export_sz, NAp);
-			utilityobj->checkoutofbounds("host::ERROR 2113d::", export_id, MAX_NUM_UPARTITIONS, import_sz, export_sz, NAp);
-			utilityobj->checkoutofbounds("host::ERROR 2113e::", import_sz, (MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE), import_sz, export_sz, NAp);
-			utilityobj->checkoutofbounds("host::ERROR 2113f::", export_sz, (MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE), import_sz, export_sz, NAp);
-			#endif 
+		if(universalparams.NUM_FPGAS_>1){
+			std::chrono::steady_clock::time_point begin_time3 = std::chrono::steady_clock::now();
+			for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
+				enable_import = true;
+				enable_export = true;
+				read_events_bool[fpga][flag] = true;
+				
+				size_t import_id = action[fpga].id_import;
+				size_t export_id = action[fpga].id_export;
+				
+				if(import_id == INVALID_IOBUFFER_ID || universalparams.NUM_FPGAS_ == 1){
+					import_id = 0; import_sz = 16; num_import_partitions = 0;
+				} else {
+					num_import_partitions = _IMPORT_BATCH_SIZE; if((num_import_partitions + import_id) >= universalparams.NUM_UPARTITIONS){ num_import_partitions = universalparams.NUM_UPARTITIONS - import_id; }
+					import_sz = num_import_partitions * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE; 
+				}
+				
+				if(export_id == INVALID_IOBUFFER_ID || universalparams.NUM_FPGAS_ == 1){
+					export_id = 0; export_sz = 16; num_export_partitions = 0;
+				} else {
+					num_export_partitions = _EXPORT_BATCH_SIZE; if((num_export_partitions + export_id) >= universalparams.NUM_UPARTITIONS){ num_export_partitions = universalparams.NUM_UPARTITIONS - export_id; }
+					export_sz = (num_export_partitions * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_;
+				}
+				
+				// import_id = 0; import_sz = 16; num_import_partitions = 0;
+				// export_id = 0; export_sz = 16; num_export_partitions = 0; // REMOVEME.
+				
+				if(fpga==0){ report_statistics[___CODE___IMPORT_BATCH_SIZE___] += num_import_partitions; report_statistics[___CODE___EXPORT_BATCH_SIZE___] += num_export_partitions; }
+				#ifdef _DEBUGMODE_CHECKS3 
+				utilityobj->checkoutofbounds("host::ERROR 2113c::", import_id, MAX_NUM_UPARTITIONS, import_sz, export_sz, NAp);
+				utilityobj->checkoutofbounds("host::ERROR 2113d::", export_id, MAX_NUM_UPARTITIONS, import_sz, export_sz, NAp);
+				utilityobj->checkoutofbounds("host::ERROR 2113e::", import_sz, (MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE), import_sz, export_sz, NAp);
+				utilityobj->checkoutofbounds("host::ERROR 2113f::", export_sz, (MAX_NUM_UPARTITIONS * MAX_UPARTITION_SIZE), import_sz, export_sz, NAp);
+				#endif 
 
-			#ifdef FPGA_IMPL
-			inBufExt_input[fpga].obj = &vertex_properties[import_id * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE];
-			inBufExt_output[fpga].obj = &vertex_properties[export_id * ((MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_)];
-			// inBufExt_input[fpga].obj = &vertex_properties[0];
-			// inBufExt_output[fpga].obj = &vertex_properties[0];
+				#ifdef FPGA_IMPL
+				inBufExt_input[fpga].obj = &vertex_properties[import_id * MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE];
+				inBufExt_output[fpga].obj = &vertex_properties[export_id * ((MAX_UPARTITION_VECSIZE * HBM_AXI_PACK_SIZE) / universalparams.NUM_FPGAS_)];
+				// inBufExt_input[fpga].obj = &vertex_properties[0];
+				// inBufExt_output[fpga].obj = &vertex_properties[0];
 
-			if(import_sz < 64){
-				if(true || profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
-				OCL_CHECK(err, buffer_import[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
-												(import_sz * sizeof(int)), &inBufExt_input[fpga], &err)); 
-			}
-			
-			if(export_sz < 64){
-				if(true || profiling0 == true){ std::cout << "Creating Export Buffers @ fpga "<<fpga<<"..." << std::endl; }
-				OCL_CHECK(err, buffer_export[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
-												(export_sz * sizeof(int)), &inBufExt_output[fpga], &err)); 
-			}
-			#endif 
-		}}
+				if(import_sz < 64){
+					if(true || profiling0 == true){ std::cout << "Creating Import Buffers @ fpga "<<fpga<<"..." << std::endl; }
+					OCL_CHECK(err, buffer_import[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
+													(import_sz * sizeof(int)), &inBufExt_input[fpga], &err)); 
+				}
+				
+				if(export_sz < 64){
+					if(true || profiling0 == true){ std::cout << "Creating Export Buffers @ fpga "<<fpga<<"..." << std::endl; }
+					OCL_CHECK(err, buffer_export[fpga][flag] = cl::Buffer(contexts[fpga], CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX | CL_MEM_USE_HOST_PTR,
+													(export_sz * sizeof(int)), &inBufExt_output[fpga], &err)); 
+				}
+				#endif 
+			}}
 		
-		double end_time3 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time3).count()) / 1000;	
-		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::allocate-buffer-in-global-memory time elapsed "<<end_time3<<" ms, "<<(end_time3 * 1000)<<" microsecs, "<< RESET << std::endl; }
+			double end_time3 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time3).count()) / 1000;	
+			if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::allocate-buffer-in-global-memory time elapsed "<<end_time3<<" ms, "<<(end_time3 * 1000)<<" microsecs, "<< RESET << std::endl; }
+		}
 		
 		#ifdef FPGA_IMPL
 		vector<cl::Event> write_event(1 * universalparams.NUM_FPGAS_);
@@ -1041,32 +1046,31 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		#ifdef FPGA_IMPL
 		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
 			if(profiling0 == true){ std::cout << "Setting Scalar Arguments..." << std::endl; }	
-			////////////////////////////////////////////////////////////////////////////////////////////////
 			action_t this_action = action[fpga]; 
-			// if(fpga > 0){ this_action.id_process = INVALID_IOBUFFER_ID; this_action.module = 777; } // REMOVEME.
-			/////////////////////////////////////////////////////////////////////////////////////////////////
 			_set_args___actions(&kernels[fpga], this_action, mask_i[fpga], universalparams, err); // action[fpga]
 		}}
 		#endif 
 		
 		// import frontiers
-		std::chrono::steady_clock::time_point begin_time5 = std::chrono::steady_clock::now();
-		#ifdef FPGA_IMPL
-		if(profiling0 == true){ std::cout << "Host to FPGA Transfer..." << std::endl; }
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
-			if(enable_import == true){
-				OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_import[fpga][flag]}, 0, nullptr, &write_event[fpga]));
-				set_callback(write_event[fpga], "ooo_queue");
-				#ifdef ___SYNC___
-				OCL_CHECK(err, err = write_event[fpga].wait()); 
-				#endif 
-			} else {
-				if(profiling0 == true){ std::cout << "Skipping Host to FPGA Transfer..." << std::endl; }
-			} 
-		}}
-		#endif
-		double end_time5 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time5).count()) / 1000;	
-		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR <<">>> host::import-frontiers time elapsed : "<<end_time5<<" ms, "<<(end_time5 * 1000)<<" microsecs, "<< RESET << std::endl;	}
+		if(universalparams.NUM_FPGAS_>1){
+			std::chrono::steady_clock::time_point begin_time5 = std::chrono::steady_clock::now();
+			#ifdef FPGA_IMPL
+			if(profiling0 == true){ std::cout << "Host to FPGA Transfer..." << std::endl; }
+			for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){  
+				if(enable_import == true){
+					OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_import[fpga][flag]}, 0, nullptr, &write_event[fpga]));
+					set_callback(write_event[fpga], "ooo_queue");
+					#ifdef ___SYNC___
+					OCL_CHECK(err, err = write_event[fpga].wait()); 
+					#endif 
+				} else {
+					if(profiling0 == true){ std::cout << "Skipping Host to FPGA Transfer..." << std::endl; }
+				} 
+			}}
+			#endif
+			double end_time5 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time5).count()) / 1000;	
+			if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR <<">>> host::import-frontiers time elapsed : "<<end_time5<<" ms, "<<(end_time5 * 1000)<<" microsecs, "<< RESET << std::endl;	}
+		}
 		
 		// ===== run kernel ===== 
 		for(unsigned int fpga=0; fpga<1; fpga++){
@@ -1132,127 +1136,139 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		#endif 
 		double end_time6 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time6).count()) / 1000;	
 		if(true || profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> kernel time elapsed for iteration "<<iters_idx[0][launch_idx]<<", launch_idx "<<launch_idx<<" : "<<end_time6<<" ms, "<<(end_time6 * 1000)<<" microsecs, "<< RESET <<std::endl; }
+		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+		unsigned int sz2 = universalparams.NUM_UPARTITIONS * universalparams.NUM_APPLYPARTITIONS * NUM_PEs * EDGE_UPDATES_CHUNKSZ * EDGE_PACK_SIZE;
+		unsigned int sz1 = epoch * sz2;
+		std::cout << TIMINGRESULTSCOLOR << ">>> "<<": average graph analytics throughput (MTEPS) = " << (sz1 / end_time6) / 1000 << " (" << (sz1 / end_time6) / 1000000 << " BTEPS) "<< RESET << std::endl; 
+		std::cout << TIMINGRESULTSCOLOR << ">>> "<<": average edge insertion/deletion/update throughput (MTEPS) = " << (sz2 / end_time6) / 1000 << " (" << (sz2 / end_time6) / 1000000 << " BTEPS) "<< RESET << std::endl; 
+		#endif 
 		
 		// export frontiers
-		std::chrono::steady_clock::time_point begin_time7 = std::chrono::steady_clock::now();
-		#ifdef FPGA_IMPL
-		if(profiling0 == true){ std::cout << "FPGA to Host Transfer..." << std::endl; }
-		for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
-			std::vector<cl::Event> eventList; eventList.push_back(kernel_events[fpga][flag]);
-			if(enable_export == true){
-				OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_export[fpga][flag]}, CL_MIGRATE_MEM_OBJECT_HOST, &eventList,
-														&read_events[fpga][flag]));		
-				set_callback(read_events[fpga][flag], "ooo_queue");
-				#ifdef ___SYNC___ // FIXME
-				OCL_CHECK(err, err = read_events[fpga][flag].wait()); 
-				#endif 
-			} else {
-				if(profiling0 == true){ std::cout << "Skipping FPGA to Host Transfer..." << std::endl; }
-			}
-		}}
-		#endif
-		double end_time7 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time7).count()) / 1000;	
-		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::export-frontiers time elapsed : "<<end_time7<<" ms, "<<(end_time7 * 1000)<<" microsecs, "<< RESET << std::endl; }
+		if(universalparams.NUM_FPGAS_>1){
+			std::chrono::steady_clock::time_point begin_time7 = std::chrono::steady_clock::now();
+			#ifdef FPGA_IMPL
+			if(profiling0 == true){ std::cout << "FPGA to Host Transfer..." << std::endl; }
+			for(unsigned int fpga=0; fpga<device_count; fpga++){ if(valid_devices[fpga]==true){ 
+				std::vector<cl::Event> eventList; eventList.push_back(kernel_events[fpga][flag]);
+				if(enable_export == true){
+					OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_export[fpga][flag]}, CL_MIGRATE_MEM_OBJECT_HOST, &eventList,
+															&read_events[fpga][flag]));		
+					set_callback(read_events[fpga][flag], "ooo_queue");
+					#ifdef ___SYNC___ // FIXME
+					OCL_CHECK(err, err = read_events[fpga][flag].wait()); 
+					#endif 
+				} else {
+					if(profiling0 == true){ std::cout << "Skipping FPGA to Host Transfer..." << std::endl; }
+				}
+			}}
+			#endif
+			double end_time7 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time7).count()) / 1000;	
+			if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::export-frontiers time elapsed : "<<end_time7<<" ms, "<<(end_time7 * 1000)<<" microsecs, "<< RESET << std::endl; }
+		}
 		
 		// post-run 
-		std::chrono::steady_clock::time_point begin_time8 = std::chrono::steady_clock::now();
-		#ifdef ___POST_RUN___
-		// post import: remove partitions just imported from queue; add partitions just imported to process queue 
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
-			if(import_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; }
-			for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){
-				if(import_pointer[fpga] + k < universalparams.NUM_UPARTITIONS){
-					if(universalparams.NUM_FPGAS_ > 1){ import_Queue[fpga][import_pointer[fpga] + k].ready_for_import -= universalparams.NUM_FPGAS_; }
-					if(universalparams.NUM_FPGAS_ > 1){ process_Queue[fpga][import_pointer[fpga] + k].ready_for_process = 1; }
-					utilityobj->checkoutofbounds("host::ERROR 2121::", import_Queue[fpga][import_pointer[fpga] + k].ready_for_import, MAX_NUM_UPARTITIONS, fpga, k, import_pointer[fpga]);		
+		if(universalparams.NUM_FPGAS_>1){
+			std::chrono::steady_clock::time_point begin_time8 = std::chrono::steady_clock::now();
+			#if defined(___POST_RUN___) 
+			// post import: remove partitions just imported from queue; add partitions just imported to process queue 
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
+				if(import_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; }
+				for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){
+					if(import_pointer[fpga] + k < universalparams.NUM_UPARTITIONS){
+						if(universalparams.NUM_FPGAS_ > 1){ import_Queue[fpga][import_pointer[fpga] + k].ready_for_import -= universalparams.NUM_FPGAS_; }
+						if(universalparams.NUM_FPGAS_ > 1){ process_Queue[fpga][import_pointer[fpga] + k].ready_for_process = 1; }
+						utilityobj->checkoutofbounds("host::ERROR 2121::", import_Queue[fpga][import_pointer[fpga] + k].ready_for_import, MAX_NUM_UPARTITIONS, fpga, k, import_pointer[fpga]);		
+					}
 				}
 			}
-		}
-		
-		// post process: remove partitions just processed from queue; indicate that partition has been processed 
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			if(process_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; } 
-			for(unsigned int k=0; k<_PE_BATCH_SIZE; k++){
-				if(process_pointer[fpga] + k >= MAX_NUM_UPARTITIONS){ continue; }
-				utilityobj->checkoutofbounds("host::ERROR 7120::", process_pointer[fpga] + k, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
-				process_Queue[fpga][process_pointer[fpga] + k].ready_for_process = 0; 
-				processed_vertex_partitions_record[iters_idx[fpga][launch_idx]][process_pointer[fpga] + k] = 1; 
-			}
-		}
-		
-		// post-apply 
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			if(action[fpga].start_pv != NAp){
-				// if(fpga==0){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }} // NEWCHANGE.
-			}
-		}
-		
-		// post gather: add partitions just gathered to export queue  
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			if(action[fpga].module != GATHER_FRONTIERS_MODULE){	continue; }
-			for(unsigned int t=action[fpga].start_gv; t<action[fpga].start_gv + action[fpga].size_gv; t+=1){	
-				utilityobj->checkoutofbounds("host::ERROR 7121::", t, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
-				if(universalparams.NUM_FPGAS_ > 1){ export_Queue[fpga][t].ready_for_export = 1;	}
-			}
-		}
-		
-		// post export: remove partitions just exported from queue
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			if(export_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; } // NEWCHANGE.
-			for(unsigned int k=0; k<_EXPORT_BATCH_SIZE; k++){ 
-				if(export_pointer[fpga] + k >= MAX_NUM_UPARTITIONS){ continue; }
-				utilityobj->checkoutofbounds("host::ERROR 7122::", export_pointer[fpga] + k, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
-				if(universalparams.NUM_FPGAS_ > 1){ export_Queue[fpga][export_pointer[fpga] + k].ready_for_export = 0; }
-			}
-		}
-		
-		// post export: transfer export to imports
-		if(action[0].id_export != INVALID_IOBUFFER_ID){							
-			for(unsigned int k=0; k<_EXPORT_BATCH_SIZE; k++){ 
-				unsigned int upartition_id = action[0].id_export + k; 
-				if(upartition_id >= universalparams.NUM_UPARTITIONS){ continue; }
-				utilityobj->checkoutofbounds("host::ERROR 7123::", upartition_id, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
-				for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
-					if(universalparams.NUM_FPGAS_ > 1){ import_Queue[fpga][upartition_id].ready_for_import += universalparams.NUM_FPGAS_; }
-					if(universalparams.NUM_FPGAS_ > 1){ import_Queue[fpga][upartition_id].iteration = iters_idx[fpga][launch_idx] + 1; }
+			
+			// post process: remove partitions just processed from queue; indicate that partition has been processed 
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
+				if(process_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; } 
+				for(unsigned int k=0; k<_PE_BATCH_SIZE; k++){
+					if(process_pointer[fpga] + k >= MAX_NUM_UPARTITIONS){ continue; }
+					utilityobj->checkoutofbounds("host::ERROR 7120::", process_pointer[fpga] + k, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
+					process_Queue[fpga][process_pointer[fpga] + k].ready_for_process = 0; 
+					processed_vertex_partitions_record[iters_idx[fpga][launch_idx]][process_pointer[fpga] + k] = 1; 
 				}
 			}
-		}	
+			
+			// post-apply 
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
+				if(action[fpga].start_pv != NAp){
+					// if(fpga==0){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }} // NEWCHANGE.
+				}
+			}
+			
+			// post gather: add partitions just gathered to export queue  
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
+				if(action[fpga].module != GATHER_FRONTIERS_MODULE){	continue; }
+				for(unsigned int t=action[fpga].start_gv; t<action[fpga].start_gv + action[fpga].size_gv; t+=1){	
+					utilityobj->checkoutofbounds("host::ERROR 7121::", t, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
+					if(universalparams.NUM_FPGAS_ > 1){ export_Queue[fpga][t].ready_for_export = 1;	}
+				}
+			}
+			
+			// post export: remove partitions just exported from queue
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
+				if(export_pointer[fpga] == INVALID_IOBUFFER_ID){ continue; } // NEWCHANGE.
+				for(unsigned int k=0; k<_EXPORT_BATCH_SIZE; k++){ 
+					if(export_pointer[fpga] + k >= MAX_NUM_UPARTITIONS){ continue; }
+					utilityobj->checkoutofbounds("host::ERROR 7122::", export_pointer[fpga] + k, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
+					if(universalparams.NUM_FPGAS_ > 1){ export_Queue[fpga][export_pointer[fpga] + k].ready_for_export = 0; }
+				}
+			}
+			
+			// post export: transfer export to imports
+			if(action[0].id_export != INVALID_IOBUFFER_ID){							
+				for(unsigned int k=0; k<_EXPORT_BATCH_SIZE; k++){ 
+					unsigned int upartition_id = action[0].id_export + k; 
+					if(upartition_id >= universalparams.NUM_UPARTITIONS){ continue; }
+					utilityobj->checkoutofbounds("host::ERROR 7123::", upartition_id, MAX_NUM_UPARTITIONS, NAp, NAp, NAp);
+					for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
+						if(universalparams.NUM_FPGAS_ > 1){ import_Queue[fpga][upartition_id].ready_for_import += universalparams.NUM_FPGAS_; }
+						if(universalparams.NUM_FPGAS_ > 1){ import_Queue[fpga][upartition_id].iteration = iters_idx[fpga][launch_idx] + 1; }
+					}
+				}
+			}	
 
-		// post import: update iters_idx
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
-			if(import_pointer[fpga] != INVALID_IOBUFFER_ID){ 
-				for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){ 
-					if(import_pointer[fpga] + k < universalparams.NUM_UPARTITIONS){ iters_idx[fpga][import_pointer[fpga] + k] += 1; }
+			// post import: update iters_idx
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ 
+				if(import_pointer[fpga] != INVALID_IOBUFFER_ID){ 
+					for(unsigned int k=0; k<_IMPORT_BATCH_SIZE; k++){ 
+						if(import_pointer[fpga] + k < universalparams.NUM_UPARTITIONS){ iters_idx[fpga][import_pointer[fpga] + k] += 1; }
+					}
 				}
-			}
-		}		
+			}		
+			
+			// update launch_idx	
+			if(process_pointer[0] != INVALID_IOBUFFER_ID){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
+			if(action[0].start_pv != NAp){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
+			if(action[0].module == GATHER_FRONTIERS_MODULE){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
+			#endif 
+			double end_time8 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time8).count()) / 1000;	
+			if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::post-process time elapsed : "<<end_time8<<" ms, "<<(end_time8 * 1000)<<" microsecs, "<< RESET << std::endl; }
+		}
 		
-		// update launch_idx	
-		if(process_pointer[0] != INVALID_IOBUFFER_ID){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
-		if(action[0].start_pv != NAp){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
-		if(action[0].module == GATHER_FRONTIERS_MODULE){ launch_idx += 1; if(launch_idx >= num_launches){ launch_idx = 0; }}
-		#endif 
-		double end_time8 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time8).count()) / 1000;	
-		if(profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> host::post-process time elapsed : "<<end_time8<<" ms, "<<(end_time8 * 1000)<<" microsecs, "<< RESET << std::endl; }
-		
-		// record edges processed 			
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
-			if(all_vertices_active_in_all_iterations == false && action[fpga].id_process != INVALID_IOBUFFER_ID){
-				for(unsigned int t=0; t<_IMPORT_BATCH_SIZE; t++){						
-					utilityobj->checkoutofbounds("host::ERROR 2223::", action[fpga].id_process, universalparams.NUM_UPARTITIONS, MAX_NUM_UPARTITIONS, NAp, NAp);
-					active_edges_in_iteration[1][iters_idx[fpga][launch_idx]].A += vertex_properties_map[iters_idx[fpga][launch_idx]][action[fpga].id_process];
+		// record edges processed 	
+		if(universalparams.NUM_FPGAS_>1){
+			for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){
+				if(all_vertices_active_in_all_iterations == false && action[fpga].id_process != INVALID_IOBUFFER_ID){
+					for(unsigned int t=0; t<_IMPORT_BATCH_SIZE; t++){						
+						utilityobj->checkoutofbounds("host::ERROR 2223::", action[fpga].id_process, universalparams.NUM_UPARTITIONS, MAX_NUM_UPARTITIONS, NAp, NAp);
+						active_edges_in_iteration[1][iters_idx[fpga][launch_idx]].A += vertex_properties_map[iters_idx[fpga][launch_idx]][action[fpga].id_process];
+					}
 				}
-			}
-		}	
+			}	
+		}
 		
 		run_idx += 1;
-		if(universalparams.NUM_FPGAS_ == 1){ break; }
+		if(universalparams.NUM_FPGAS_ == 1 && epoch == universalparams.NUM_ITERATIONS-1){ break; }
 		// exit(EXIT_SUCCESS);
 	} // epoch
 	double end_time1 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time1).count()) / 1000;	
 	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for current iteration : "<<end_time1<<" ms, "<<(end_time1 * 1000)<<" microsecs, "<< RESET << std::endl;
-
+	
 	cout<<"-------------------------+++++++++++++++++++++++++++--------------------- num_iterations_dense: "<<num_iterations_dense<<", num_iterations: "<<num_iterations<<endl;
 	for(unsigned int iter=0; iter<num_iterations; iter+=1){ // FIXME (num_launches * num_iterations * 2)
 		active_vertices_in_iteration[1][iter].A = universalparams.NUM_VERTICES;
@@ -1360,7 +1376,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	}
 	
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-	std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Edge-update Throughput (MUEPS) = " << ((universalparams.NUM_UPARTITIONS * universalparams.NUM_APPLYPARTITIONS * NUM_PEs * universalparams.NUM_FPGAS_ * 512 * 16) / (end_time / num_iterations)) / 1000 << " MUEPS, Throughput (BTEPS) = " << ((universalparams.NUM_UPARTITIONS * universalparams.NUM_APPLYPARTITIONS * NUM_PEs * universalparams.NUM_FPGAS_ * 512 * 16) / (end_time / num_iterations)) / 1000000 << " BTEPS "<< RESET << std::endl;			
+	std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Edge-update Throughput (MUEPS) = " << ((universalparams.NUM_UPARTITIONS * universalparams.NUM_APPLYPARTITIONS * NUM_PEs * universalparams.NUM_FPGAS_ * EDGE_UPDATES_CHUNKSZ * EDGE_PACK_SIZE) / (end_time / num_iterations)) / 1000 << " MUEPS, Throughput (BTEPS) = " << ((universalparams.NUM_UPARTITIONS * universalparams.NUM_APPLYPARTITIONS * NUM_PEs * universalparams.NUM_FPGAS_ * 512 * 16) / (end_time / num_iterations)) / 1000000 << " BTEPS "<< RESET << std::endl;			
 	#endif 
 	
 	// Copy Result from Device Global Memory to Host Local Memory

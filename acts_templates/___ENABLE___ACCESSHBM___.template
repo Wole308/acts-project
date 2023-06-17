@@ -203,7 +203,11 @@ void dinsertmany_edgesdram(unsigned int offset__, edge3_vec_dt data[NUM_VALID_PE
 			data_[n][2*v+1] = data[n].data[v].dstvid;
 		}
 	}
-	master_insertmany_Bvec(offsets, data_, {% include '___HBM___ARGS___.template' %});
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	master_insertmany_vec(offsets, data_, {% include '___HBM___ARGS___.template' %});
+	#else 
+	master_insertmany_Bvec(offsets, data_, {% include '___HBM___ARGS___.template' %}); 
+	#endif 
 	return;
 }
 
@@ -225,7 +229,11 @@ void dinsertmany_updatesdram(unsigned int offset__, keyvalue_t data[NUM_VALID_PE
 			data_[n][2*v+1] = data[n][v].value;
 		}
 	}
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	master_insertmany_vec(offsets, data_, {% include '___HBM___ARGS___.template' %}); // NEWCHANGE.
+	#else 
 	master_insertmany_Bvec(offsets, data_, {% include '___HBM___ARGS___.template' %});
+	#endif 
 	return;
 }
 void dretrievemany_udatesdram(unsigned int offset__, uint512_vec_dt data[NUM_VALID_PEs], {% include '___HBM___PARAMS___.template' %}){

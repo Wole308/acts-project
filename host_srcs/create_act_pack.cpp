@@ -392,7 +392,15 @@ void save_final_edges(unsigned int cmd, unsigned int base_offset, map_t * edges_
 		SAVE_FULLYPREPARED_EDGEUPDATES: for(unsigned int t=0; t<max; t++){
 			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 	
 				edge_dtype edge_update_ = URAM_edges[v][offset_p[v] + t];
-				if(t < stats[v][p_[v]].size){ edge[v].srcvid = edge_update_.srcvid / EDGE_PACK_SIZE; edge[v].dstvid = edge_update_.dstvid / EDGE_PACK_SIZE; } // NOTE: converted local partition vid to local vector partition 
+				if(t < stats[v][p_[v]].size){ 
+					edge[v].srcvid = edge_update_.srcvid / EDGE_PACK_SIZE; edge[v].dstvid = edge_update_.dstvid / EDGE_PACK_SIZE; 
+					#ifdef _DEBUGMODE_CHECKS3
+					checkoutofbounds_("create_act_pack::ERROR 52213::", edge_update_.srcvid, MAX_UPARTITION_SIZE, v, NAp, NAp);
+					checkoutofbounds_("create_act_pack::ERROR 52214::", edge_update_.dstvid, MAX_UPARTITION_SIZE, v, NAp, NAp);
+					checkoutofbounds_("create_act_pack::ERROR 52215::", edge[v].srcvid, MAX_UPARTITION_VECSIZE, v, NAp, NAp);
+					checkoutofbounds_("create_act_pack::ERROR 52216::", edge[v].dstvid, MAX_UPARTITION_VECSIZE, v, NAp, NAp);
+					#endif 
+				} // NOTE: converted local partition vid to local vector partition 
 				else { edge[v].srcvid = INVALIDDATA; edge[v].dstvid = INVALIDDATA; }
 				#ifdef _DEBUGMODE_KERNELPRINTS//4
 				if(t==0){ cout<<"save_fullyprepared_edgeupdates: llp_id: "<<llp_id<<", t:"<<t<<", edge["<<v<<"].srcvid: "<<edge[v].srcvid<<" ("<<edge[v].srcvid % EDGE_PACK_SIZE<<"), edge["<<v<<"].dstvid: "<<edge[v].dstvid<<" ("<<edge[v].dstvid % EDGE_PACK_SIZE<<")"<<endl; }
