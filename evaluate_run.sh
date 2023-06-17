@@ -60,12 +60,15 @@
 DATASET_BASEDIR="/home/oj2zf/Documents/dataset"
 		
 DATSETS=(
-		kron_g500-logn20 
+		com-Orkut
+		# soc-Pokec
+		
+		# kron_g500-logn20 
 		# rmat_16m_256m 
 		# it-2004 
 		# GAP-twitter
 		
-		# indochina-2004 
+		indochina-2004 
 		# twitter7 
 		# uk-2005 
 		# soc-sinaweibo
@@ -89,19 +92,20 @@ NUM_PES=(
 		)
 		
 XCLBINS=(
+		"outputs/vector_addition.xclbin"
 		# "outputs/vector_addition_static_x1.xclbin"
 		# "outputs/vector_addition_dynamic_x1.xclbin"	
 		# "outputs/vector_addition_static_1fpga_x1.xclbin"	
-		"outputs/vector_addition_vtx16.xclbin"	
+		# "outputs/vector_addition_vtx16.xclbin"	
 		# "outputs/vector_addition_vtx32.xclbin"	
 		)
 		
 RUN_IN_ASYNC_MODE=(
-		1	
-		# 0
+		# 1	
+		0
 		)
 	
-XWARE_ID=0 # 0, 1
+XWARE_ID=1 # 0, 1
 MAX_NUM_ITERATIONS=1
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "

@@ -5,11 +5,11 @@ rm -rf build_dir*
 rm -rf package.*
 rm -rf _x* *xclbin.run_summary qemu-memory-_* emulation _vimage pl* start_simulation.sh
 # -rm -rf _x* *xclbin.run_summary qemu-memory-_* emulation _vimage pl* start_simulation.sh *.xclbin
--------------------------------------------------- EVALUATE_DATASET.SH: HARDWARE ACTS APPLICATION RUNNING --------------------------------------------------
-python gen.py HW 0 12 0
+-------------------------------------------------- EVALUATE_DATASET.SH: SOFTWARE ACTS APPLICATION RUNNING --------------------------------------------------
+python gen.py SW 0 12 0
 ACTGraph (Courtesy: Jinja 2.0)...
 Generating sources... 
-XWARE: HW
+XWARE: SW
 RUNNING_SYNTHESIS: 0
 NUM_PEs: 12
 RUN_IN_ASYNC_MODE: 0
@@ -19,10 +19,13 @@ EDGE_PACK_SIZE: 16
 HBM_AXI_PACK_SIZE: 16
 successful!
 ...
-g++ -o host /home/oj2zf/Documents/Vitis_Accel_Examples-master/common/includes/xcl2/xcl2.cpp host_srcs/hostprocess.cpp host_srcs/prepare_graph.cpp host_srcs/act_pack.cpp host_srcs/create_act_pack.cpp host_srcs/app.cpp host_srcs/utility.cpp host_srcs/algorithm.cpp host_srcs/host.cpp -I/opt/xilinx/xrt/include -I/tools/Xilinx/Vivado/2022.2/include -Wall -O0 -g -std=c++1y -I/home/oj2zf/Documents/Vitis_Accel_Examples-master/common/includes/xcl2 -fmessage-length=0 -L/opt/xilinx/xrt/lib -pthread -lOpenCL -lrt -lstdc++  -I/opt/xilinx/xrt/include/ -I/tools/Xilinx/./Vitis_HLS/2021.2/include/ -I/tools/Xilinx/Vitis/2021.2/runtime/ -I/tools/Xilinx/Vivado/2021.2/include/ -pthread -march=native -lrt xcl.c -L/opt/Xilinx/SDx/2021.2/runtime/lib/x86_64 -lOpenCL -pthread -lrt 			
-pagerank algorithm running...: dataset: kron_g500-logn20, num fpgas: 4, xclbin: outputs/vector_addition_vtx16.xclbin num_iterations: 16
+rm -rf ./host /{*sw_emu*,*hw_emu*} 
+rm -rf profile_* TempConfig system_estimate.xtxt *.rpt *.csv 
+rm -rf src/*.ll *v++* .Xil emconfig.json dltmp* xmltmp* *.log *.jou *.wcfg *.wdb
+g++ host_srcs/hostprocess.cpp host_srcs/prepare_graph.cpp host_srcs/act_pack.cpp host_srcs/create_act_pack.cpp host_srcs/app.cpp host_srcs/utility.cpp host_srcs/algorithm.cpp host_srcs/host.cpp acts_templates/acts_kernel.cpp -std=c++11 -pthread -march=native -lrt -o host
+pagerank algorithm running...: dataset: com-Orkut, num fpgas: 1, xclbin: outputs/vector_addition.xclbin num_iterations: 2
 Hostprocess:: Graph Analytics Started...
-app::run:: app algo started. (algo: pr, numiterations: 16, rootvid: 1, graph path: /home/oj2zf/Documents/dataset/kron_g500-logn20/kron_g500-logn20.mtx, graph dir: 0, _binaryFile1: outputs/vector_addition_vtx16.xclbin)
+app::run:: app algo started. (algo: pr, numiterations: 2, rootvid: 1, graph path: /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx, graph dir: 0, _binaryFile1: outputs/vector_addition.xclbin)
 app: initializing HBM_axichannels...
 app: *** initializing HBM_axichannels... i: 0, n: 0
 app: *** initializing HBM_axichannels... i: 0, n: 1
@@ -48,78 +51,6 @@ app: *** initializing HBM_axichannels... i: 10, n: 0
 app: *** initializing HBM_axichannels... i: 10, n: 1
 app: *** initializing HBM_axichannels... i: 11, n: 0
 app: *** initializing HBM_axichannels... i: 11, n: 1
-app: *** initializing HBM_axichannels... i: 12, n: 0
-app: *** initializing HBM_axichannels... i: 12, n: 1
-app: *** initializing HBM_axichannels... i: 13, n: 0
-app: *** initializing HBM_axichannels... i: 13, n: 1
-app: *** initializing HBM_axichannels... i: 14, n: 0
-app: *** initializing HBM_axichannels... i: 14, n: 1
-app: *** initializing HBM_axichannels... i: 15, n: 0
-app: *** initializing HBM_axichannels... i: 15, n: 1
-app: *** initializing HBM_axichannels... i: 16, n: 0
-app: *** initializing HBM_axichannels... i: 16, n: 1
-app: *** initializing HBM_axichannels... i: 17, n: 0
-app: *** initializing HBM_axichannels... i: 17, n: 1
-app: *** initializing HBM_axichannels... i: 18, n: 0
-app: *** initializing HBM_axichannels... i: 18, n: 1
-app: *** initializing HBM_axichannels... i: 19, n: 0
-app: *** initializing HBM_axichannels... i: 19, n: 1
-app: *** initializing HBM_axichannels... i: 20, n: 0
-app: *** initializing HBM_axichannels... i: 20, n: 1
-app: *** initializing HBM_axichannels... i: 21, n: 0
-app: *** initializing HBM_axichannels... i: 21, n: 1
-app: *** initializing HBM_axichannels... i: 22, n: 0
-app: *** initializing HBM_axichannels... i: 22, n: 1
-app: *** initializing HBM_axichannels... i: 23, n: 0
-app: *** initializing HBM_axichannels... i: 23, n: 1
-app: *** initializing HBM_axichannels... i: 24, n: 0
-app: *** initializing HBM_axichannels... i: 24, n: 1
-app: *** initializing HBM_axichannels... i: 25, n: 0
-app: *** initializing HBM_axichannels... i: 25, n: 1
-app: *** initializing HBM_axichannels... i: 26, n: 0
-app: *** initializing HBM_axichannels... i: 26, n: 1
-app: *** initializing HBM_axichannels... i: 27, n: 0
-app: *** initializing HBM_axichannels... i: 27, n: 1
-app: *** initializing HBM_axichannels... i: 28, n: 0
-app: *** initializing HBM_axichannels... i: 28, n: 1
-app: *** initializing HBM_axichannels... i: 29, n: 0
-app: *** initializing HBM_axichannels... i: 29, n: 1
-app: *** initializing HBM_axichannels... i: 30, n: 0
-app: *** initializing HBM_axichannels... i: 30, n: 1
-app: *** initializing HBM_axichannels... i: 31, n: 0
-app: *** initializing HBM_axichannels... i: 31, n: 1
-app: *** initializing HBM_axichannels... i: 32, n: 0
-app: *** initializing HBM_axichannels... i: 32, n: 1
-app: *** initializing HBM_axichannels... i: 33, n: 0
-app: *** initializing HBM_axichannels... i: 33, n: 1
-app: *** initializing HBM_axichannels... i: 34, n: 0
-app: *** initializing HBM_axichannels... i: 34, n: 1
-app: *** initializing HBM_axichannels... i: 35, n: 0
-app: *** initializing HBM_axichannels... i: 35, n: 1
-app: *** initializing HBM_axichannels... i: 36, n: 0
-app: *** initializing HBM_axichannels... i: 36, n: 1
-app: *** initializing HBM_axichannels... i: 37, n: 0
-app: *** initializing HBM_axichannels... i: 37, n: 1
-app: *** initializing HBM_axichannels... i: 38, n: 0
-app: *** initializing HBM_axichannels... i: 38, n: 1
-app: *** initializing HBM_axichannels... i: 39, n: 0
-app: *** initializing HBM_axichannels... i: 39, n: 1
-app: *** initializing HBM_axichannels... i: 40, n: 0
-app: *** initializing HBM_axichannels... i: 40, n: 1
-app: *** initializing HBM_axichannels... i: 41, n: 0
-app: *** initializing HBM_axichannels... i: 41, n: 1
-app: *** initializing HBM_axichannels... i: 42, n: 0
-app: *** initializing HBM_axichannels... i: 42, n: 1
-app: *** initializing HBM_axichannels... i: 43, n: 0
-app: *** initializing HBM_axichannels... i: 43, n: 1
-app: *** initializing HBM_axichannels... i: 44, n: 0
-app: *** initializing HBM_axichannels... i: 44, n: 1
-app: *** initializing HBM_axichannels... i: 45, n: 0
-app: *** initializing HBM_axichannels... i: 45, n: 1
-app: *** initializing HBM_axichannels... i: 46, n: 0
-app: *** initializing HBM_axichannels... i: 46, n: 1
-app: *** initializing HBM_axichannels... i: 47, n: 0
-app: *** initializing HBM_axichannels... i: 47, n: 1
 app: initializing HBM_axicenters
 app: --- initializing HBM_axichannels... i: 0, n: 0
 app: --- initializing HBM_axichannels... i: 0, n: 1
@@ -137,52 +68,53 @@ app: --- initializing HBM_axichannels... i: 6, n: 0
 app: --- initializing HBM_axichannels... i: 6, n: 1
 app: --- initializing HBM_axichannels... i: 7, n: 0
 app: --- initializing HBM_axichannels... i: 7, n: 1
-prepare_graph:: preparing graph @ /home/oj2zf/Documents/dataset/kron_g500-logn20/kron_g500-logn20.mtx...
-prepare_graph:: dataset header: num_vertices: 1049576, num_vertices2: 1049576, num_edges: 44621272
-prepare_graph:: edge: srcv: 1, dstv: 47799, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 68477, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 129501, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 195903, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 307644, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 318643, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 345484, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 363438, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 420457, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 503951, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 511005, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 573407, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 629359, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 668502, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 757069, weight: 0
-prepare_graph:: edge: srcv: 1, dstv: 949234, weight: 0
-SUMMARY: linecount: 44620273, edgesbuffer.size(): 44620272
-prepare_graph:: Finished Stage 1: Buffering edges of /home/oj2zf/Documents/dataset/kron_g500-logn20/kron_g500-logn20.mtx (num_vertices: 1049576, num_vertices2: 1049576, num_edges: 44621272)
+prepare_graph:: preparing graph @ /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx...
+prepare_graph:: dataset header: num_vertices: 3073441, num_vertices2: 3073441, num_edges: 117186083
+prepare_graph:: edge: srcv: 1, dstv: 2, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 3, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 4, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 5, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 6, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 7, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 8, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 9, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 10, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 11, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 12, weight: 0
+prepare_graph:: edge: srcv: 1, dstv: 13, weight: 0
+prepare_graph:: edge: srcv: 2, dstv: 5, weight: 0
+prepare_graph:: edge: srcv: 2, dstv: 6, weight: 0
+prepare_graph:: edge: srcv: 2, dstv: 15, weight: 0
+prepare_graph:: edge: srcv: 2, dstv: 60, weight: 0
+prepare_graph: loading edges 100000000
+SUMMARY: linecount: 117185084, edgesbuffer.size(): 117185083
+prepare_graph:: Finished Stage 1: Buffering edges of /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx (num_vertices: 3073441, num_vertices2: 3073441, num_edges: 117186083)
 prepare_graph: assigning variables...
 prepare_graph: creating buffers...
 prepare_graph: creating buffers(2)...
 prepare_graph: populating inout degrees of all vertices...
 prepare_graph: creating vertex pointers...
 prepare_graph::start:: vptr_dup[1]: 0
-prepare_graph::start:: vptr_dup[2]: 17
-prepare_graph::start:: vptr_dup[3]: 23
-prepare_graph::start:: vptr_dup[1048574]: 44620272
-prepare_graph::start:: vptr_dup[1048575]: 44620272
-prepare_graph::start:: vptr_dup[1048576]: 44620272
-prepare_graph::start:: last: vptr_dup[1048576]: 44620272
+prepare_graph::start:: vptr_dup[2]: 12
+prepare_graph::start:: vptr_dup[3]: 123
+prepare_graph::start:: vptr_dup[3072439]: 117185083
+prepare_graph::start:: vptr_dup[3072440]: 117185083
+prepare_graph::start:: vptr_dup[3072441]: 117185083
+prepare_graph::start:: last: vptr_dup[3072441]: 117185083
 prepare_graph: checking new vertex pointers created...
 prepare_graph::start:: checking...
 prepare_graph::start:: finished checking.
-prepare_graph:: Finished Stage 3: Buffering duplicate edges of /home/oj2zf/Documents/dataset/kron_g500-logn20/kron_g500-logn20.mtx (num_vertices: 1048577, num_vertices2: 1049576, num_edges: 44621272, edgesbuffer_dup_size: 44620272, edgesbuffer_dup.size(): 44621272)
+prepare_graph:: Finished Stage 3: Buffering duplicate edges of /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx (num_vertices: 3072442, num_vertices2: 3073441, num_edges: 117186083, edgesbuffer_dup_size: 117185083, edgesbuffer_dup.size(): 117186083)
 prepare_graph:: checking edge data for errors... 
 Finished checking edge data for errors: numerrors: 0
-prepare_graph:: Finished preparing /home/oj2zf/Documents/dataset/kron_g500-logn20/kron_g500-logn20.mtx
-app:run: num_vertices: 1049577, num_edges: 44622272
-app::run:: NUM_VERTICES: 1049577, NUM_EDGES: 44622272, NUM_UPARTITIONS: 9, NUM_APPLYPARTITIONS: 1, VERTEX RANGE: 21866
-app::run::  vdata_subpartition_vecsize: 170
-app::run::  num_subpartition_per_partition: 48
+prepare_graph:: Finished preparing /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx
+app:run: num_vertices: 3073442, num_edges: 117187083
+app::run:: NUM_VERTICES: 3073442, NUM_EDGES: 117187083, NUM_UPARTITIONS: 24, NUM_APPLYPARTITIONS: 2, VERTEX RANGE: 256120
+app::run::  vdata_subpartition_vecsize: 682
+app::run::  num_subpartition_per_partition: 12
 app: loading global addresses: {vptrs, edges, updates, vertexprops, frontiers}...
---_________________________--------------------- nfrontiersz_u32: 261120, vdatasz_u32: 261888, globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS] = 16336 
-app: universalparams.NUM_FPGAS_: 4
+--_________________________--------------------- nfrontiersz_u32: 523776, vdatasz_u32: 523776, globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS] = 32752 
+app: universalparams.NUM_FPGAS_: 1
 app: EDGE_PACK_SIZE: 16
 app: HBM_CHANNEL_PACK_SIZE: 32
 app: HBM_AXI_PACK_SIZE: 16
@@ -195,10 +127,10 @@ app: _MAX_UPARTITION_SIZE: 130944
 app: HBM_CHANNEL_BYTESIZE: 268435456
 app: HBM_CHANNEL_SIZE: 4194304
 app: UPDATES_BUFFER_PACK_SIZE: 16
-app: __NUM_UPARTITIONS: 9
-app: __NUM_APPLYPARTITIONS: 1
-app: NUM_SUBPARTITION_PER_PARTITION: 48
-app: VDATA_SUBPARTITION_VECSIZE: 170
+app: __NUM_UPARTITIONS: 24
+app: __NUM_APPLYPARTITIONS: 2
+app: NUM_SUBPARTITION_PER_PARTITION: 12
+app: VDATA_SUBPARTITION_VECSIZE: 682
 app: UPDATES_BUFFER_PACK_SIZE: 16
 === act_pack: EDGE_PACK_SIZE: 16 ===
 === act_pack: HBM_CHANNEL_PACK_SIZE: 32 ===
@@ -213,66 +145,31 @@ app: UPDATES_BUFFER_PACK_SIZE: 16
 === act_pack: HBM_CHANNEL_SIZE: 4194304 ===
 === act_pack: MAX_NUM_LLPSETS: 1 ===
 === act_pack: UPDATES_BUFFER_PACK_SIZE: 16 ===
+=== act_pack: ))))))))))))))))))))))))))))))) edgedatabuffer.size(): 117186083 ==))))))))))))))))))))))))))))))))))))=
 +++ act_pack:: tryy: 2. 
-act-pack edges:: PE: 0: edges_in_channel[0].size(): 929589
-act-pack edges:: PE: 1: edges_in_channel[1].size(): 929589
-act-pack edges:: PE: 2: edges_in_channel[2].size(): 929589
-act-pack edges:: PE: 3: edges_in_channel[3].size(): 929589
-act-pack edges:: PE: 4: edges_in_channel[4].size(): 929589
-act-pack edges:: PE: 5: edges_in_channel[5].size(): 929589
-act-pack edges:: PE: 6: edges_in_channel[6].size(): 929589
-act-pack edges:: PE: 7: edges_in_channel[7].size(): 929589
-act-pack edges:: PE: 8: edges_in_channel[8].size(): 929589
-act-pack edges:: PE: 9: edges_in_channel[9].size(): 929589
-act-pack edges:: PE: 10: edges_in_channel[10].size(): 929589
-act-pack edges:: PE: 11: edges_in_channel[11].size(): 929589
-act-pack edges:: PE: 12: edges_in_channel[12].size(): 929589
-act-pack edges:: PE: 13: edges_in_channel[13].size(): 929589
-act-pack edges:: PE: 14: edges_in_channel[14].size(): 929589
-act-pack edges:: PE: 15: edges_in_channel[15].size(): 929589
-act-pack edges:: PE: 16: edges_in_channel[16].size(): 929589
-act-pack edges:: PE: 17: edges_in_channel[17].size(): 929589
-act-pack edges:: PE: 18: edges_in_channel[18].size(): 929589
-act-pack edges:: PE: 19: edges_in_channel[19].size(): 929589
-act-pack edges:: PE: 20: edges_in_channel[20].size(): 929589
-act-pack edges:: PE: 21: edges_in_channel[21].size(): 929589
-act-pack edges:: PE: 22: edges_in_channel[22].size(): 929589
-act-pack edges:: PE: 23: edges_in_channel[23].size(): 929589
-act-pack edges:: PE: 24: edges_in_channel[24].size(): 929589
-act-pack edges:: PE: 25: edges_in_channel[25].size(): 929589
-act-pack edges:: PE: 26: edges_in_channel[26].size(): 929589
-act-pack edges:: PE: 27: edges_in_channel[27].size(): 929589
-act-pack edges:: PE: 28: edges_in_channel[28].size(): 929589
-act-pack edges:: PE: 29: edges_in_channel[29].size(): 929589
-act-pack edges:: PE: 30: edges_in_channel[30].size(): 929589
-act-pack edges:: PE: 31: edges_in_channel[31].size(): 929589
-act-pack edges:: PE: 32: edges_in_channel[32].size(): 929589
-act-pack edges:: PE: 33: edges_in_channel[33].size(): 929589
-act-pack edges:: PE: 34: edges_in_channel[34].size(): 929589
-act-pack edges:: PE: 35: edges_in_channel[35].size(): 929589
-act-pack edges:: PE: 36: edges_in_channel[36].size(): 929589
-act-pack edges:: PE: 37: edges_in_channel[37].size(): 929589
-act-pack edges:: PE: 38: edges_in_channel[38].size(): 929589
-act-pack edges:: PE: 39: edges_in_channel[39].size(): 929589
-act-pack edges:: PE: 40: edges_in_channel[40].size(): 929589
-act-pack edges:: PE: 41: edges_in_channel[41].size(): 929589
-act-pack edges:: PE: 42: edges_in_channel[42].size(): 929589
-act-pack edges:: PE: 43: edges_in_channel[43].size(): 929589
-act-pack edges:: PE: 44: edges_in_channel[44].size(): 929589
-act-pack edges:: PE: 45: edges_in_channel[45].size(): 929589
-act-pack edges:: PE: 46: edges_in_channel[46].size(): 929589
-act-pack edges:: PE: 47: edges_in_channel[47].size(): 929589
------ ideal act-pack edges:: 929630 ----- 
-act_pack: SUCCESS 447. (min(929589) / max(929589)) * 100 < 30...
+act-pack edges:: PE: 0: edges_in_channel[0].size(): 9765424
+act-pack edges:: PE: 1: edges_in_channel[1].size(): 9765424
+act-pack edges:: PE: 2: edges_in_channel[2].size(): 9765424
+act-pack edges:: PE: 3: edges_in_channel[3].size(): 9765424
+act-pack edges:: PE: 4: edges_in_channel[4].size(): 9765424
+act-pack edges:: PE: 5: edges_in_channel[5].size(): 9765424
+act-pack edges:: PE: 6: edges_in_channel[6].size(): 9765424
+act-pack edges:: PE: 7: edges_in_channel[7].size(): 9765423
+act-pack edges:: PE: 8: edges_in_channel[8].size(): 9765423
+act-pack edges:: PE: 9: edges_in_channel[9].size(): 9765423
+act-pack edges:: PE: 10: edges_in_channel[10].size(): 9765423
+act-pack edges:: PE: 11: edges_in_channel[11].size(): 9765423
+----- ideal act-pack edges:: 9765590 ----- 
+act_pack: SUCCESS 447. (min(9765423) / max(9765424)) * 100 < 30...
 load_edges: loading edges [STAGE 2]: preparing edges...
 loading vertex-updates ptrs...
 loading raw edge updates...
 loading partial-processed edge updates...
 loading edge updates (actpack format)...
 loading csr edges...
-checkpoint: loading csr edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CSREDGES]: 67441 (of 4194304)
+checkpoint: loading csr edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CSREDGES]: 71537 (of 4194304)
 loading act-pack edges...
-checkpoint: loading act-pack edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES]: 67457 (of 4194304)
+checkpoint: loading act-pack edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES]: 71553 (of 4194304)
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTIONS: 32
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATESPTRS: 144
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATESPTRS: 65552
@@ -282,7 +179,7 @@ app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS2: 1040
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__UPDATESPTRS: 17
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATES: 16
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__PARTIALLYPROCESSEDEDGEUPDATES: 16
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 16
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 4112
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CSREDGES: 16
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VERTEXUPDATES: 0
@@ -299,28 +196,55 @@ app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS: 67376
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATES: 67393
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__PARTIALLYPROCESSEDEDGEUPDATES: 67409
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES: 67425
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 67441
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 67457
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 71537
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 71553
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VDATAS: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__END: 0 (of 4194304 wide-words) (0 bytes)
-app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_VERTICES: 1049577
-app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_EDGES: 44622272
-### app: lenght (ww): 61712, lenght: 987392
-### app: returned_volume_size (ww): 61712, returned_volume_size: 987392
-### app: max_lenght (ww): 61712, max_lenght: 987392
-### app: min_lenght (ww): 61712, min_lenght: 987392
-### app: total_lenght (ww): 61712, total_lenght: 987392 (ideal lenght: 929630) (=>6 % increase)
+app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_VERTICES: 3073442
+app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_EDGES: 117187083
+### creating act-pack in upartition 0 (of 24): [PEs 0, ]
+### creating act-pack in upartition 1 (of 24): [PEs 0, ]
+### creating act-pack in upartition 2 (of 24): [PEs 0, ]
+### creating act-pack in upartition 3 (of 24): [PEs 0, ]
+### creating act-pack in upartition 4 (of 24): [PEs 0, ]
+### creating act-pack in upartition 5 (of 24): [PEs 0, ]
+### creating act-pack in upartition 6 (of 24): [PEs 0, ]
+### creating act-pack in upartition 7 (of 24): [PEs 0, ]
+### creating act-pack in upartition 8 (of 24): [PEs 0, ]
+### creating act-pack in upartition 9 (of 24): [PEs 0, ]
+### creating act-pack in upartition 10 (of 24): [PEs 0, ]
+### creating act-pack in upartition 11 (of 24): [PEs 0, ]
+### creating act-pack in upartition 12 (of 24): [PEs 0, ]
+### creating act-pack in upartition 13 (of 24): [PEs 0, ]
+### creating act-pack in upartition 14 (of 24): [PEs 0, ]
+### creating act-pack in upartition 15 (of 24): [PEs 0, ]
+### creating act-pack in upartition 16 (of 24): [PEs 0, ]
+### creating act-pack in upartition 17 (of 24): [PEs 0, ]
+### creating act-pack in upartition 18 (of 24): [PEs 0, ]
+### creating act-pack in upartition 19 (of 24): [PEs 0, ]
+### creating act-pack in upartition 20 (of 24): [PEs 0, ]
+### creating act-pack in upartition 21 (of 24): [PEs 0, ]
+### creating act-pack in upartition 22 (of 24): [PEs 0, ]
+### creating act-pack in upartition 23 (of 24): [PEs 0, ]
+create-actpack: returned_vu_map[0][0].offset: 0, returned_vu_map[0][0].size: 0
+create-actpack: FINISH: returned_volume_size: 0, returned_volume_size * EDGE_PACK_SIZE: 0
+create-actpack: FINISH: returned_volume2_size[0]: 631725, returned_volume2_size[0] * EDGE_PACK_SIZE: 10107600
+### app: lenght (ww): 631725, lenght: 10107600
+### app: returned_volume_size (ww): 631725, returned_volume_size: 10107600
+### app: max_lenght (ww): 631725, max_lenght: 10107600
+### app: min_lenght (ww): 631725, min_lenght: 10107600
+### app: total_lenght (ww): 631725, total_lenght: 10107600 (ideal lenght: 9765590) (=>3 % increase)
 loading vertex updates...
-checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]: 67457 (of 4194304)
+checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]: 704318 (of 4194304)
 loading vertex properties...
-checkpoint: loading vertex properties: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS]: 261281 (of 4194304)
+checkpoint: loading vertex properties: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS]: 1468155 (of 4194304)
 loading cfrontier...
-checkpoint: loading cfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP]: 269481 (of 4194304)
+checkpoint: loading cfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP]: 1484539 (of 4194304)
 loading nfrontier...
-loading nfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS]: 277681 (of 4194304)
+loading nfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS]: 1492739 (of 4194304)
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTIONS: 32
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATESPTRS: 144
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATESPTRS: 65552
@@ -330,13 +254,13 @@ app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS2: 1040
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__UPDATESPTRS: 17
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATES: 16
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__PARTIALLYPROCESSEDEDGEUPDATES: 16
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 16
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 4112
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CSREDGES: 16
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES: 62752
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VERTEXUPDATES: 193824
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VDATAS: 8200
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES: 632765
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VERTEXUPDATES: 763837
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VDATAS: 16384
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CFRONTIERSTMP: 8200
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__NFRONTIERS: 16336
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__NFRONTIERS: 32752
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTIONS: 512
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATESPTRS: 544
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS: 688
@@ -347,77 +271,48 @@ app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS: 67376
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATES: 67393
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__PARTIALLYPROCESSEDEDGEUPDATES: 67409
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES: 67425
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 67441
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 67457
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES: 67457
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VDATAS: 261281
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP: 269481
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS: 277681
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__END: 294017 (of 4194304 wide-words) (37634176 bytes)
-app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_VERTICES: 1049577
-app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_EDGES: 44622272
-host::run::  NUM_FPGAS: 4
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 71537
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 71553
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES: 704318
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VDATAS: 1468155
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP: 1484539
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS: 1492739
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__END: 1525491 (of 4194304 wide-words) (195262848 bytes)
+app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_VERTICES: 3073442
+app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_EDGES: 117187083
+host::run::  NUM_FPGAS: 1
 host::run::  NUM_PEs: 12
-host::run::  universalparams.GLOBAL_NUM_PEs_: 48
+host::run::  universalparams.GLOBAL_NUM_PEs_: 12
 host::run::  RUN_IN_ASYNC_MODE: 0
-host::run::  _PE_BATCH_SIZE: 96
-host::run::  GF_BATCH_SIZE: 96
+host::run::  _PE_BATCH_SIZE: 24
+host::run::  GF_BATCH_SIZE: 24
 host::run::  AU_BATCH_SIZE: 2
-host::run::  IMPORT_BATCH_SIZE: 96
-host::run::  EXPORT_BATCH_SIZE: 96
-host::runapp_sync: universalparams.NUM_FPGAS_: 4 ---
+host::run::  IMPORT_BATCH_SIZE: 24
+host::run::  EXPORT_BATCH_SIZE: 24
+host::runapp_sync: universalparams.NUM_FPGAS_: 1 ---
 host::runapp_sync: NUM_HBM_ARGS: 2 ---
-host::runapp_sync: ARRAY_SIZE: 4704272 ---
+host::runapp_sync: ARRAY_SIZE: 24407856 ---
 host::runapp_sync: HBM_CHANNEL_SIZE: 4194304 ---
 host::runapp_sync: _IMPORT_EXPORT_GRANULARITY_VECSIZE: 8184 ---
-host::runapp_sync: hbm_channel_wwsize * HBM_AXI_PACK_SIZE: 4704272 ---
-Creating Context...
-Found Platform
-Platform Name: Xilinx
-host:: FPGA 0 device name: xilinx_u280_gen3x16_xdma_base_1
-------------------------------------------- host: 1 devices found. -------------------------------------------
-Initializing OpenCL objects
-Creating Context[0]...
-INFO: Reading outputs/vector_addition_vtx16.xclbin
-Loading: 'outputs/vector_addition_vtx16.xclbin'
---- host::runapp_sync: bytes_per_iteration: 18817088, bytesc_per_iteration: 268435456 ---
-host:: allocating channel buffers...
+host::runapp_sync: hbm_channel_wwsize * HBM_AXI_PACK_SIZE: 24407856 ---
+--- host::runapp_sync: bytes_per_iteration: 97631424, bytesc_per_iteration: 268435456 ---
 host:: allocating vertex property buffers...
-Creating Buffers...
-Creating Buffer 0 (fpga 0)...
-Creating Buffer 1 (fpga 0)...
-Creating Center Buffers...
-Creating Center Buffer 0...
-Creating Center Buffer 1...
-Creating I/O Buffers...
-Setting Kernel Arguments...
-Setting the k_vadd Argument for argument 0...
-Setting the k_vadd Argument for argument 1...
-Setting Kernel Arguments (center HBM)...
-Setting Kernel Argument for argument 2...
-Setting Kernel Argument for argument 3...
-Copying data (Host to Device)...
-Copying data @ channel 0 (Host to Device)...
-Copying data @ channel 1 (Host to Device)...
-Copying data @ center channel 0 (Host to Device)...
-Copying data @ center channel 1 (Host to Device)...
->>> %%%% write-to-FPGA time elapsed : 51.00 ms, 51000.00 microsecs, 
-host: end of iteration 0: 17 active vertices generated, 17 edges processed in (0.00 ms, 0.00 microsecs)
-host: end of iteration 1: 33953 active vertices generated, 42878 edges processed in (3.00 ms, 3000.00 microsecs)
-host: end of iteration 2: 526989 active vertices generated, 21076634 edges processed in (445.00 ms, 445000.00 microsecs)
-host: end of iteration 3: 62820 active vertices generated, 18634350 edges processed in (493.00 ms, 493000.00 microsecs)
-host: end of iteration 4: 970 active vertices generated, 289282 edges processed in (13.00 ms, 13000.00 microsecs)
-host: end of iteration 5: 47 active vertices generated, 10381 edges processed in (0.00 ms, 0.00 microsecs)
-host: end of iteration 6: 2 active vertices generated, 532 edges processed in (0.00 ms, 0.00 microsecs)
+host: end of iteration 0: 12 active vertices generated, 12 edges processed in (0.00 ms, 0.00 microsecs)
+host: end of iteration 1: 469 active vertices generated, 561 edges processed in (0.00 ms, 0.00 microsecs)
+host: end of iteration 2: 26611 active vertices generated, 36419 edges processed in (2.00 ms, 2000.00 microsecs)
+host: end of iteration 3: 777010 active vertices generated, 2588347 edges processed in (99.00 ms, 99000.00 microsecs)
+host: end of iteration 4: 2241220 active vertices generated, 49180934 edges processed in (1348.00 ms, 1348000.00 microsecs)
+host: end of iteration 5: 26631 active vertices generated, 65239260 edges processed in (1632.00 ms, 1632000.00 microsecs)
+host: end of iteration 6: 487 active vertices generated, 139441 edges processed in (5.00 ms, 5000.00 microsecs)
 no more activer vertices to process. breaking out @ iteration 7... 
 host: active partitions for iteration: 0:  (0 partitions)
-host: active partitions for iteration: 1: 0, 2, 3, 4, 5, 7,  (6 partitions)
-host: active partitions for iteration: 2: 0, 1, 2, 3, 4, 5, 6, 7, 8,  (9 partitions)
-host: active partitions for iteration: 3: 0, 1, 2, 3, 4, 5, 6, 7, 8,  (9 partitions)
-host: active partitions for iteration: 4: 0, 1, 2, 3, 4, 5, 6, 7, 8,  (9 partitions)
-host: active partitions for iteration: 5: 0, 1, 2, 3, 4, 5, 6, 7,  (8 partitions)
-host: active partitions for iteration: 6: 0, 1, 2, 3, 4, 5, 7,  (7 partitions)
-host: active partitions for iteration: 7:  (0 partitions)
+host: active partitions for iteration: 1: 0,  (1 partitions)
+host: active partitions for iteration: 2: 0, 21,  (2 partitions)
+host: active partitions for iteration: 3: 0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,  (19 partitions)
+host: active partitions for iteration: 4: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,  (24 partitions)
+host: active partitions for iteration: 5: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,  (24 partitions)
+host: active partitions for iteration: 6: 0, 1, 2, 3, 4, 5, 15, 16, 17, 18, 19, 20, 21, 22, 23,  (15 partitions)
+host: active partitions for iteration: 7: 17, 18, 19, 20, 22, 23,  (6 partitions)
 host: active partitions for iteration: 8:  (0 partitions)
 host: active partitions for iteration: 9:  (0 partitions)
 host: active partitions for iteration: 10:  (0 partitions)
@@ -427,1015 +322,481 @@ host: active partitions for iteration: 13:  (0 partitions)
 host: active partitions for iteration: 14:  (0 partitions)
 host: active partitions for iteration: 15:  (0 partitions)
 
-[1m[37m#################################################################### ACTS in FPGA mode [16 iterations] ####################################################################[0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 3), epoch 0, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 0]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 1 (of 3), epoch 1, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 2 (of 3), epoch 2, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 3), epoch 3, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 3), epoch 4, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~1, launch_idx 0 (of 3), epoch 5, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 1]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 1, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~1, launch_idx 1 (of 3), epoch 6, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 1, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~1, launch_idx 2 (of 3), epoch 7, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 1, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~1, launch_idx 0 (of 3), epoch 8, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 1, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~1, launch_idx 0 (of 3), epoch 9, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 1, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~2, launch_idx 0 (of 3), epoch 10, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 2]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 2, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~2, launch_idx 1 (of 3), epoch 11, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 2, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~2, launch_idx 2 (of 3), epoch 12, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 2, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~2, launch_idx 0 (of 3), epoch 13, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 2, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~2, launch_idx 0 (of 3), epoch 14, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 2, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~3, launch_idx 0 (of 3), epoch 15, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 3]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 3, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~3, launch_idx 1 (of 3), epoch 16, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 3, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~3, launch_idx 2 (of 3), epoch 17, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 3, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~3, launch_idx 0 (of 3), epoch 18, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 3, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~3, launch_idx 0 (of 3), epoch 19, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 3, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~4, launch_idx 0 (of 3), epoch 20, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 4]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 4, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~4, launch_idx 1 (of 3), epoch 21, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 4, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~4, launch_idx 2 (of 3), epoch 22, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 4, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~4, launch_idx 0 (of 3), epoch 23, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 4, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~4, launch_idx 0 (of 3), epoch 24, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 4, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~5, launch_idx 0 (of 3), epoch 25, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 5]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 5, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~5, launch_idx 1 (of 3), epoch 26, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 5, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~5, launch_idx 2 (of 3), epoch 27, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 5, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~5, launch_idx 0 (of 3), epoch 28, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 5, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~5, launch_idx 0 (of 3), epoch 29, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 5, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~6, launch_idx 0 (of 3), epoch 30, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 6]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 6, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~6, launch_idx 1 (of 3), epoch 31, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 6, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~6, launch_idx 2 (of 3), epoch 32, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 6, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~6, launch_idx 0 (of 3), epoch 33, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 6, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~6, launch_idx 0 (of 3), epoch 34, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 6, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~7, launch_idx 0 (of 3), epoch 35, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 7]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 7, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~7, launch_idx 1 (of 3), epoch 36, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 7, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~7, launch_idx 2 (of 3), epoch 37, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 7, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~7, launch_idx 0 (of 3), epoch 38, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 7, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~7, launch_idx 0 (of 3), epoch 39, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 7, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~8, launch_idx 0 (of 3), epoch 40, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 8]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 8, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~8, launch_idx 1 (of 3), epoch 41, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 8, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~8, launch_idx 2 (of 3), epoch 42, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 8, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~8, launch_idx 0 (of 3), epoch 43, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 8, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~8, launch_idx 0 (of 3), epoch 44, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 8, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~9, launch_idx 0 (of 3), epoch 45, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 9]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 9, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~9, launch_idx 1 (of 3), epoch 46, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 9, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~9, launch_idx 2 (of 3), epoch 47, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 9, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~9, launch_idx 0 (of 3), epoch 48, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 9, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~9, launch_idx 0 (of 3), epoch 49, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 9, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~10, launch_idx 0 (of 3), epoch 50, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 10]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 10, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~10, launch_idx 1 (of 3), epoch 51, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 10, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~10, launch_idx 2 (of 3), epoch 52, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 10, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~10, launch_idx 0 (of 3), epoch 53, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 10, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~10, launch_idx 0 (of 3), epoch 54, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 10, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~11, launch_idx 0 (of 3), epoch 55, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 11]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 11, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~11, launch_idx 1 (of 3), epoch 56, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 11, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~11, launch_idx 2 (of 3), epoch 57, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 11, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~11, launch_idx 0 (of 3), epoch 58, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 11, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~11, launch_idx 0 (of 3), epoch 59, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 11, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~12, launch_idx 0 (of 3), epoch 60, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 12]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 12, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~12, launch_idx 1 (of 3), epoch 61, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 12, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~12, launch_idx 2 (of 3), epoch 62, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 12, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~12, launch_idx 0 (of 3), epoch 63, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 12, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~12, launch_idx 0 (of 3), epoch 64, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 12, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~13, launch_idx 0 (of 3), epoch 65, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 13]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 13, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~13, launch_idx 1 (of 3), epoch 66, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 13, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~13, launch_idx 2 (of 3), epoch 67, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 13, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~13, launch_idx 0 (of 3), epoch 68, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 13, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~13, launch_idx 0 (of 3), epoch 69, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 13, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~14, launch_idx 0 (of 3), epoch 70, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 14]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 14, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~14, launch_idx 1 (of 3), epoch 71, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 14, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~14, launch_idx 2 (of 3), epoch 72, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 14, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~14, launch_idx 0 (of 3), epoch 73, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 14, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~14, launch_idx 0 (of 3), epoch 74, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 14, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~15, launch_idx 0 (of 3), epoch 75, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [processing stage][GAS iteration: 15]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 9, start_pv: 666, size_pv: 666, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 15, launch_idx 0 : 2.00 ms, 2000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~15, launch_idx 1 (of 3), epoch 76, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [applying stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 0, size_pv: 1, start_gv: 666, size_gv: 666
-[1m[37m>>> kernel time elapsed for iteration 15, launch_idx 1 : 1.00 ms, 1000.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~15, launch_idx 2 (of 3), epoch 77, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [gathering stage]: fpga: 0, start_pu: 666, size_pu: 666, start_pv: 666, size_pv: 666, start_gv: 0, size_gv: 9
-[1m[37m>>> kernel time elapsed for iteration 15, launch_idx 2 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~15, launch_idx 0 (of 3), epoch 78, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Import Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 96  [FPGAs 0, 1, 2, 3, ]... (num_export_partitions: 9, export_sz: 294624)
-[1m[37m>>> kernel time elapsed for iteration 15, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~15, launch_idx 0 (of 3), epoch 79, fpgas [0 - 3] started... --------------------------------[0m
-[1m[37m>>> host::pre-run time elapsed : 0.00 ms, 0.00 microsecs, [0m
-Creating Export Buffers @ fpga 0...
-[1m[37m>>> host::allocate-buffer-in-global-memory time elapsed 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::set-kernel-arguments time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::import-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-host: launching acts [importing stage]: --> importing upartition: 0 to 96 (num_import_partitions: 9, import_sz: 1178496)...
-[1m[37m>>> kernel time elapsed for iteration 15, launch_idx 0 : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::export-frontiers time elapsed : 0.00 ms, 0.00 microsecs, [0m
-[1m[37m>>> host::post-process time elapsed : 0.00 ms, 0.00 microsecs, [0m
-
-[1m[37m-------------------------------- host: GAS iteration: ~16, launch_idx 0 (of 3), epoch 80, fpgas [0 - 3] started... --------------------------------[0m
-host: FINISH: maximum iteration reached. breaking out...
-[1m[37m>>> total kernel time elapsed for current iteration : 154.00 ms, 154000.00 microsecs, [0m
--------------------------+++++++++++++++++++++++++++--------------------- num_iterations_dense: 16, num_iterations: 16
-Waiting...
-[1m[37m>>> total kernel time elapsed for all iterations : 154.00 ms, 154000.00 microsecs, [0m
-host:: number of active vertices in iteration 0: 1
-host:: number of active vertices in iteration 1: 17
-host:: number of active vertices in iteration 2: 33953
-host:: number of active vertices in iteration 3: 526988
-host:: number of active vertices in iteration 4: 62820
-host:: number of active vertices in iteration 5: 970
-host:: number of active vertices in iteration 6: 47
-host:: number of active vertices in iteration 7: 2
-host:: number of active vertices in iteration 8: 0
-host:: number of active vertices in iteration 9: 0
-host:: number of active vertices in iteration 10: 0
-host:: number of active vertices in iteration 11: 0
-host:: number of active vertices in iteration 12: 0
-host:: number of active vertices in iteration 13: 0
-host:: number of active vertices in iteration 14: 0
-host:: number of active vertices in iteration 15: 0
-host:: total: 624798
-host:: number of edges processed in iteration 0: 17
-host:: number of edges processed in iteration 1: 42878
-host:: number of edges processed in iteration 2: 21076634
-host:: number of edges processed in iteration 3: 18634350
-host:: number of edges processed in iteration 4: 289282
-host:: number of edges processed in iteration 5: 10381
-host:: number of edges processed in iteration 6: 532
-host:: number of edges processed in iteration 7: 0
-host:: number of edges processed in iteration 8: 0
-host:: number of edges processed in iteration 9: 0
-host:: number of edges processed in iteration 10: 0
-host:: number of edges processed in iteration 11: 0
-host:: number of edges processed in iteration 12: 0
-host:: number of edges processed in iteration 13: 0
-host:: number of edges processed in iteration 14: 0
-host:: number of edges processed in iteration 15: 0
-host:: total # edges processed across entire run: 40054074
-[READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS]
->>> [*0, *0, *0, *0, *0, *0, *0][Per FPGA / iteration]
-[NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]
->>> [*0, *0, *0, ][Per FPGA / iteration]
-[IMPORT_BATCH_SIZE, EXPORT_BATCH_SIZE, NUM_UPARTITIONS, NUM_APPLYPARTITIONS]
->>> [*9, *9, *1178496, *1178496, *9, *1, ][Per FPGA / iteration]
-[1m[37m>>> total processing achieved in 26 'iterations' | versus ideal 16 GAS iterations[0m
-host:: FPGA-Only mode
---- 1049577 active vertices processed in iteration 0 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 1 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 2 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 3 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 4 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 5 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 6 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 7 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 8 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 9 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 10 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 11 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 12 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 13 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 14 in 9 ms  [FPGA]
---- 1049577 active vertices processed in iteration 15 in 9 ms  [FPGA]
-
-[1m[37m>>> : Total # edges processed: 44622272, time elapsed per iteration = 9.62 ms [0m
-[1m[37m>>> : Average Throughput (MTEPS) = 4636.08 MTEPS, Throughput (BTEPS) = 4.64 BTEPS [0m
-Getting Results (Device to Host)...
-Copying data @ center channel 0 (Device to Host)...
-Copying data @ center channel 1 (Device to Host)...
->>> read-from-FPGA time elapsed : 43.00 ms, 43000.00 microsecs, 
-Waiting...
-host::run:: Graph: /home/oj2zf/Documents/dataset/kron_g500-logn20/kron_g500-logn20.mtx ran successfully.
-TEST PASSED
-
-TEST FINISHED
-HOSTPROCESS:: FINISHED RUNNING 0
-[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 47894215587[nanao seconds](Iteration 666)[0m
-[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 47894215[micro seconds](Iteration 666)[0m
-[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 47894[milli seconds](Iteration 666)[0m
-[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 47[seconds](Iteration 666)[0m
-
+[1m[37m#################################################################### ACTS in FPGA mode [2 iterations] ####################################################################[0m
+
+[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 1), epoch 0, fpgas [0 - 0] started... --------------------------------[0m
+host: launching acts [processing stage][GAS iteration: 0]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 16)...
+host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 16)
+acts started [processing stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+### acts started [importing stage]: --> importing upartition: 0 to 24...
+### acts started [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]...
+acts: resetting updates space...
+>>> acts : [load] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 0, maxsz: 86918
+>>> acts : [load] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 0, maxsz: 48806
+>>> acts : [load] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 0, maxsz: 48632
+>>> acts : [load] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 0, maxsz: 38893
+>>> acts : [load] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 0, maxsz: 24448
+>>> acts : [load] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 0, maxsz: 23320
+>>> acts : [load] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 0, maxsz: 19081
+>>> acts : [load] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 0, maxsz: 69646
+>>> acts : [load] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 0, maxsz: 67736
+>>> acts : [load] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 0, maxsz: 40553
+>>> acts : [load] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 0, maxsz: 34163
+>>> acts : [load] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 0, maxsz: 25348
+>>> acts : [load] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 0, maxsz: 20607
+>>> acts : [load] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 0, maxsz: 13980
+>>> acts : [load] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 0, maxsz: 12931
+>>> acts : [load] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 0, maxsz: 12720
+>>> acts : [load] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 0, maxsz: 10532
+>>> acts : [load] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 0, maxsz: 8128
+>>> acts : [load] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 0, maxsz: 6579
+>>> acts : [load] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 0, maxsz: 5526
+>>> acts : [load] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 0, maxsz: 6327
+>>> acts : [load] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 0, maxsz: 3304
+>>> acts : [load] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 0, maxsz: 2627
+>>> acts : [load] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 0, maxsz: 920
+>>> acts : [load] edge_maps_buffer[0][24].offset: 631725, edge_maps_buffer[0][24].size: 0, maxsz: 4294335571
++++ processing 0 edges in upartition 0: [PEs 0, ]
++++ processing 0 edges in upartition 1: [PEs 0, ]
++++ processing 0 edges in upartition 2: [PEs 0, ]
++++ processing 0 edges in upartition 3: [PEs 0, ]
++++ processing 0 edges in upartition 4: [PEs 0, ]
++++ processing 0 edges in upartition 5: [PEs 0, ]
++++ processing 0 edges in upartition 6: [PEs 0, ]
++++ processing 0 edges in upartition 7: [PEs 0, ]
++++ processing 0 edges in upartition 8: [PEs 0, ]
++++ processing 0 edges in upartition 9: [PEs 0, ]
++++ processing 0 edges in upartition 10: [PEs 0, ]
++++ processing 0 edges in upartition 11: [PEs 0, ]
++++ processing 0 edges in upartition 12: [PEs 0, ]
++++ processing 0 edges in upartition 13: [PEs 0, ]
++++ processing 0 edges in upartition 14: [PEs 0, ]
++++ processing 0 edges in upartition 15: [PEs 0, ]
++++ processing 0 edges in upartition 16: [PEs 0, ]
++++ processing 0 edges in upartition 17: [PEs 0, ]
++++ processing 0 edges in upartition 18: [PEs 0, ]
++++ processing 0 edges in upartition 19: [PEs 0, ]
++++ processing 0 edges in upartition 20: [PEs 0, ]
++++ processing 0 edges in upartition 21: [PEs 0, ]
++++ processing 0 edges in upartition 22: [PEs 0, ]
++++ processing 0 edges in upartition 23: [PEs 0, ]
+### applying vertex updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ] [max 2, 0]
+### applying edge updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ]
+--- applying 0 vertex/edge updates in vpartition 0, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 86918, edge_maps_buffer[0][0].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 0, maxsz: 86918
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 261 (of 8192), total num misses: 261[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48806, edge_maps_buffer[0][1].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 0, maxsz: 48806
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 534[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48632, edge_maps_buffer[0][2].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 0, maxsz: 48632
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 239 (of 8192), total num misses: 773[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 38893, edge_maps_buffer[0][3].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 0, maxsz: 38893
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 1052[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 24448, edge_maps_buffer[0][4].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 0, maxsz: 24448
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 230 (of 8192), total num misses: 1282[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 23320, edge_maps_buffer[0][5].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 0, maxsz: 23320
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1552[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 19081, edge_maps_buffer[0][6].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 0, maxsz: 19081
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 292 (of 8192), total num misses: 1844[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 69646, edge_maps_buffer[0][7].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 0, maxsz: 69646
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 280 (of 8192), total num misses: 2124[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-edges: saving 139 (2224) missed edge updates for processing (0)... --------------------------------
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 67736, edge_maps_buffer[0][8].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 0, maxsz: 67736
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 260 (of 8192), total num misses: 260[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 40553, edge_maps_buffer[0][9].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 0, maxsz: 40553
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 539[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 34163, edge_maps_buffer[0][10].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 0, maxsz: 34163
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 818[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 25348, edge_maps_buffer[0][11].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 0, maxsz: 25348
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1088[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 20607, edge_maps_buffer[0][12].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 0, maxsz: 20607
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 256 (of 8192), total num misses: 1344[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 13980, edge_maps_buffer[0][13].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 0, maxsz: 13980
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 274 (of 8192), total num misses: 1618[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12931, edge_maps_buffer[0][14].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 0, maxsz: 12931
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 1891[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12720, edge_maps_buffer[0][15].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 0, maxsz: 12720
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 237 (of 8192), total num misses: 2128[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 10532, edge_maps_buffer[0][16].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 0, maxsz: 10532
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 266 (of 8192), total num misses: 2394[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-edges: saving 144 (2304) missed edge updates for processing (1)... --------------------------------
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 8128, edge_maps_buffer[0][17].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 0, maxsz: 8128
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: num_edges_updated: 0, num_edges_inserted: 7770, num misses: 246 (of 8192), total num misses: 246[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6579, edge_maps_buffer[0][18].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 0, maxsz: 6579
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: num_edges_updated: 0, num_edges_inserted: 7470, num misses: 211 (of 8192), total num misses: 457[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 5526, edge_maps_buffer[0][19].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 0, maxsz: 5526
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: num_edges_updated: 0, num_edges_inserted: 7549, num misses: 241 (of 8192), total num misses: 698[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6327, edge_maps_buffer[0][20].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 0, maxsz: 6327
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: num_edges_updated: 0, num_edges_inserted: 7552, num misses: 263 (of 8192), total num misses: 961[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 3304, edge_maps_buffer[0][21].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 0, maxsz: 3304
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: num_edges_updated: 0, num_edges_inserted: 7230, num misses: 236 (of 8192), total num misses: 1197[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 2627, edge_maps_buffer[0][22].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 0, maxsz: 2627
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: num_edges_updated: 0, num_edges_inserted: 7404, num misses: 311 (of 8192), total num misses: 1508[0m
+--- applying 0 vertex/edge updates in vpartition 0, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 920, edge_maps_buffer[0][23].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 0, maxsz: 920
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 23][max_num_edges: 920]: num_edges_updated: 0, num_edges_inserted: 6410, num misses: 377 (of 8192), total num misses: 1885[0m
+### applying vertex updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ] [max 2, 0]
+### applying edge updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ]
+--- applying 0 vertex/edge updates in vpartition 1, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 86918, edge_maps_buffer[0][0].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 0, maxsz: 86918
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 0][max_num_edges: 86918]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 261 (of 8192), total num misses: 261[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48806, edge_maps_buffer[0][1].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 0, maxsz: 48806
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 1][max_num_edges: 48806]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 534[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48632, edge_maps_buffer[0][2].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 0, maxsz: 48632
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 2][max_num_edges: 48632]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 239 (of 8192), total num misses: 773[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 38893, edge_maps_buffer[0][3].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 0, maxsz: 38893
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 3][max_num_edges: 38893]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 1052[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 24448, edge_maps_buffer[0][4].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 0, maxsz: 24448
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 4][max_num_edges: 24448]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 230 (of 8192), total num misses: 1282[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 23320, edge_maps_buffer[0][5].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 0, maxsz: 23320
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 5][max_num_edges: 23320]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1552[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 19081, edge_maps_buffer[0][6].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 0, maxsz: 19081
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 6][max_num_edges: 19081]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 292 (of 8192), total num misses: 1844[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 69646, edge_maps_buffer[0][7].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 0, maxsz: 69646
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 7][max_num_edges: 69646]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 280 (of 8192), total num misses: 2124[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-edges: saving 139 (2224) missed edge updates for processing (0)... --------------------------------
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 67736, edge_maps_buffer[0][8].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 0, maxsz: 67736
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 8][max_num_edges: 67736]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 260 (of 8192), total num misses: 260[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 40553, edge_maps_buffer[0][9].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 0, maxsz: 40553
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 9][max_num_edges: 40553]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 539[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 34163, edge_maps_buffer[0][10].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 0, maxsz: 34163
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 10][max_num_edges: 34163]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 818[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 25348, edge_maps_buffer[0][11].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 0, maxsz: 25348
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 11][max_num_edges: 25348]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1088[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 20607, edge_maps_buffer[0][12].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 0, maxsz: 20607
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 12][max_num_edges: 20607]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 256 (of 8192), total num misses: 1344[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 13980, edge_maps_buffer[0][13].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 0, maxsz: 13980
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 13][max_num_edges: 13980]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 274 (of 8192), total num misses: 1618[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12931, edge_maps_buffer[0][14].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 0, maxsz: 12931
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 14][max_num_edges: 12931]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 1891[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12720, edge_maps_buffer[0][15].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 0, maxsz: 12720
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 15][max_num_edges: 12720]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 237 (of 8192), total num misses: 2128[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 10532, edge_maps_buffer[0][16].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 0, maxsz: 10532
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 16][max_num_edges: 10532]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 266 (of 8192), total num misses: 2394[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-edges: saving 144 (2304) missed edge updates for processing (1)... --------------------------------
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 8128, edge_maps_buffer[0][17].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 0, maxsz: 8128
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 17][max_num_edges: 8128]: num_edges_updated: 0, num_edges_inserted: 7770, num misses: 246 (of 8192), total num misses: 246[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6579, edge_maps_buffer[0][18].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 0, maxsz: 6579
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 18][max_num_edges: 6579]: num_edges_updated: 0, num_edges_inserted: 7470, num misses: 211 (of 8192), total num misses: 457[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 5526, edge_maps_buffer[0][19].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 0, maxsz: 5526
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 19][max_num_edges: 5526]: num_edges_updated: 0, num_edges_inserted: 7549, num misses: 241 (of 8192), total num misses: 698[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6327, edge_maps_buffer[0][20].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 0, maxsz: 6327
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 20][max_num_edges: 6327]: num_edges_updated: 0, num_edges_inserted: 7552, num misses: 263 (of 8192), total num misses: 961[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 3304, edge_maps_buffer[0][21].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 0, maxsz: 3304
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 21][max_num_edges: 3304]: num_edges_updated: 0, num_edges_inserted: 7230, num misses: 236 (of 8192), total num misses: 1197[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 2627, edge_maps_buffer[0][22].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 0, maxsz: 2627
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 22][max_num_edges: 2627]: num_edges_updated: 0, num_edges_inserted: 7404, num misses: 311 (of 8192), total num misses: 1508[0m
+--- applying 0 vertex/edge updates in vpartition 1, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 920, edge_maps_buffer[0][23].size: 0 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 0, maxsz: 920
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 23][max_num_edges: 920]: num_edges_updated: 0, num_edges_inserted: 6410, num misses: 377 (of 8192), total num misses: 1885[0m
+### gathering frontiers for upartitionID 0: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 1: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 2: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 3: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 4: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 5: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 6: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 7: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 8: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 9: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 10: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 11: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 12: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 13: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 14: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 15: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 16: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 17: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 18: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 19: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 20: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 21: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 22: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+### gathering frontiers for upartitionID 23: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+[acts: READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS] 
+>>> [Per FPGA][1571328, 0, 3142656, 0, 0, 3142656, 3142656]
+[acts: NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]
+>>> [Per FPGA][383648, 0, 0]
+>>> acts : [save] edge_maps_s[0][0].offset: 0, edge_maps_s[0][0].size: 1024, maxsz: 86918
+>>> acts : [save] edge_maps_s[0][1].offset: 86918, edge_maps_s[0][1].size: 1024, maxsz: 48806
+>>> acts : [save] edge_maps_s[0][2].offset: 135724, edge_maps_s[0][2].size: 1024, maxsz: 48632
+>>> acts : [save] edge_maps_s[0][3].offset: 184356, edge_maps_s[0][3].size: 1024, maxsz: 38893
+>>> acts : [save] edge_maps_s[0][4].offset: 223249, edge_maps_s[0][4].size: 1024, maxsz: 24448
+>>> acts : [save] edge_maps_s[0][5].offset: 247697, edge_maps_s[0][5].size: 1024, maxsz: 23320
+>>> acts : [save] edge_maps_s[0][6].offset: 271017, edge_maps_s[0][6].size: 1024, maxsz: 19081
+>>> acts : [save] edge_maps_s[0][7].offset: 290098, edge_maps_s[0][7].size: 1024, maxsz: 69646
+>>> acts : [save] edge_maps_s[0][8].offset: 359744, edge_maps_s[0][8].size: 1024, maxsz: 67736
+>>> acts : [save] edge_maps_s[0][9].offset: 427480, edge_maps_s[0][9].size: 1024, maxsz: 40553
+>>> acts : [save] edge_maps_s[0][10].offset: 468033, edge_maps_s[0][10].size: 1024, maxsz: 34163
+>>> acts : [save] edge_maps_s[0][11].offset: 502196, edge_maps_s[0][11].size: 1024, maxsz: 25348
+>>> acts : [save] edge_maps_s[0][12].offset: 527544, edge_maps_s[0][12].size: 1024, maxsz: 20607
+>>> acts : [save] edge_maps_s[0][13].offset: 548151, edge_maps_s[0][13].size: 1024, maxsz: 13980
+>>> acts : [save] edge_maps_s[0][14].offset: 562131, edge_maps_s[0][14].size: 1024, maxsz: 12931
+>>> acts : [save] edge_maps_s[0][15].offset: 575062, edge_maps_s[0][15].size: 1024, maxsz: 12720
+>>> acts : [save] edge_maps_s[0][16].offset: 587782, edge_maps_s[0][16].size: 1024, maxsz: 10532
+>>> acts : [save] edge_maps_s[0][17].offset: 598314, edge_maps_s[0][17].size: 1024, maxsz: 8128
+>>> acts : [save] edge_maps_s[0][18].offset: 606442, edge_maps_s[0][18].size: 1024, maxsz: 6579
+>>> acts : [save] edge_maps_s[0][19].offset: 613021, edge_maps_s[0][19].size: 1024, maxsz: 5526
+>>> acts : [save] edge_maps_s[0][20].offset: 618547, edge_maps_s[0][20].size: 1024, maxsz: 6327
+>>> acts : [save] edge_maps_s[0][21].offset: 624874, edge_maps_s[0][21].size: 1024, maxsz: 3304
+>>> acts : [save] edge_maps_s[0][22].offset: 628178, edge_maps_s[0][22].size: 1024, maxsz: 2627
+>>> acts : [save] edge_maps_s[0][23].offset: 630805, edge_maps_s[0][23].size: 1024, maxsz: 920
+>>> acts : [save] edge_maps_s[0][24].offset: 631725, edge_maps_s[0][24].size: 0, maxsz: 4294335571
+[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 206.00 ms, 206000.00 microsecs, [0m
+
+[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 1), epoch 1, fpgas [0 - 0] started... --------------------------------[0m
+host: launching acts [processing stage][GAS iteration: 0]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 16)...
+host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 16)
+acts started [processing stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+### acts started [importing stage]: --> importing upartition: 0 to 24...
+### acts started [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]...
+acts: resetting updates space...
+>>> acts : [load] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 1024, maxsz: 86918
+>>> acts : [load] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 1024, maxsz: 48806
+>>> acts : [load] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 1024, maxsz: 48632
+>>> acts : [load] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 1024, maxsz: 38893
+>>> acts : [load] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 1024, maxsz: 24448
+>>> acts : [load] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 1024, maxsz: 23320
+>>> acts : [load] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 1024, maxsz: 19081
+>>> acts : [load] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 1024, maxsz: 69646
+>>> acts : [load] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 1024, maxsz: 67736
+>>> acts : [load] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 1024, maxsz: 40553
+>>> acts : [load] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 1024, maxsz: 34163
+>>> acts : [load] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 1024, maxsz: 25348
+>>> acts : [load] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 1024, maxsz: 20607
+>>> acts : [load] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 1024, maxsz: 13980
+>>> acts : [load] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 1024, maxsz: 12931
+>>> acts : [load] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 1024, maxsz: 12720
+>>> acts : [load] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 1024, maxsz: 10532
+>>> acts : [load] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 1024, maxsz: 8128
+>>> acts : [load] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 1024, maxsz: 6579
+>>> acts : [load] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 1024, maxsz: 5526
+>>> acts : [load] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 1024, maxsz: 6327
+>>> acts : [load] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 1024, maxsz: 3304
+>>> acts : [load] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 1024, maxsz: 2627
+>>> acts : [load] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 1024, maxsz: 920
+>>> acts : [load] edge_maps_buffer[0][24].offset: 631725, edge_maps_buffer[0][24].size: 0, maxsz: 4294335571
++++ processing 1024 edges in upartition 0: [PEs 0, ]
++++ processing 1024 edges in upartition 1: [PEs 0, ]
++++ processing 1024 edges in upartition 2: [PEs 0, ]
++++ processing 1024 edges in upartition 3: [PEs 0, ]
++++ processing 1024 edges in upartition 4: [PEs 0, ]
++++ processing 1024 edges in upartition 5: [PEs 0, ]
++++ processing 1024 edges in upartition 6: [PEs 0, ]
++++ processing 1024 edges in upartition 7: [PEs 0, ]
++++ processing 1024 edges in upartition 8: [PEs 0, ]
++++ processing 1024 edges in upartition 9: [PEs 0, ]
++++ processing 1024 edges in upartition 10: [PEs 0, ]
++++ processing 1024 edges in upartition 11: [PEs 0, ]
++++ processing 1024 edges in upartition 12: [PEs 0, ]
++++ processing 1024 edges in upartition 13: [PEs 0, ]
++++ processing 1024 edges in upartition 14: [PEs 0, ]
++++ processing 1024 edges in upartition 15: [PEs 0, ]
++++ processing 1024 edges in upartition 16: [PEs 0, ]
++++ processing 1024 edges in upartition 17: [PEs 0, ]
++++ processing 1024 edges in upartition 18: [PEs 0, ]
++++ processing 1024 edges in upartition 19: [PEs 0, ]
++++ processing 1024 edges in upartition 20: [PEs 0, ]
++++ processing 1024 edges in upartition 21: [PEs 0, ]
++++ processing 1024 edges in upartition 22: [PEs 0, ]
++++ processing 1024 edges in upartition 23: [PEs 0, ]
+### applying vertex updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ] [max 2, 6144]
+### applying edge updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ]
+--- applying 256 vertex/edge updates in vpartition 0, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 86918, edge_maps_buffer[0][0].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 1024, maxsz: 86918
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 300 (of 8192), total num misses: 300[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48806, edge_maps_buffer[0][1].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 1024, maxsz: 48806
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 262 (of 8192), total num misses: 562[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48632, edge_maps_buffer[0][2].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 1024, maxsz: 48632
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 253 (of 8192), total num misses: 815[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 38893, edge_maps_buffer[0][3].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 1024, maxsz: 38893
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 262 (of 8192), total num misses: 1077[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 24448, edge_maps_buffer[0][4].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 1024, maxsz: 24448
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: num_edges_updated: 0, num_edges_inserted: 7101, num misses: 219 (of 8192), total num misses: 1296[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 23320, edge_maps_buffer[0][5].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 1024, maxsz: 23320
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: num_edges_updated: 0, num_edges_inserted: 6913, num misses: 208 (of 8192), total num misses: 1504[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 19081, edge_maps_buffer[0][6].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 1024, maxsz: 19081
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: num_edges_updated: 0, num_edges_inserted: 7207, num misses: 213 (of 8192), total num misses: 1717[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 69646, edge_maps_buffer[0][7].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 1024, maxsz: 69646
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: num_edges_updated: 1, num_edges_inserted: 8192, num misses: 289 (of 8192), total num misses: 2006[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 67736, edge_maps_buffer[0][8].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 1024, maxsz: 67736
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 267 (of 8192), total num misses: 2273[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-edges: saving 142 (2272) missed edge updates for processing (0)... --------------------------------
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 40553, edge_maps_buffer[0][9].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 1024, maxsz: 40553
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 229 (of 8192), total num misses: 229[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 34163, edge_maps_buffer[0][10].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 1024, maxsz: 34163
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 255 (of 8192), total num misses: 484[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 25348, edge_maps_buffer[0][11].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 1024, maxsz: 25348
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: num_edges_updated: 0, num_edges_inserted: 7798, num misses: 223 (of 8192), total num misses: 707[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 20607, edge_maps_buffer[0][12].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 1024, maxsz: 20607
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: num_edges_updated: 0, num_edges_inserted: 7545, num misses: 225 (of 8192), total num misses: 932[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 13980, edge_maps_buffer[0][13].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 1024, maxsz: 13980
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 232 (of 8192), total num misses: 1164[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12931, edge_maps_buffer[0][14].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 1024, maxsz: 12931
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: num_edges_updated: 0, num_edges_inserted: 8187, num misses: 273 (of 8192), total num misses: 1437[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12720, edge_maps_buffer[0][15].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 1024, maxsz: 12720
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: num_edges_updated: 0, num_edges_inserted: 7874, num misses: 226 (of 8192), total num misses: 1663[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 10532, edge_maps_buffer[0][16].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 1024, maxsz: 10532
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: num_edges_updated: 0, num_edges_inserted: 7082, num misses: 213 (of 8192), total num misses: 1876[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 8128, edge_maps_buffer[0][17].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 1024, maxsz: 8128
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: num_edges_updated: 0, num_edges_inserted: 7598, num misses: 217 (of 8192), total num misses: 2093[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-edges: saving 136 (2176) missed edge updates for processing (1)... --------------------------------
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6579, edge_maps_buffer[0][18].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 1024, maxsz: 6579
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: num_edges_updated: 0, num_edges_inserted: 7649, num misses: 227 (of 8192), total num misses: 227[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 5526, edge_maps_buffer[0][19].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 1024, maxsz: 5526
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: num_edges_updated: 0, num_edges_inserted: 7496, num misses: 213 (of 8192), total num misses: 440[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6327, edge_maps_buffer[0][20].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 1024, maxsz: 6327
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: num_edges_updated: 0, num_edges_inserted: 7409, num misses: 258 (of 8192), total num misses: 698[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 3304, edge_maps_buffer[0][21].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 1024, maxsz: 3304
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: num_edges_updated: 0, num_edges_inserted: 6899, num misses: 234 (of 8192), total num misses: 932[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 2627, edge_maps_buffer[0][22].size: 1024 ~~~~~~~~~~~~~~
+^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 1024, maxsz: 2627
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: num_edges_updated: 0, num_edges_inserted: 7208, num misses: 281 (of 8192), total num misses: 1213[0m
+--- applying 256 vertex/edge updates in vpartition 0, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+~~~~~~~~~~~~~~ chunksz: 4294967192, max_num_edges: 920, edge_maps_buffer[0][23].size: 1024 ~~~~~~~~~~~~~~
+utility::checkoutofbounds: ERROR. out of bounds. message: acts_kernel::ERROR 88223::, data: 4294967192, upper_bound: 4194304, msgdata1: 666, msgdata2: 666, msgdata3: 4294967295
