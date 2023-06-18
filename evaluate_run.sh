@@ -63,7 +63,7 @@ DATSETS=(
 		com-Orkut
 		# soc-Pokec
 		
-		# kron_g500-logn20 
+		kron_g500-logn20 
 		# rmat_16m_256m 
 		# it-2004 
 		# GAP-twitter
@@ -105,8 +105,8 @@ RUN_IN_ASYNC_MODE=(
 		0
 		)
 	
-XWARE_ID=1 # 0, 1
-MAX_NUM_ITERATIONS=1
+XWARE_ID=0 # 0, 1
+MAX_NUM_ITERATIONS=16
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do	

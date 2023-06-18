@@ -117,8 +117,13 @@ EC_PROCESS_EDGES_LOOP1: for(unsigned int llp_set=0; llp_set<1; llp_set++){
 						
 						for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 						#pragma HLS UNROLL
+							#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
+							update_out2[inst][v].key = update_out[inst][v].key;
+							update_out2[inst][v].value = update_out[inst][v].value;
+							#else 
 							update_out2[inst][v].key += update_out[inst][v].key;
 							update_out2[inst][v].value += update_out[inst][v].value;
+							#endif 
 						}	
 					}
 					

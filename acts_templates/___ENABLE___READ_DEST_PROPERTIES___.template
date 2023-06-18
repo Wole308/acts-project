@@ -1,7 +1,11 @@
 vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
 #pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
 
-READ_DEST_PROPERTIES_LOOP2B: for(unsigned int t=0; t<MAX_APPLYPARTITION_VECSIZE; t++){
+#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+unsigned int sz = MAX_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY){ sz = 0; }
+#endif 
+
+READ_DEST_PROPERTIES_LOOP2B: for(unsigned int t=0; t<sz; t++){
 #pragma HLS PIPELINE II={{context['II_READ_DEST_PROPERTIES_LOOP2B']}}
 	dretrievemany_vdatadram(voffset, t, vprop, {% include '___HBM___ARGS___.template' %});
 	READ_DEST_PROPERTIES_LOOP2C: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 

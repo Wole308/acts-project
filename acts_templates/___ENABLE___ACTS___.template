@@ -33,7 +33,7 @@ unsigned int num_prints = 1;
 #define MY_IFDEF_VDATABUFFER() vprop_t URAM_vprop[EDGE_PACK_SIZE][MAXVALID_APPLYPARTITION_VECSIZE]
 #define MY_IFDEF_TOPLEVELFUNC() void top_function({% include '___HBM___PARAMS___.template' %}, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB, \
 	HBM_channelAXI_t * HBM_import, HBM_channelAXI_t * HBM_export, \
-	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, \
+	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, unsigned int command, \
 	unsigned int mask0, unsigned int mask1, unsigned int mask2, unsigned int mask3, unsigned int mask4, unsigned int mask5, unsigned int mask6, unsigned int mask7 \
 	)
 #else
@@ -47,7 +47,7 @@ unsigned int num_prints = 1;
 #define MY_IFDEF_VDATABUFFER() vprop_t * URAM_vprop[EDGE_PACK_SIZE]
 #define MY_IFDEF_TOPLEVELFUNC() unsigned int acts_kernel::top_function({% include '___HBM___PARAMS___.template' %}, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB, \
 	HBM_channelAXI_t * HBM_import, HBM_channelAXI_t * HBM_export, \
-	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, \
+	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, unsigned int command, \
 	unsigned int mask0, unsigned int mask1, unsigned int mask2, unsigned int mask3, unsigned int mask4, unsigned int mask5, unsigned int mask6, unsigned int mask7, \
 	unsigned int report_statistics[64])					
 #endif
@@ -213,6 +213,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 #pragma HLS INTERFACE s_axilite port = size_import_export
 #pragma HLS INTERFACE s_axilite port = status
 #pragma HLS INTERFACE s_axilite port = numfpgas
+#pragma HLS INTERFACE s_axilite port = command
 #pragma HLS INTERFACE s_axilite port = mask0
 #pragma HLS INTERFACE s_axilite port = mask1
 #pragma HLS INTERFACE s_axilite port = mask2
@@ -266,6 +267,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	action.size_import_export = size_import_export;
 	action.status = status;
 	action.numfpgas = numfpgas; 
+	action.command = command;
 	
 	unsigned int mask[8]; mask[0] = mask0; mask[1] = mask1; mask[2] = mask2; mask[3] = mask3; mask[4] = mask4; mask[5] = mask5; mask[6] = mask6; mask[7] = mask7;
 	
@@ -319,7 +321,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	#ifdef _DEBUGMODE_KERNELPRINTS4
 	if((action.module == ALL_MODULES || action.module == PROCESS_EDGES_MODULE) && (action.start_pu == 0)){ if(action.fpga < num_prints){ cout << "acts: resetting updates space..." <<endl; }}
 	#endif 
-	LOAD_UPDATEPTRS_lOOP1B: for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; t++){	
+	LOAD_UPDATEPTRS_lOOP1: for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; t++){	
 	#pragma HLS PIPELINE II=1
 		updatesptrs[t] = load_vupdate_map(globalparams[GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS], t, {% include '___HBM___ARGS___.template' %});	
 		updatesptrs[t].offset = 0; // FIXME.
@@ -332,25 +334,26 @@ MY_IFDEF_TOPLEVELFUNC(){
 	// load edge map 
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
 	map_t edge_maps_l[NUM_VALID_PEs];
+	map_t edgeu_maps_l[NUM_VALID_PEs];
 	#pragma HLS ARRAY_PARTITION variable=edge_maps_l complete
-	for(unsigned int p_u=action.start_pu; p_u<action.start_pu + action.size_pu + 4; p_u+=action.skip_pu){
-	load_edgemaps((p_u * MAX_NUM_LLPSETS) + 0, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], edge_maps_l, {% include '___HBM___ARGS___.template' %}); 
-	#pragma HLS PIPELINE II=1
+	#pragma HLS ARRAY_PARTITION variable=edgeu_maps_l complete
+	LOAD_EDGEPTRS_lOOP1: for(unsigned int p_u=action.start_pu; p_u<action.start_pu + action.size_pu + 4; p_u+=action.skip_pu){
+		load_edgemaps((p_u * MAX_NUM_LLPSETS) + 0, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], edge_maps_l, {% include '___HBM___ARGS___.template' %}); 
+		load_edgemaps((p_u * MAX_NUM_LLPSETS) + 0, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS], edgeu_maps_l, {% include '___HBM___ARGS___.template' %}); // REMOVEME.
 		for(unsigned int n=0; n<NUM_VALID_PEs; n++){
 			#pragma HLS UNROLL
-			edge_maps_buffer[n][p_u].offset = edge_maps_l[n].offset;
-			edge_maps_buffer[n][p_u].size = edge_maps_l[n].size;
-			edge_maps_buffer[n][p_u].tmp_size = edge_maps_l[n].size;	
-			/* #ifdef _DEBUGMODE_KERNELPRINTS4
+			edge_maps_buffer[n][p_u].offset = edge_maps_l[n].offset; edge_maps_buffer[n][p_u].size = edge_maps_l[n].size;
+			edgeu_maps_buffer[n][p_u].offset = edgeu_maps_l[n].offset; edgeu_maps_buffer[n][p_u].size = edgeu_maps_l[n].size;
+			#ifdef _DEBUGMODE_KERNELPRINTS//4
 			cout<<">>> acts : [load] edge_maps_l["<<n<<"]["<<p_u<<"].offset: "<<edge_maps_l[n].offset<<", edge_maps_l["<<n<<"]["<<p_u<<"].size: "<<edge_maps_l[n].size<<", maxsz: "<<(edge_maps_buffer[n][p_u + 1].offset - edge_maps_buffer[n][p_u].offset)<<endl;
-			// cout<<">>>----------------- acts : [load] edge_maps_buffer["<<n<<"]["<<p_u<<"].offset: "<<edge_maps_buffer[n][p_u].offset<<", edge_maps_buffer["<<n<<"]["<<p_u<<"].size: "<<edge_maps_buffer[n][p_u].size<<", edge_maps_buffer["<<n<<"]["<<p_u<<"].tmp_size: "<<edge_maps_buffer[n][p_u].tmp_size<<endl;
-			#endif  */
+			cout<<">>> acts : [load] edgeu_maps_l["<<n<<"]["<<p_u<<"].offset: "<<edgeu_maps_l[n].offset<<", edgeu_maps_l["<<n<<"]["<<p_u<<"].size: "<<edgeu_maps_l[n].size<<endl;
+			#endif 
 		}
 	}
 	for(unsigned int p_u=action.start_pu; p_u<action.start_pu + action.size_pu + 4; p_u+=action.skip_pu){
 		for(unsigned int n=0; n<NUM_VALID_PEs; n++){
 			#ifdef _DEBUGMODE_KERNELPRINTS4
-			cout<<">>> acts : [load] edge_maps_buffer["<<n<<"]["<<p_u<<"].offset: "<<edge_maps_buffer[n][p_u].offset<<", edge_maps_buffer["<<n<<"]["<<p_u<<"].size: "<<edge_maps_buffer[n][p_u].size<<", maxsz: "<<(edge_maps_buffer[n][p_u + 1].offset - edge_maps_buffer[n][p_u].offset)<<endl;
+			cout<<">>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: "<<p_u<<"]: offset: "<<edge_maps_buffer[n][p_u].offset<<", proc: "<<edge_maps_buffer[n][p_u].size<<", rem: "<<edgeu_maps_buffer[n][p_u].size<<", maxsz: "<<(edge_maps_buffer[n][p_u + 1].offset - edge_maps_buffer[n][p_u].offset)<<endl;
 			#endif 
 		}
 	}
@@ -391,7 +394,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 			if(p_u % 2==0){
 				#if NUM_PEs==1
 				unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
-				{% include '___ENABLE___READ_DEST_PROPERTIES_SINGLEFPGA___.template' %}	
+				{% include '___ENABLE___READ_DEST_PROPERTIES_1PE___.template' %}	
 				#else 
 				{% include '___ENABLE___READ_FRONTIERS___.template' %}		
 				#endif 
@@ -480,6 +483,10 @@ MY_IFDEF_TOPLEVELFUNC(){
 	if(action.module == GATHER_FRONTIERS_MODULE || action.module == ALL_MODULES){
 		GATHER_FRONTIERS_MODULE_LOOP: for(unsigned int upartitionID=action.start_gv; upartitionID<action.start_gv + action.size_gv; upartitionID++){	
 			if(upartitionID >= globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]){ continue; } 
+			#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+			if(action.command == GRAPH_UPDATE_ONLY){ continue; }
+			#endif 
+			
 			#ifndef ___RUNNING_FPGA_SYNTHESIS___
 			if(action.fpga < num_prints){ cout<<"### gathering frontiers for upartitionID "<<upartitionID<<": [PEs "; for(unsigned int n=0; n<NUM_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS] / action.numfpgas<<"]"<<endl; }
 			#endif	
@@ -518,19 +525,21 @@ MY_IFDEF_TOPLEVELFUNC(){
 	// save state: edges 
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
 	map_t edge_maps_s[NUM_VALID_PEs];
+	map_t edgeu_maps_s[NUM_VALID_PEs];
 	#pragma HLS ARRAY_PARTITION variable=edge_maps_s complete
+	#pragma HLS ARRAY_PARTITION variable=edgeu_maps_s complete
 	for(unsigned int p_u=action.start_pu; p_u<action.start_pu + action.size_pu + 4; p_u+=action.skip_pu){
 	#pragma HLS PIPELINE II=1
 		for(unsigned int n=0; n<NUM_VALID_PEs; n++){
 			#pragma HLS UNROLL
-			edge_maps_s[n].offset = edge_maps_buffer[n][p_u].offset;
-			// edge_maps_s[n].size = edge_maps_buffer[n][p_u].tmp_size;
-			edge_maps_s[n].size = edge_maps_buffer[n][p_u].size;
+			edge_maps_s[n].offset = edge_maps_buffer[n][p_u].offset; edge_maps_s[n].size = edge_maps_buffer[n][p_u].size;
+			edgeu_maps_s[n].offset = edgeu_maps_buffer[n][p_u].offset; edgeu_maps_s[n].size = edgeu_maps_buffer[n][p_u].size;
 			#ifdef _DEBUGMODE_KERNELPRINTS4
-			cout<<">>> acts : [save] edge_maps_s["<<n<<"]["<<p_u<<"].offset: "<<edge_maps_s[n].offset<<", edge_maps_s["<<n<<"]["<<p_u<<"].size: "<<edge_maps_s[n].size<<", maxsz: "<<(edge_maps_buffer[n][p_u + 1].offset - edge_maps_buffer[n][p_u].offset)<<endl;
+			cout<<">>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: "<<p_u<<"]: offset: "<<edge_maps_buffer[n][p_u].offset<<", proc: "<<edge_maps_buffer[n][p_u].size<<", rem: "<<edgeu_maps_buffer[n][p_u].size<<", maxsz: "<<(edge_maps_buffer[n][p_u + 1].offset - edge_maps_buffer[n][p_u].offset)<<endl;
 			#endif 
 		}
 		save_edgemaps((p_u * MAX_NUM_LLPSETS) + 0, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], edge_maps_s, {% include '___HBM___ARGS___.template' %}); 
+		save_edgemaps((p_u * MAX_NUM_LLPSETS) + 0, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS], edgeu_maps_s, {% include '___HBM___ARGS___.template' %}); 
 	}
 	#endif 
 	

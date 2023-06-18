@@ -23,9 +23,9 @@ rm -rf ./host /{*sw_emu*,*hw_emu*}
 rm -rf profile_* TempConfig system_estimate.xtxt *.rpt *.csv 
 rm -rf src/*.ll *v++* .Xil emconfig.json dltmp* xmltmp* *.log *.jou *.wcfg *.wdb
 g++ host_srcs/hostprocess.cpp host_srcs/prepare_graph.cpp host_srcs/act_pack.cpp host_srcs/create_act_pack.cpp host_srcs/app.cpp host_srcs/utility.cpp host_srcs/algorithm.cpp host_srcs/host.cpp acts_templates/acts_kernel.cpp -std=c++11 -pthread -march=native -lrt -o host
-pagerank algorithm running...: dataset: com-Orkut, num fpgas: 1, xclbin: outputs/vector_addition.xclbin num_iterations: 2
+pagerank algorithm running...: dataset: com-Orkut, num fpgas: 1, xclbin: outputs/vector_addition.xclbin num_iterations: 4
 Hostprocess:: Graph Analytics Started...
-app::run:: app algo started. (algo: pr, numiterations: 2, rootvid: 1, graph path: /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx, graph dir: 0, _binaryFile1: outputs/vector_addition.xclbin)
+app::run:: app algo started. (algo: pr, numiterations: 4, rootvid: 1, graph path: /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx, graph dir: 0, _binaryFile1: outputs/vector_addition.xclbin)
 app: initializing HBM_axichannels...
 app: *** initializing HBM_axichannels... i: 0, n: 0
 app: *** initializing HBM_axichannels... i: 0, n: 1
@@ -165,40 +165,39 @@ load_edges: loading edges [STAGE 2]: preparing edges...
 loading vertex-updates ptrs...
 loading raw edge updates...
 loading partial-processed edge updates...
-loading edge updates (actpack format)...
 loading csr edges...
-checkpoint: loading csr edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CSREDGES]: 71537 (of 4194304)
+checkpoint: loading csr edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CSREDGES]: 2849 (of 4194304)
 loading act-pack edges...
-checkpoint: loading act-pack edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES]: 71553 (of 4194304)
+checkpoint: loading act-pack edges: globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES]: 2865 (of 4194304)
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTIONS: 32
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATESPTRS: 144
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATESPTRS: 65552
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATESPTRS: 16
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATESPTRS: 80
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CSRVPTRS: 16
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS: 80
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS2: 1040
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__UPDATESPTRS: 17
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATES: 16
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__PARTIALLYPROCESSEDEDGEUPDATES: 16
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 4112
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__PARTIALLYPROCESSEDEDGEUPDATES: 1040
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CSREDGES: 16
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VERTEXUPDATES: 0
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VDATAS: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CFRONTIERSTMP: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__NFRONTIERS: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTIONS: 512
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATESPTRS: 544
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS: 688
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSRVPTRS: 66240
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS: 66256
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS2: 66336
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS: 67376
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATES: 67393
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__PARTIALLYPROCESSEDEDGEUPDATES: 67409
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES: 67425
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 71537
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 71553
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS: 1696
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSRVPTRS: 560
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS: 576
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS2: 656
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS: 1776
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATES: 1793
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__PARTIALLYPROCESSEDEDGEUPDATES: 1809
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 2849
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 2865
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES: 0
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VDATAS: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP: 0
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS: 0
@@ -237,47 +236,51 @@ create-actpack: FINISH: returned_volume2_size[0]: 631725, returned_volume2_size[
 ### app: max_lenght (ww): 631725, max_lenght: 10107600
 ### app: min_lenght (ww): 631725, min_lenght: 10107600
 ### app: total_lenght (ww): 631725, total_lenght: 10107600 (ideal lenght: 9765590) (=>3 % increase)
+checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES]: 2865 (of 4194304)
 loading vertex updates...
-checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]: 704318 (of 4194304)
+checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]: 635630 (of 4194304)
+loading edge updates (actpack format)...
+loading csr edges...
+checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES]: 1268395 (of 4194304)
 loading vertex properties...
-checkpoint: loading vertex properties: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS]: 1468155 (of 4194304)
+checkpoint: loading vertex properties: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS]: 1900136 (of 4194304)
 loading cfrontier...
-checkpoint: loading cfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP]: 1484539 (of 4194304)
+checkpoint: loading cfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP]: 1916520 (of 4194304)
 loading nfrontier...
-loading nfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS]: 1492739 (of 4194304)
+loading nfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS]: 1924720 (of 4194304)
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTIONS: 32
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATESPTRS: 144
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATESPTRS: 65552
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATESPTRS: 16
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATESPTRS: 80
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CSRVPTRS: 16
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS: 80
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS2: 1040
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__UPDATESPTRS: 17
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__RAWEDGEUPDATES: 16
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__PARTIALLYPROCESSEDEDGEUPDATES: 16
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 4112
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__PARTIALLYPROCESSEDEDGEUPDATES: 1040
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CSREDGES: 16
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES: 632765
-app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VERTEXUPDATES: 763837
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VERTEXUPDATES: 632765
+app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__EDGEUPDATES: 631741
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__VDATAS: 16384
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__CFRONTIERSTMP: 8200
 app:: BASEOFFSET: GLOBALPARAMSCODE__WWSIZE__NFRONTIERS: 32752
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTIONS: 512
 app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATESPTRS: 544
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS: 688
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSRVPTRS: 66240
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS: 66256
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS2: 66336
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS: 67376
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATES: 67393
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__PARTIALLYPROCESSEDEDGEUPDATES: 67409
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES: 67425
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 71537
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 71553
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES: 704318
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VDATAS: 1468155
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP: 1484539
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS: 1492739
-app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__END: 1525491 (of 4194304 wide-words) (195262848 bytes)
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS: 1696
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSRVPTRS: 560
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS: 576
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS2: 656
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__UPDATESPTRS: 1776
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__RAWEDGEUPDATES: 1793
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__PARTIALLYPROCESSEDEDGEUPDATES: 1809
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CSREDGES: 2849
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES: 2865
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES: 635630
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES: 1268395
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__VDATAS: 1900136
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP: 1916520
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS: 1924720
+app:: BASEOFFSET: GLOBALPARAMSCODE__BASEOFFSET__END: 1957472 (of 4194304 wide-words) (250556416 bytes)
 app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_VERTICES: 3073442
 app:: BASEOFFSET: GLOBALPARAMSCODE__PARAM__NUM_EDGES: 117187083
 host::run::  NUM_FPGAS: 1
@@ -291,19 +294,19 @@ host::run::  IMPORT_BATCH_SIZE: 24
 host::run::  EXPORT_BATCH_SIZE: 24
 host::runapp_sync: universalparams.NUM_FPGAS_: 1 ---
 host::runapp_sync: NUM_HBM_ARGS: 2 ---
-host::runapp_sync: ARRAY_SIZE: 24407856 ---
+host::runapp_sync: ARRAY_SIZE: 31319552 ---
 host::runapp_sync: HBM_CHANNEL_SIZE: 4194304 ---
 host::runapp_sync: _IMPORT_EXPORT_GRANULARITY_VECSIZE: 8184 ---
-host::runapp_sync: hbm_channel_wwsize * HBM_AXI_PACK_SIZE: 24407856 ---
---- host::runapp_sync: bytes_per_iteration: 97631424, bytesc_per_iteration: 268435456 ---
+host::runapp_sync: hbm_channel_wwsize * HBM_AXI_PACK_SIZE: 31319552 ---
+--- host::runapp_sync: bytes_per_iteration: 125278208, bytesc_per_iteration: 268435456 ---
 host:: allocating vertex property buffers...
 host: end of iteration 0: 12 active vertices generated, 12 edges processed in (0.00 ms, 0.00 microsecs)
 host: end of iteration 1: 469 active vertices generated, 561 edges processed in (0.00 ms, 0.00 microsecs)
 host: end of iteration 2: 26611 active vertices generated, 36419 edges processed in (2.00 ms, 2000.00 microsecs)
 host: end of iteration 3: 777010 active vertices generated, 2588347 edges processed in (99.00 ms, 99000.00 microsecs)
-host: end of iteration 4: 2241220 active vertices generated, 49180934 edges processed in (1348.00 ms, 1348000.00 microsecs)
-host: end of iteration 5: 26631 active vertices generated, 65239260 edges processed in (1632.00 ms, 1632000.00 microsecs)
-host: end of iteration 6: 487 active vertices generated, 139441 edges processed in (5.00 ms, 5000.00 microsecs)
+host: end of iteration 4: 2241220 active vertices generated, 49180934 edges processed in (1346.00 ms, 1346000.00 microsecs)
+host: end of iteration 5: 26631 active vertices generated, 65239260 edges processed in (1697.00 ms, 1697000.00 microsecs)
+host: end of iteration 6: 487 active vertices generated, 139441 edges processed in (6.00 ms, 6000.00 microsecs)
 no more activer vertices to process. breaking out @ iteration 7... 
 host: active partitions for iteration: 0:  (0 partitions)
 host: active partitions for iteration: 1: 0,  (1 partitions)
@@ -322,481 +325,865 @@ host: active partitions for iteration: 13:  (0 partitions)
 host: active partitions for iteration: 14:  (0 partitions)
 host: active partitions for iteration: 15:  (0 partitions)
 
-[1m[37m#################################################################### ACTS in FPGA mode [2 iterations] ####################################################################[0m
+[1m[37m#################################################################### ACTS in FPGA mode [4 iterations] ####################################################################[0m
 
 [1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 1), epoch 0, fpgas [0 - 0] started... --------------------------------[0m
 host: launching acts [processing stage][GAS iteration: 0]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
 host: launching acts [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
 host: launching acts [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
-host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 16)...
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 16)
+host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 0)...
+host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 0)
 acts started [processing stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
 acts started [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
 acts started [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
 ### acts started [importing stage]: --> importing upartition: 0 to 24...
 ### acts started [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]...
 acts: resetting updates space...
->>> acts : [load] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 0, maxsz: 86918
->>> acts : [load] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 0, maxsz: 48806
->>> acts : [load] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 0, maxsz: 48632
->>> acts : [load] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 0, maxsz: 38893
->>> acts : [load] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 0, maxsz: 24448
->>> acts : [load] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 0, maxsz: 23320
->>> acts : [load] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 0, maxsz: 19081
->>> acts : [load] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 0, maxsz: 69646
->>> acts : [load] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 0, maxsz: 67736
->>> acts : [load] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 0, maxsz: 40553
->>> acts : [load] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 0, maxsz: 34163
->>> acts : [load] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 0, maxsz: 25348
->>> acts : [load] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 0, maxsz: 20607
->>> acts : [load] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 0, maxsz: 13980
->>> acts : [load] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 0, maxsz: 12931
->>> acts : [load] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 0, maxsz: 12720
->>> acts : [load] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 0, maxsz: 10532
->>> acts : [load] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 0, maxsz: 8128
->>> acts : [load] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 0, maxsz: 6579
->>> acts : [load] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 0, maxsz: 5526
->>> acts : [load] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 0, maxsz: 6327
->>> acts : [load] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 0, maxsz: 3304
->>> acts : [load] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 0, maxsz: 2627
->>> acts : [load] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 0, maxsz: 920
->>> acts : [load] edge_maps_buffer[0][24].offset: 631725, edge_maps_buffer[0][24].size: 0, maxsz: 4294335571
-+++ processing 0 edges in upartition 0: [PEs 0, ]
-+++ processing 0 edges in upartition 1: [PEs 0, ]
-+++ processing 0 edges in upartition 2: [PEs 0, ]
-+++ processing 0 edges in upartition 3: [PEs 0, ]
-+++ processing 0 edges in upartition 4: [PEs 0, ]
-+++ processing 0 edges in upartition 5: [PEs 0, ]
-+++ processing 0 edges in upartition 6: [PEs 0, ]
-+++ processing 0 edges in upartition 7: [PEs 0, ]
-+++ processing 0 edges in upartition 8: [PEs 0, ]
-+++ processing 0 edges in upartition 9: [PEs 0, ]
-+++ processing 0 edges in upartition 10: [PEs 0, ]
-+++ processing 0 edges in upartition 11: [PEs 0, ]
-+++ processing 0 edges in upartition 12: [PEs 0, ]
-+++ processing 0 edges in upartition 13: [PEs 0, ]
-+++ processing 0 edges in upartition 14: [PEs 0, ]
-+++ processing 0 edges in upartition 15: [PEs 0, ]
-+++ processing 0 edges in upartition 16: [PEs 0, ]
-+++ processing 0 edges in upartition 17: [PEs 0, ]
-+++ processing 0 edges in upartition 18: [PEs 0, ]
-+++ processing 0 edges in upartition 19: [PEs 0, ]
-+++ processing 0 edges in upartition 20: [PEs 0, ]
-+++ processing 0 edges in upartition 21: [PEs 0, ]
-+++ processing 0 edges in upartition 22: [PEs 0, ]
-+++ processing 0 edges in upartition 23: [PEs 0, ]
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 0, rem: 86918, maxsz: 86918
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 0, rem: 48806, maxsz: 48806
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 0, rem: 48632, maxsz: 48632
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 0, rem: 38893, maxsz: 38893
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 0, rem: 24448, maxsz: 24448
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 0, rem: 23320, maxsz: 23320
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 0, rem: 19081, maxsz: 19081
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 0, rem: 69646, maxsz: 69646
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 0, rem: 67736, maxsz: 67736
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 0, rem: 40553, maxsz: 40553
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 0, rem: 34163, maxsz: 34163
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 0, rem: 25348, maxsz: 25348
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 0, rem: 20607, maxsz: 20607
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 0, rem: 13980, maxsz: 13980
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 0, rem: 12931, maxsz: 12931
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 0, rem: 12720, maxsz: 12720
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 0, rem: 10532, maxsz: 10532
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 0, rem: 8128, maxsz: 8128
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 0, rem: 6579, maxsz: 6579
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 0, rem: 5526, maxsz: 5526
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 0, rem: 6327, maxsz: 6327
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 0, rem: 3304, maxsz: 3304
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 0, rem: 2627, maxsz: 2627
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 0, rem: 920, maxsz: 920
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
++++ processing 0 edges (of 1390688) in upartition 0: [PEs 0, ]
++++ processing 0 edges (of 780896) in upartition 1: [PEs 0, ]
++++ processing 0 edges (of 778112) in upartition 2: [PEs 0, ]
++++ processing 0 edges (of 622288) in upartition 3: [PEs 0, ]
++++ processing 0 edges (of 391168) in upartition 4: [PEs 0, ]
++++ processing 0 edges (of 373120) in upartition 5: [PEs 0, ]
++++ processing 0 edges (of 305296) in upartition 6: [PEs 0, ]
++++ processing 0 edges (of 1114336) in upartition 7: [PEs 0, ]
++++ processing 0 edges (of 1083776) in upartition 8: [PEs 0, ]
++++ processing 0 edges (of 648848) in upartition 9: [PEs 0, ]
++++ processing 0 edges (of 546608) in upartition 10: [PEs 0, ]
++++ processing 0 edges (of 405568) in upartition 11: [PEs 0, ]
++++ processing 0 edges (of 329712) in upartition 12: [PEs 0, ]
++++ processing 0 edges (of 223680) in upartition 13: [PEs 0, ]
++++ processing 0 edges (of 206896) in upartition 14: [PEs 0, ]
++++ processing 0 edges (of 203520) in upartition 15: [PEs 0, ]
++++ processing 0 edges (of 168512) in upartition 16: [PEs 0, ]
++++ processing 0 edges (of 130048) in upartition 17: [PEs 0, ]
++++ processing 0 edges (of 105264) in upartition 18: [PEs 0, ]
++++ processing 0 edges (of 88416) in upartition 19: [PEs 0, ]
++++ processing 0 edges (of 101232) in upartition 20: [PEs 0, ]
++++ processing 0 edges (of 52864) in upartition 21: [PEs 0, ]
++++ processing 0 edges (of 42032) in upartition 22: [PEs 0, ]
++++ processing 0 edges (of 14720) in upartition 23: [PEs 0, ]
 ### applying vertex updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ] [max 2, 0]
 ### applying edge updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ]
 --- applying 0 vertex/edge updates in vpartition 0, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 86918, edge_maps_buffer[0][0].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 0, maxsz: 86918
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 261 (of 8192), total num misses: 261[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 261 (of 8192), total # misses: 261[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48806, edge_maps_buffer[0][1].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 0, maxsz: 48806
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 534[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 534[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48632, edge_maps_buffer[0][2].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 0, maxsz: 48632
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 239 (of 8192), total num misses: 773[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 773[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 38893, edge_maps_buffer[0][3].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 0, maxsz: 38893
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 1052[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1052[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 24448, edge_maps_buffer[0][4].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 0, maxsz: 24448
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 230 (of 8192), total num misses: 1282[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1282[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 23320, edge_maps_buffer[0][5].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 0, maxsz: 23320
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1552[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1552[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 19081, edge_maps_buffer[0][6].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 0, maxsz: 19081
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 292 (of 8192), total num misses: 1844[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1844[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 69646, edge_maps_buffer[0][7].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 0, maxsz: 69646
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 280 (of 8192), total num misses: 2124[0m
+-------------------------------- apply-all-updates: saving 139 (2224) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 2124[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
--------------------------------- apply-edges: saving 139 (2224) missed edge updates for processing (0)... --------------------------------
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 67736, edge_maps_buffer[0][8].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 0, maxsz: 67736
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 260 (of 8192), total num misses: 260[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 260[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 40553, edge_maps_buffer[0][9].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 0, maxsz: 40553
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 539[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 539[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 34163, edge_maps_buffer[0][10].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 0, maxsz: 34163
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 818[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 818[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 25348, edge_maps_buffer[0][11].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 0, maxsz: 25348
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1088[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1088[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 20607, edge_maps_buffer[0][12].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 0, maxsz: 20607
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 256 (of 8192), total num misses: 1344[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1344[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 13980, edge_maps_buffer[0][13].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 0, maxsz: 13980
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 274 (of 8192), total num misses: 1618[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1618[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12931, edge_maps_buffer[0][14].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 0, maxsz: 12931
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 1891[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 1891[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12720, edge_maps_buffer[0][15].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 0, maxsz: 12720
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 237 (of 8192), total num misses: 2128[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 2128[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 10532, edge_maps_buffer[0][16].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 0, maxsz: 10532
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 266 (of 8192), total num misses: 2394[0m
+-------------------------------- apply-all-updates: saving 144 (2304) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 2394[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
--------------------------------- apply-edges: saving 144 (2304) missed edge updates for processing (1)... --------------------------------
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 8128, edge_maps_buffer[0][17].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 0, maxsz: 8128
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: num_edges_updated: 0, num_edges_inserted: 7770, num misses: 246 (of 8192), total num misses: 246[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 246[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6579, edge_maps_buffer[0][18].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 0, maxsz: 6579
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: num_edges_updated: 0, num_edges_inserted: 7470, num misses: 211 (of 8192), total num misses: 457[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 457[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 5526, edge_maps_buffer[0][19].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 0, maxsz: 5526
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: num_edges_updated: 0, num_edges_inserted: 7549, num misses: 241 (of 8192), total num misses: 698[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 698[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6327, edge_maps_buffer[0][20].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 0, maxsz: 6327
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: num_edges_updated: 0, num_edges_inserted: 7552, num misses: 263 (of 8192), total num misses: 961[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 961[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 3304, edge_maps_buffer[0][21].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 0, maxsz: 3304
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: num_edges_updated: 0, num_edges_inserted: 7230, num misses: 236 (of 8192), total num misses: 1197[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 7230, # deleted: 0, # misses: 236 (of 8192), total # misses: 1197[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 2627, edge_maps_buffer[0][22].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 0, maxsz: 2627
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: num_edges_updated: 0, num_edges_inserted: 7404, num misses: 311 (of 8192), total num misses: 1508[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 7404, # deleted: 0, # misses: 311 (of 8192), total # misses: 1508[0m
 --- applying 0 vertex/edge updates in vpartition 0, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 920, edge_maps_buffer[0][23].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 0, maxsz: 920
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 23][max_num_edges: 920]: num_edges_updated: 0, num_edges_inserted: 6410, num misses: 377 (of 8192), total num misses: 1885[0m
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 6410, # deleted: 0, # misses: 377 (of 8192), total # misses: 1885[0m
 ### applying vertex updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ] [max 2, 0]
 ### applying edge updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ]
 --- applying 0 vertex/edge updates in vpartition 1, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 86918, edge_maps_buffer[0][0].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 0, maxsz: 86918
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 0][max_num_edges: 86918]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 261 (of 8192), total num misses: 261[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 323 (of 8192), total # misses: 323[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48806, edge_maps_buffer[0][1].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 0, maxsz: 48806
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 1][max_num_edges: 48806]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 534[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 596[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48632, edge_maps_buffer[0][2].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 0, maxsz: 48632
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 2][max_num_edges: 48632]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 239 (of 8192), total num misses: 773[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 835[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 38893, edge_maps_buffer[0][3].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 0, maxsz: 38893
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 3][max_num_edges: 38893]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 1052[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1114[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 24448, edge_maps_buffer[0][4].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 0, maxsz: 24448
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 4][max_num_edges: 24448]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 230 (of 8192), total num misses: 1282[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1344[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 23320, edge_maps_buffer[0][5].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 0, maxsz: 23320
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 5][max_num_edges: 23320]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1552[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1614[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 19081, edge_maps_buffer[0][6].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 0, maxsz: 19081
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 6][max_num_edges: 19081]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 292 (of 8192), total num misses: 1844[0m
+-------------------------------- apply-all-updates: saving 130 (2080) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1906[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 69646, edge_maps_buffer[0][7].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 0, maxsz: 69646
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 7][max_num_edges: 69646]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 280 (of 8192), total num misses: 2124[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 280[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
--------------------------------- apply-edges: saving 139 (2224) missed edge updates for processing (0)... --------------------------------
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 67736, edge_maps_buffer[0][8].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 0, maxsz: 67736
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 8][max_num_edges: 67736]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 260 (of 8192), total num misses: 260[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 540[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 40553, edge_maps_buffer[0][9].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 0, maxsz: 40553
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 9][max_num_edges: 40553]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 539[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 819[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 34163, edge_maps_buffer[0][10].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 0, maxsz: 34163
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 10][max_num_edges: 34163]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 279 (of 8192), total num misses: 818[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1098[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 25348, edge_maps_buffer[0][11].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 0, maxsz: 25348
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 11][max_num_edges: 25348]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 270 (of 8192), total num misses: 1088[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1368[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 20607, edge_maps_buffer[0][12].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 0, maxsz: 20607
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 12][max_num_edges: 20607]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 256 (of 8192), total num misses: 1344[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1624[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 13980, edge_maps_buffer[0][13].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 0, maxsz: 13980
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 13][max_num_edges: 13980]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 274 (of 8192), total num misses: 1618[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1898[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12931, edge_maps_buffer[0][14].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 0, maxsz: 12931
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 14][max_num_edges: 12931]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 273 (of 8192), total num misses: 1891[0m
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 2171[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12720, edge_maps_buffer[0][15].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 0, maxsz: 12720
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 15][max_num_edges: 12720]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 237 (of 8192), total num misses: 2128[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 237[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 10532, edge_maps_buffer[0][16].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 0, maxsz: 10532
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 16][max_num_edges: 10532]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 266 (of 8192), total num misses: 2394[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 503[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
--------------------------------- apply-edges: saving 144 (2304) missed edge updates for processing (1)... --------------------------------
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 8128, edge_maps_buffer[0][17].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 0, maxsz: 8128
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 17][max_num_edges: 8128]: num_edges_updated: 0, num_edges_inserted: 7770, num misses: 246 (of 8192), total num misses: 246[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 749[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6579, edge_maps_buffer[0][18].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 0, maxsz: 6579
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 18][max_num_edges: 6579]: num_edges_updated: 0, num_edges_inserted: 7470, num misses: 211 (of 8192), total num misses: 457[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 960[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 5526, edge_maps_buffer[0][19].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 0, maxsz: 5526
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 19][max_num_edges: 5526]: num_edges_updated: 0, num_edges_inserted: 7549, num misses: 241 (of 8192), total num misses: 698[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 1201[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6327, edge_maps_buffer[0][20].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 0, maxsz: 6327
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 20][max_num_edges: 6327]: num_edges_updated: 0, num_edges_inserted: 7552, num misses: 263 (of 8192), total num misses: 961[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 1464[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 3304, edge_maps_buffer[0][21].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 0, maxsz: 3304
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 21][max_num_edges: 3304]: num_edges_updated: 0, num_edges_inserted: 7230, num misses: 236 (of 8192), total num misses: 1197[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 7230, # deleted: 0, # misses: 236 (of 8192), total # misses: 1700[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 2627, edge_maps_buffer[0][22].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 0, maxsz: 2627
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 22][max_num_edges: 2627]: num_edges_updated: 0, num_edges_inserted: 7404, num misses: 311 (of 8192), total num misses: 1508[0m
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 7404, # deleted: 0, # misses: 311 (of 8192), total # misses: 2011[0m
 --- applying 0 vertex/edge updates in vpartition 1, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 920, edge_maps_buffer[0][23].size: 0 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 0, maxsz: 920
-[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 23][max_num_edges: 920]: num_edges_updated: 0, num_edges_inserted: 6410, num misses: 377 (of 8192), total num misses: 1885[0m
-### gathering frontiers for upartitionID 0: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 1: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 2: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 3: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 4: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 5: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 6: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 7: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 8: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 9: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 10: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 11: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 12: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 13: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 14: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 15: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 16: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 17: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 18: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 19: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 20: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 21: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 22: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
-### gathering frontiers for upartitionID 23: [PEs 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ] [target FPGAs 0, ] [max 24]
+-------------------------------- apply-all-updates: saving 139 (2224) missed edge updates for later processing (2)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 5085, # deleted: 0, # misses: 239 (of 6528), total # misses: 2250[0m
 [acts: READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS] 
->>> [Per FPGA][1571328, 0, 3142656, 0, 0, 3142656, 3142656]
+>>> [Per FPGA][0, 0, 0, 0, 0, 0, 0]
 [acts: NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]
->>> [Per FPGA][383648, 0, 0]
->>> acts : [save] edge_maps_s[0][0].offset: 0, edge_maps_s[0][0].size: 1024, maxsz: 86918
->>> acts : [save] edge_maps_s[0][1].offset: 86918, edge_maps_s[0][1].size: 1024, maxsz: 48806
->>> acts : [save] edge_maps_s[0][2].offset: 135724, edge_maps_s[0][2].size: 1024, maxsz: 48632
->>> acts : [save] edge_maps_s[0][3].offset: 184356, edge_maps_s[0][3].size: 1024, maxsz: 38893
->>> acts : [save] edge_maps_s[0][4].offset: 223249, edge_maps_s[0][4].size: 1024, maxsz: 24448
->>> acts : [save] edge_maps_s[0][5].offset: 247697, edge_maps_s[0][5].size: 1024, maxsz: 23320
->>> acts : [save] edge_maps_s[0][6].offset: 271017, edge_maps_s[0][6].size: 1024, maxsz: 19081
->>> acts : [save] edge_maps_s[0][7].offset: 290098, edge_maps_s[0][7].size: 1024, maxsz: 69646
->>> acts : [save] edge_maps_s[0][8].offset: 359744, edge_maps_s[0][8].size: 1024, maxsz: 67736
->>> acts : [save] edge_maps_s[0][9].offset: 427480, edge_maps_s[0][9].size: 1024, maxsz: 40553
->>> acts : [save] edge_maps_s[0][10].offset: 468033, edge_maps_s[0][10].size: 1024, maxsz: 34163
->>> acts : [save] edge_maps_s[0][11].offset: 502196, edge_maps_s[0][11].size: 1024, maxsz: 25348
->>> acts : [save] edge_maps_s[0][12].offset: 527544, edge_maps_s[0][12].size: 1024, maxsz: 20607
->>> acts : [save] edge_maps_s[0][13].offset: 548151, edge_maps_s[0][13].size: 1024, maxsz: 13980
->>> acts : [save] edge_maps_s[0][14].offset: 562131, edge_maps_s[0][14].size: 1024, maxsz: 12931
->>> acts : [save] edge_maps_s[0][15].offset: 575062, edge_maps_s[0][15].size: 1024, maxsz: 12720
->>> acts : [save] edge_maps_s[0][16].offset: 587782, edge_maps_s[0][16].size: 1024, maxsz: 10532
->>> acts : [save] edge_maps_s[0][17].offset: 598314, edge_maps_s[0][17].size: 1024, maxsz: 8128
->>> acts : [save] edge_maps_s[0][18].offset: 606442, edge_maps_s[0][18].size: 1024, maxsz: 6579
->>> acts : [save] edge_maps_s[0][19].offset: 613021, edge_maps_s[0][19].size: 1024, maxsz: 5526
->>> acts : [save] edge_maps_s[0][20].offset: 618547, edge_maps_s[0][20].size: 1024, maxsz: 6327
->>> acts : [save] edge_maps_s[0][21].offset: 624874, edge_maps_s[0][21].size: 1024, maxsz: 3304
->>> acts : [save] edge_maps_s[0][22].offset: 628178, edge_maps_s[0][22].size: 1024, maxsz: 2627
->>> acts : [save] edge_maps_s[0][23].offset: 630805, edge_maps_s[0][23].size: 1024, maxsz: 920
->>> acts : [save] edge_maps_s[0][24].offset: 631725, edge_maps_s[0][24].size: 0, maxsz: 4294335571
-[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 206.00 ms, 206000.00 microsecs, [0m
+>>> [Per FPGA][382224, 0, 0]
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 1024, rem: 85894, maxsz: 86918
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 1024, rem: 47782, maxsz: 48806
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 1024, rem: 47608, maxsz: 48632
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 1024, rem: 37869, maxsz: 38893
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 1024, rem: 23424, maxsz: 24448
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 1024, rem: 22296, maxsz: 23320
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 1024, rem: 18057, maxsz: 19081
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 1024, rem: 68622, maxsz: 69646
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 1024, rem: 66712, maxsz: 67736
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 1024, rem: 39529, maxsz: 40553
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 1024, rem: 33139, maxsz: 34163
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 1024, rem: 24324, maxsz: 25348
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 1024, rem: 19583, maxsz: 20607
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 1024, rem: 12956, maxsz: 13980
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 1024, rem: 11907, maxsz: 12931
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 1024, rem: 11696, maxsz: 12720
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 1024, rem: 9508, maxsz: 10532
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 1024, rem: 7104, maxsz: 8128
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 1024, rem: 5555, maxsz: 6579
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 1024, rem: 4502, maxsz: 5526
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 1024, rem: 5303, maxsz: 6327
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 1024, rem: 2280, maxsz: 3304
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 1024, rem: 1603, maxsz: 2627
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 920, rem: 0, maxsz: 920
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
+[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 77.00 ms, 77000.00 microsecs, [0m
+[1m[37m>>> num edges processed (sz1): 0, num edges updated (sz2): 4718592 [0m
+[1m[37m>>> average graph analytics throughput (MTEPS) = 0.00 MTEPS (0.00 BTEPS) [0m
+[1m[37m>>> average graph update throughput (MTEPS) = 61.28 MTEPS (0.06 BTEPS) [0m
 
 [1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 1), epoch 1, fpgas [0 - 0] started... --------------------------------[0m
 host: launching acts [processing stage][GAS iteration: 0]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
 host: launching acts [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
 host: launching acts [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
-host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 16)...
-host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 16)
+host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 0)...
+host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 0)
 acts started [processing stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
 acts started [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
 acts started [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
 ### acts started [importing stage]: --> importing upartition: 0 to 24...
 ### acts started [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]...
 acts: resetting updates space...
->>> acts : [load] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 1024, maxsz: 86918
->>> acts : [load] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 1024, maxsz: 48806
->>> acts : [load] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 1024, maxsz: 48632
->>> acts : [load] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 1024, maxsz: 38893
->>> acts : [load] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 1024, maxsz: 24448
->>> acts : [load] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 1024, maxsz: 23320
->>> acts : [load] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 1024, maxsz: 19081
->>> acts : [load] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 1024, maxsz: 69646
->>> acts : [load] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 1024, maxsz: 67736
->>> acts : [load] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 1024, maxsz: 40553
->>> acts : [load] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 1024, maxsz: 34163
->>> acts : [load] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 1024, maxsz: 25348
->>> acts : [load] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 1024, maxsz: 20607
->>> acts : [load] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 1024, maxsz: 13980
->>> acts : [load] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 1024, maxsz: 12931
->>> acts : [load] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 1024, maxsz: 12720
->>> acts : [load] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 1024, maxsz: 10532
->>> acts : [load] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 1024, maxsz: 8128
->>> acts : [load] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 1024, maxsz: 6579
->>> acts : [load] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 1024, maxsz: 5526
->>> acts : [load] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 1024, maxsz: 6327
->>> acts : [load] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 1024, maxsz: 3304
->>> acts : [load] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 1024, maxsz: 2627
->>> acts : [load] edge_maps_buffer[0][23].offset: 630805, edge_maps_buffer[0][23].size: 1024, maxsz: 920
->>> acts : [load] edge_maps_buffer[0][24].offset: 631725, edge_maps_buffer[0][24].size: 0, maxsz: 4294335571
-+++ processing 1024 edges in upartition 0: [PEs 0, ]
-+++ processing 1024 edges in upartition 1: [PEs 0, ]
-+++ processing 1024 edges in upartition 2: [PEs 0, ]
-+++ processing 1024 edges in upartition 3: [PEs 0, ]
-+++ processing 1024 edges in upartition 4: [PEs 0, ]
-+++ processing 1024 edges in upartition 5: [PEs 0, ]
-+++ processing 1024 edges in upartition 6: [PEs 0, ]
-+++ processing 1024 edges in upartition 7: [PEs 0, ]
-+++ processing 1024 edges in upartition 8: [PEs 0, ]
-+++ processing 1024 edges in upartition 9: [PEs 0, ]
-+++ processing 1024 edges in upartition 10: [PEs 0, ]
-+++ processing 1024 edges in upartition 11: [PEs 0, ]
-+++ processing 1024 edges in upartition 12: [PEs 0, ]
-+++ processing 1024 edges in upartition 13: [PEs 0, ]
-+++ processing 1024 edges in upartition 14: [PEs 0, ]
-+++ processing 1024 edges in upartition 15: [PEs 0, ]
-+++ processing 1024 edges in upartition 16: [PEs 0, ]
-+++ processing 1024 edges in upartition 17: [PEs 0, ]
-+++ processing 1024 edges in upartition 18: [PEs 0, ]
-+++ processing 1024 edges in upartition 19: [PEs 0, ]
-+++ processing 1024 edges in upartition 20: [PEs 0, ]
-+++ processing 1024 edges in upartition 21: [PEs 0, ]
-+++ processing 1024 edges in upartition 22: [PEs 0, ]
-+++ processing 1024 edges in upartition 23: [PEs 0, ]
-### applying vertex updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ] [max 2, 6144]
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 1024, rem: 85894, maxsz: 86918
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 1024, rem: 47782, maxsz: 48806
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 1024, rem: 47608, maxsz: 48632
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 1024, rem: 37869, maxsz: 38893
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 1024, rem: 23424, maxsz: 24448
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 1024, rem: 22296, maxsz: 23320
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 1024, rem: 18057, maxsz: 19081
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 1024, rem: 68622, maxsz: 69646
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 1024, rem: 66712, maxsz: 67736
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 1024, rem: 39529, maxsz: 40553
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 1024, rem: 33139, maxsz: 34163
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 1024, rem: 24324, maxsz: 25348
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 1024, rem: 19583, maxsz: 20607
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 1024, rem: 12956, maxsz: 13980
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 1024, rem: 11907, maxsz: 12931
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 1024, rem: 11696, maxsz: 12720
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 1024, rem: 9508, maxsz: 10532
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 1024, rem: 7104, maxsz: 8128
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 1024, rem: 5555, maxsz: 6579
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 1024, rem: 4502, maxsz: 5526
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 1024, rem: 5303, maxsz: 6327
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 1024, rem: 2280, maxsz: 3304
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 1024, rem: 1603, maxsz: 2627
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 920, rem: 0, maxsz: 920
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
++++ processing 16384 edges (of 1390688) in upartition 0: [PEs 0, ]
++++ processing 16384 edges (of 780896) in upartition 1: [PEs 0, ]
++++ processing 16384 edges (of 778112) in upartition 2: [PEs 0, ]
++++ processing 16384 edges (of 622288) in upartition 3: [PEs 0, ]
++++ processing 16384 edges (of 391168) in upartition 4: [PEs 0, ]
++++ processing 16384 edges (of 373120) in upartition 5: [PEs 0, ]
++++ processing 16384 edges (of 305296) in upartition 6: [PEs 0, ]
++++ processing 16384 edges (of 1114336) in upartition 7: [PEs 0, ]
++++ processing 16384 edges (of 1083776) in upartition 8: [PEs 0, ]
++++ processing 16384 edges (of 648848) in upartition 9: [PEs 0, ]
++++ processing 16384 edges (of 546608) in upartition 10: [PEs 0, ]
++++ processing 16384 edges (of 405568) in upartition 11: [PEs 0, ]
++++ processing 16384 edges (of 329712) in upartition 12: [PEs 0, ]
++++ processing 16384 edges (of 223680) in upartition 13: [PEs 0, ]
++++ processing 16384 edges (of 206896) in upartition 14: [PEs 0, ]
++++ processing 16384 edges (of 203520) in upartition 15: [PEs 0, ]
++++ processing 16384 edges (of 168512) in upartition 16: [PEs 0, ]
++++ processing 16384 edges (of 130048) in upartition 17: [PEs 0, ]
++++ processing 16384 edges (of 105264) in upartition 18: [PEs 0, ]
++++ processing 16384 edges (of 88416) in upartition 19: [PEs 0, ]
++++ processing 16384 edges (of 101232) in upartition 20: [PEs 0, ]
++++ processing 16384 edges (of 52864) in upartition 21: [PEs 0, ]
++++ processing 16384 edges (of 42032) in upartition 22: [PEs 0, ]
++++ processing 14720 edges (of 14720) in upartition 23: [PEs 0, ]
+### applying vertex updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ] [max 2, 12236]
 ### applying edge updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ]
---- applying 256 vertex/edge updates in vpartition 0, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 86918, edge_maps_buffer[0][0].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][0].offset: 0, edge_maps_buffer[0][0].size: 1024, maxsz: 86918
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 300 (of 8192), total num misses: 300[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48806, edge_maps_buffer[0][1].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][1].offset: 86918, edge_maps_buffer[0][1].size: 1024, maxsz: 48806
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 262 (of 8192), total num misses: 562[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 48632, edge_maps_buffer[0][2].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][2].offset: 135724, edge_maps_buffer[0][2].size: 1024, maxsz: 48632
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 253 (of 8192), total num misses: 815[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 38893, edge_maps_buffer[0][3].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][3].offset: 184356, edge_maps_buffer[0][3].size: 1024, maxsz: 38893
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 262 (of 8192), total num misses: 1077[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 24448, edge_maps_buffer[0][4].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][4].offset: 223249, edge_maps_buffer[0][4].size: 1024, maxsz: 24448
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: num_edges_updated: 0, num_edges_inserted: 7101, num misses: 219 (of 8192), total num misses: 1296[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 23320, edge_maps_buffer[0][5].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][5].offset: 247697, edge_maps_buffer[0][5].size: 1024, maxsz: 23320
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: num_edges_updated: 0, num_edges_inserted: 6913, num misses: 208 (of 8192), total num misses: 1504[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 19081, edge_maps_buffer[0][6].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][6].offset: 271017, edge_maps_buffer[0][6].size: 1024, maxsz: 19081
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: num_edges_updated: 0, num_edges_inserted: 7207, num misses: 213 (of 8192), total num misses: 1717[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 69646, edge_maps_buffer[0][7].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][7].offset: 290098, edge_maps_buffer[0][7].size: 1024, maxsz: 69646
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: num_edges_updated: 1, num_edges_inserted: 8192, num misses: 289 (of 8192), total num misses: 2006[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 67736, edge_maps_buffer[0][8].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][8].offset: 359744, edge_maps_buffer[0][8].size: 1024, maxsz: 67736
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 267 (of 8192), total num misses: 2273[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
--------------------------------- apply-edges: saving 142 (2272) missed edge updates for processing (0)... --------------------------------
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 40553, edge_maps_buffer[0][9].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][9].offset: 427480, edge_maps_buffer[0][9].size: 1024, maxsz: 40553
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 229 (of 8192), total num misses: 229[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 34163, edge_maps_buffer[0][10].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][10].offset: 468033, edge_maps_buffer[0][10].size: 1024, maxsz: 34163
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 255 (of 8192), total num misses: 484[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 25348, edge_maps_buffer[0][11].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][11].offset: 502196, edge_maps_buffer[0][11].size: 1024, maxsz: 25348
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: num_edges_updated: 0, num_edges_inserted: 7798, num misses: 223 (of 8192), total num misses: 707[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 20607, edge_maps_buffer[0][12].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][12].offset: 527544, edge_maps_buffer[0][12].size: 1024, maxsz: 20607
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: num_edges_updated: 0, num_edges_inserted: 7545, num misses: 225 (of 8192), total num misses: 932[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 13980, edge_maps_buffer[0][13].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][13].offset: 548151, edge_maps_buffer[0][13].size: 1024, maxsz: 13980
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: num_edges_updated: 0, num_edges_inserted: 8192, num misses: 232 (of 8192), total num misses: 1164[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12931, edge_maps_buffer[0][14].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][14].offset: 562131, edge_maps_buffer[0][14].size: 1024, maxsz: 12931
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: num_edges_updated: 0, num_edges_inserted: 8187, num misses: 273 (of 8192), total num misses: 1437[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 12720, edge_maps_buffer[0][15].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][15].offset: 575062, edge_maps_buffer[0][15].size: 1024, maxsz: 12720
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: num_edges_updated: 0, num_edges_inserted: 7874, num misses: 226 (of 8192), total num misses: 1663[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 10532, edge_maps_buffer[0][16].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][16].offset: 587782, edge_maps_buffer[0][16].size: 1024, maxsz: 10532
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: num_edges_updated: 0, num_edges_inserted: 7082, num misses: 213 (of 8192), total num misses: 1876[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 8128, edge_maps_buffer[0][17].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][17].offset: 598314, edge_maps_buffer[0][17].size: 1024, maxsz: 8128
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: num_edges_updated: 0, num_edges_inserted: 7598, num misses: 217 (of 8192), total num misses: 2093[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
--------------------------------- apply-edges: saving 136 (2176) missed edge updates for processing (1)... --------------------------------
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6579, edge_maps_buffer[0][18].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][18].offset: 606442, edge_maps_buffer[0][18].size: 1024, maxsz: 6579
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: num_edges_updated: 0, num_edges_inserted: 7649, num misses: 227 (of 8192), total num misses: 227[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 5526, edge_maps_buffer[0][19].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][19].offset: 613021, edge_maps_buffer[0][19].size: 1024, maxsz: 5526
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: num_edges_updated: 0, num_edges_inserted: 7496, num misses: 213 (of 8192), total num misses: 440[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 6327, edge_maps_buffer[0][20].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][20].offset: 618547, edge_maps_buffer[0][20].size: 1024, maxsz: 6327
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: num_edges_updated: 0, num_edges_inserted: 7409, num misses: 258 (of 8192), total num misses: 698[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 3304, edge_maps_buffer[0][21].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][21].offset: 624874, edge_maps_buffer[0][21].size: 1024, maxsz: 3304
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: num_edges_updated: 0, num_edges_inserted: 6899, num misses: 234 (of 8192), total num misses: 932[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 512, max_num_edges: 2627, edge_maps_buffer[0][22].size: 1024 ~~~~~~~~~~~~~~
-^^^^^^ apply_all_updates : [save] edge_maps_buffer[0][22].offset: 628178, edge_maps_buffer[0][22].size: 1024, maxsz: 2627
-[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: num_edges_updated: 0, num_edges_inserted: 7208, num misses: 281 (of 8192), total num misses: 1213[0m
---- applying 256 vertex/edge updates in vpartition 0, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
-~~~~~~~~~~~~~~ chunksz: 4294967192, max_num_edges: 920, edge_maps_buffer[0][23].size: 1024 ~~~~~~~~~~~~~~
-utility::checkoutofbounds: ERROR. out of bounds. message: acts_kernel::ERROR 88223::, data: 4294967192, upper_bound: 4194304, msgdata1: 666, msgdata2: 666, msgdata3: 4294967295
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 381 (of 8192), total # misses: 381[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 654[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 893[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1172[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1402[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1672[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1964[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 280[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 540[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 819[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1098[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1368[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1624[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1898[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 2171[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 237[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 503[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 749[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 960[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 1201[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 1464[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 7230, # deleted: 0, # misses: 236 (of 8192), total # misses: 1700[0m
+--- applying 8192 vertex/edge updates in vpartition 0, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 7404, # deleted: 0, # misses: 311 (of 8192), total # misses: 2011[0m
+--- applying 7360 vertex/edge updates in vpartition 0, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 2011[0m
+### applying vertex updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ] [max 2, 12236]
+### applying edge updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ]
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 336 (of 8192), total # misses: 336[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 609[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 848[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1127[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1357[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1627[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 129 (2064) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1919[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 280[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 540[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 819[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1098[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1368[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1624[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1898[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 2171[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 237[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 503[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 749[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 960[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 1201[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 1464[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 7230, # deleted: 0, # misses: 236 (of 8192), total # misses: 1700[0m
+--- applying 8192 vertex/edge updates in vpartition 1, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 7404, # deleted: 0, # misses: 311 (of 8192), total # misses: 2011[0m
+--- applying 7360 vertex/edge updates in vpartition 1, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 2011[0m
+[acts: READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS] 
+>>> [Per FPGA][0, 391552, 0, 0, 0, 0, 0]
+[acts: NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]
+>>> [Per FPGA][370816, 0, 0]
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 2048, rem: 84870, maxsz: 86918
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 2048, rem: 46758, maxsz: 48806
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 2048, rem: 46584, maxsz: 48632
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 2048, rem: 36845, maxsz: 38893
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 2048, rem: 22400, maxsz: 24448
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 2048, rem: 21272, maxsz: 23320
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 2048, rem: 17033, maxsz: 19081
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 2048, rem: 67598, maxsz: 69646
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 2048, rem: 65688, maxsz: 67736
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 2048, rem: 38505, maxsz: 40553
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 2048, rem: 32115, maxsz: 34163
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 2048, rem: 23300, maxsz: 25348
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 2048, rem: 18559, maxsz: 20607
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 2048, rem: 11932, maxsz: 13980
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 2048, rem: 10883, maxsz: 12931
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 2048, rem: 10672, maxsz: 12720
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 2048, rem: 8484, maxsz: 10532
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 2048, rem: 6080, maxsz: 8128
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 2048, rem: 4531, maxsz: 6579
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 2048, rem: 3478, maxsz: 5526
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 2048, rem: 4279, maxsz: 6327
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 2048, rem: 1256, maxsz: 3304
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 2048, rem: 579, maxsz: 2627
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 920, rem: 0, maxsz: 920
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
+[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 107.00 ms, 107000.00 microsecs, [0m
+[1m[37m>>> num edges processed (sz1): 4718592, num edges updated (sz2): 4718592 [0m
+[1m[37m>>> average graph analytics throughput (MTEPS) = 44.10 MTEPS (0.04 BTEPS) [0m
+[1m[37m>>> average graph update throughput (MTEPS) = 44.10 MTEPS (0.04 BTEPS) [0m
+
+[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 1), epoch 2, fpgas [0 - 0] started... --------------------------------[0m
+host: launching acts [processing stage][GAS iteration: 0]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 0)...
+host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 0)
+acts started [processing stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+### acts started [importing stage]: --> importing upartition: 0 to 24...
+### acts started [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]...
+acts: resetting updates space...
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 2048, rem: 84870, maxsz: 86918
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 2048, rem: 46758, maxsz: 48806
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 2048, rem: 46584, maxsz: 48632
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 2048, rem: 36845, maxsz: 38893
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 2048, rem: 22400, maxsz: 24448
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 2048, rem: 21272, maxsz: 23320
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 2048, rem: 17033, maxsz: 19081
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 2048, rem: 67598, maxsz: 69646
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 2048, rem: 65688, maxsz: 67736
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 2048, rem: 38505, maxsz: 40553
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 2048, rem: 32115, maxsz: 34163
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 2048, rem: 23300, maxsz: 25348
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 2048, rem: 18559, maxsz: 20607
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 2048, rem: 11932, maxsz: 13980
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 2048, rem: 10883, maxsz: 12931
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 2048, rem: 10672, maxsz: 12720
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 2048, rem: 8484, maxsz: 10532
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 2048, rem: 6080, maxsz: 8128
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 2048, rem: 4531, maxsz: 6579
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 2048, rem: 3478, maxsz: 5526
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 2048, rem: 4279, maxsz: 6327
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 2048, rem: 1256, maxsz: 3304
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 2048, rem: 579, maxsz: 2627
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 920, rem: 0, maxsz: 920
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
++++ processing 32768 edges (of 1390688) in upartition 0: [PEs 0, ]
++++ processing 32768 edges (of 780896) in upartition 1: [PEs 0, ]
++++ processing 32768 edges (of 778112) in upartition 2: [PEs 0, ]
++++ processing 32768 edges (of 622288) in upartition 3: [PEs 0, ]
++++ processing 32768 edges (of 391168) in upartition 4: [PEs 0, ]
++++ processing 32768 edges (of 373120) in upartition 5: [PEs 0, ]
++++ processing 32768 edges (of 305296) in upartition 6: [PEs 0, ]
++++ processing 32768 edges (of 1114336) in upartition 7: [PEs 0, ]
++++ processing 32768 edges (of 1083776) in upartition 8: [PEs 0, ]
++++ processing 32768 edges (of 648848) in upartition 9: [PEs 0, ]
++++ processing 32768 edges (of 546608) in upartition 10: [PEs 0, ]
++++ processing 32768 edges (of 405568) in upartition 11: [PEs 0, ]
++++ processing 32768 edges (of 329712) in upartition 12: [PEs 0, ]
++++ processing 32768 edges (of 223680) in upartition 13: [PEs 0, ]
++++ processing 32768 edges (of 206896) in upartition 14: [PEs 0, ]
++++ processing 32768 edges (of 203520) in upartition 15: [PEs 0, ]
++++ processing 32768 edges (of 168512) in upartition 16: [PEs 0, ]
++++ processing 32768 edges (of 130048) in upartition 17: [PEs 0, ]
++++ processing 32768 edges (of 105264) in upartition 18: [PEs 0, ]
++++ processing 32768 edges (of 88416) in upartition 19: [PEs 0, ]
++++ processing 32768 edges (of 101232) in upartition 20: [PEs 0, ]
++++ processing 32768 edges (of 52864) in upartition 21: [PEs 0, ]
++++ processing 32768 edges (of 42032) in upartition 22: [PEs 0, ]
++++ processing 14720 edges (of 14720) in upartition 23: [PEs 0, ]
+### applying vertex updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ] [max 2, 24012]
+### applying edge updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ]
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 335 (of 8192), total # misses: 335[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 608[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 847[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1126[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1356[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1626[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 129 (2064) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1918[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 280[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 540[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 819[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1098[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1368[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1624[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1898[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 2171[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 237[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 503[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 749[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 960[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 1201[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 1464[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 7230, # deleted: 0, # misses: 236 (of 8192), total # misses: 1700[0m
+--- applying 16384 vertex/edge updates in vpartition 0, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 7404, # deleted: 0, # misses: 311 (of 8192), total # misses: 2011[0m
+--- applying 7360 vertex/edge updates in vpartition 0, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 2011[0m
+### applying vertex updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ] [max 2, 24012]
+### applying edge updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ]
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 336 (of 8192), total # misses: 336[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 609[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 848[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1127[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1357[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1627[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 129 (2064) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1919[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 280[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 540[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 819[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1098[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1368[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1624[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1898[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 2171[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 237[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 503[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 749[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 960[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 1201[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 1464[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 7230, # deleted: 0, # misses: 236 (of 8192), total # misses: 1700[0m
+--- applying 16384 vertex/edge updates in vpartition 1, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 1072, # deleted: 0, # misses: 11 (of 1072), total # misses: 1711[0m
+--- applying 7360 vertex/edge updates in vpartition 1, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 1711[0m
+[acts: READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS] 
+>>> [Per FPGA][0, 768384, 0, 0, 0, 0, 0]
+[acts: NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]
+>>> [Per FPGA][364384, 0, 0]
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 3072, rem: 83846, maxsz: 86918
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 3072, rem: 45734, maxsz: 48806
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 3072, rem: 45560, maxsz: 48632
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 3072, rem: 35821, maxsz: 38893
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 3072, rem: 21376, maxsz: 24448
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 3072, rem: 20248, maxsz: 23320
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 3072, rem: 16009, maxsz: 19081
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 3072, rem: 66574, maxsz: 69646
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 3072, rem: 64664, maxsz: 67736
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 3072, rem: 37481, maxsz: 40553
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 3072, rem: 31091, maxsz: 34163
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 3072, rem: 22276, maxsz: 25348
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 3072, rem: 17535, maxsz: 20607
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 3072, rem: 10908, maxsz: 13980
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 3072, rem: 9859, maxsz: 12931
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 3072, rem: 9648, maxsz: 12720
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 3072, rem: 7460, maxsz: 10532
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 3072, rem: 5056, maxsz: 8128
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 3072, rem: 3507, maxsz: 6579
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 3072, rem: 2454, maxsz: 5526
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 3072, rem: 3255, maxsz: 6327
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 3072, rem: 232, maxsz: 3304
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 2627, rem: 0, maxsz: 2627
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 920, rem: 0, maxsz: 920
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
+[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 140.00 ms, 140000.00 microsecs, [0m
+[1m[37m>>> num edges processed (sz1): 9437184, num edges updated (sz2): 4718592 [0m
+[1m[37m>>> average graph analytics throughput (MTEPS) = 67.41 MTEPS (0.07 BTEPS) [0m
+[1m[37m>>> average graph update throughput (MTEPS) = 33.70 MTEPS (0.03 BTEPS) [0m
+
+[1m[37m-------------------------------- host: GAS iteration: ~0, launch_idx 0 (of 1), epoch 3, fpgas [0 - 0] started... --------------------------------[0m
+host: launching acts [processing stage][GAS iteration: 0]: fpga: 0, start_pu: 0 [id_process: 0], size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv: 0, size_pv: 2, start_gv: 0, size_gv: 24
+host: launching acts [importing stage]: --> importing upartition: 0 to 24 (num_import_partitions: 0, import_sz: 0)...
+host: launching acts [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]... (num_export_partitions: 0, export_sz: 0)
+acts started [processing stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [applying stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+acts started [gathering stage]: fpga: 0, start_pu: 0, size_pu: 24, start_pv_fpga: 666, start_pv: 0, size_pv: 2, start_gv_fpga: 666, start_gv: 0, size_gv: 24
+### acts started [importing stage]: --> importing upartition: 0 to 24...
+### acts started [exporting stage]: <-- exporting vpartition: 0 to 24  [FPGAs 0, ]...
+acts: resetting updates space...
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 3072, rem: 83846, maxsz: 86918
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 3072, rem: 45734, maxsz: 48806
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 3072, rem: 45560, maxsz: 48632
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 3072, rem: 35821, maxsz: 38893
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 3072, rem: 21376, maxsz: 24448
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 3072, rem: 20248, maxsz: 23320
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 3072, rem: 16009, maxsz: 19081
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 3072, rem: 66574, maxsz: 69646
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 3072, rem: 64664, maxsz: 67736
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 3072, rem: 37481, maxsz: 40553
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 3072, rem: 31091, maxsz: 34163
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 3072, rem: 22276, maxsz: 25348
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 3072, rem: 17535, maxsz: 20607
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 3072, rem: 10908, maxsz: 13980
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 3072, rem: 9859, maxsz: 12931
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 3072, rem: 9648, maxsz: 12720
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 3072, rem: 7460, maxsz: 10532
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 3072, rem: 5056, maxsz: 8128
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 3072, rem: 3507, maxsz: 6579
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 3072, rem: 2454, maxsz: 5526
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 3072, rem: 3255, maxsz: 6327
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 3072, rem: 232, maxsz: 3304
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 2627, rem: 0, maxsz: 2627
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 920, rem: 0, maxsz: 920
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [load][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
++++ processing 49152 edges (of 1390688) in upartition 0: [PEs 0, ]
++++ processing 49152 edges (of 780896) in upartition 1: [PEs 0, ]
++++ processing 49152 edges (of 778112) in upartition 2: [PEs 0, ]
++++ processing 49152 edges (of 622288) in upartition 3: [PEs 0, ]
++++ processing 49152 edges (of 391168) in upartition 4: [PEs 0, ]
++++ processing 49152 edges (of 373120) in upartition 5: [PEs 0, ]
++++ processing 49152 edges (of 305296) in upartition 6: [PEs 0, ]
++++ processing 49152 edges (of 1114336) in upartition 7: [PEs 0, ]
++++ processing 49152 edges (of 1083776) in upartition 8: [PEs 0, ]
++++ processing 49152 edges (of 648848) in upartition 9: [PEs 0, ]
++++ processing 49152 edges (of 546608) in upartition 10: [PEs 0, ]
++++ processing 49152 edges (of 405568) in upartition 11: [PEs 0, ]
++++ processing 49152 edges (of 329712) in upartition 12: [PEs 0, ]
++++ processing 49152 edges (of 223680) in upartition 13: [PEs 0, ]
++++ processing 49152 edges (of 206896) in upartition 14: [PEs 0, ]
++++ processing 49152 edges (of 203520) in upartition 15: [PEs 0, ]
++++ processing 49152 edges (of 168512) in upartition 16: [PEs 0, ]
++++ processing 49152 edges (of 130048) in upartition 17: [PEs 0, ]
++++ processing 49152 edges (of 105264) in upartition 18: [PEs 0, ]
++++ processing 49152 edges (of 88416) in upartition 19: [PEs 0, ]
++++ processing 49152 edges (of 101232) in upartition 20: [PEs 0, ]
++++ processing 49152 edges (of 52864) in upartition 21: [PEs 0, ]
++++ processing 42032 edges (of 42032) in upartition 22: [PEs 0, ]
++++ processing 14720 edges (of 14720) in upartition 23: [PEs 0, ]
+### applying vertex updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ] [max 2, 35566]
+### applying edge updates in vpartition 0: [PEs 0, ] [target FPGAs 0, ]
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 335 (of 8192), total # misses: 335[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 608[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 847[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1126[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1356[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1626[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 129 (2064) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1918[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 280[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 540[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 819[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1098[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1368[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1624[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1898[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 2171[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 237[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 503[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 749[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 960[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 1201[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 1464[0m
+--- applying 24576 vertex/edge updates in vpartition 0, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 3187, # deleted: 0, # misses: 54 (of 3712), total # misses: 1518[0m
+--- applying 21024 vertex/edge updates in vpartition 0, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 1518[0m
+--- applying 7360 vertex/edge updates in vpartition 0, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 0, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 1518[0m
+### applying vertex updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ] [max 2, 35565]
+### applying edge updates in vpartition 1: [PEs 0, ] [target FPGAs 0, ]
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 0, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 0][max_num_edges: 86918]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 336 (of 8192), total # misses: 336[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 1, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 1][max_num_edges: 48806]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 609[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 2, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 2][max_num_edges: 48632]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 239 (of 8192), total # misses: 848[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 3, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 3][max_num_edges: 38893]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1127[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 4, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 4][max_num_edges: 24448]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 230 (of 8192), total # misses: 1357[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 5, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 5][max_num_edges: 23320]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1627[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 6, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 129 (2064) missed edge updates for later processing (0)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 6][max_num_edges: 19081]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 292 (of 8192), total # misses: 1919[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 7, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 7][max_num_edges: 69646]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 280 (of 8192), total # misses: 280[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 8, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 8][max_num_edges: 67736]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 260 (of 8192), total # misses: 540[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 9, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 9][max_num_edges: 40553]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 819[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 10, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 10][max_num_edges: 34163]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 279 (of 8192), total # misses: 1098[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 11, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 11][max_num_edges: 25348]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 270 (of 8192), total # misses: 1368[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 12, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 12][max_num_edges: 20607]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 256 (of 8192), total # misses: 1624[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 13, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 13][max_num_edges: 13980]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 274 (of 8192), total # misses: 1898[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 14, PE 0: [PEs 0, ] [target FPGAs 0, ]
+-------------------------------- apply-all-updates: saving 131 (2096) missed edge updates for later processing (1)... --------------------------------
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 14][max_num_edges: 12931]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 273 (of 8192), total # misses: 2171[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 15, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 15][max_num_edges: 12720]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 237 (of 8192), total # misses: 237[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 16, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 16][max_num_edges: 10532]: # updated: 0, # inserted: 8192, # deleted: 0, # misses: 266 (of 8192), total # misses: 503[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 17, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 17][max_num_edges: 8128]: # updated: 0, # inserted: 7770, # deleted: 0, # misses: 246 (of 8192), total # misses: 749[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 18, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 18][max_num_edges: 6579]: # updated: 0, # inserted: 7470, # deleted: 0, # misses: 211 (of 8192), total # misses: 960[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 19, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 19][max_num_edges: 5526]: # updated: 0, # inserted: 7549, # deleted: 0, # misses: 241 (of 8192), total # misses: 1201[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 20, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 20][max_num_edges: 6327]: # updated: 0, # inserted: 7552, # deleted: 0, # misses: 263 (of 8192), total # misses: 1464[0m
+--- applying 24576 vertex/edge updates in vpartition 1, upartition 21, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 21][max_num_edges: 3304]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 1464[0m
+--- applying 21008 vertex/edge updates in vpartition 1, upartition 22, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 22][max_num_edges: 2627]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 1464[0m
+--- applying 7360 vertex/edge updates in vpartition 1, upartition 23, PE 0: [PEs 0, ] [target FPGAs 0, ]
+[1m[37m--- apply-edge-updates: [p_v: 1, p_u: 23][max_num_edges: 920]: # updated: 0, # inserted: 0, # deleted: 0, # misses: 0 (of 0), total # misses: 1464[0m
+[acts: READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS] 
+>>> [Per FPGA][0, 1138096, 0, 0, 0, 0, 0]
+[acts: NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]
+>>> [Per FPGA][344784, 0, 0]
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 0]: offset: 0, proc: 4096, rem: 82822, maxsz: 86918
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 1]: offset: 86918, proc: 4096, rem: 44710, maxsz: 48806
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 2]: offset: 135724, proc: 4096, rem: 44536, maxsz: 48632
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 3]: offset: 184356, proc: 4096, rem: 34797, maxsz: 38893
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 4]: offset: 223249, proc: 4096, rem: 20352, maxsz: 24448
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 5]: offset: 247697, proc: 4096, rem: 19224, maxsz: 23320
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 6]: offset: 271017, proc: 4096, rem: 14985, maxsz: 19081
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 7]: offset: 290098, proc: 4096, rem: 65550, maxsz: 69646
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 8]: offset: 359744, proc: 4096, rem: 63640, maxsz: 67736
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 9]: offset: 427480, proc: 4096, rem: 36457, maxsz: 40553
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 10]: offset: 468033, proc: 4096, rem: 30067, maxsz: 34163
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 11]: offset: 502196, proc: 4096, rem: 21252, maxsz: 25348
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 12]: offset: 527544, proc: 4096, rem: 16511, maxsz: 20607
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 13]: offset: 548151, proc: 4096, rem: 9884, maxsz: 13980
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 14]: offset: 562131, proc: 4096, rem: 8835, maxsz: 12931
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 15]: offset: 575062, proc: 4096, rem: 8624, maxsz: 12720
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 16]: offset: 587782, proc: 4096, rem: 6436, maxsz: 10532
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 17]: offset: 598314, proc: 4096, rem: 4032, maxsz: 8128
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 18]: offset: 606442, proc: 4096, rem: 2483, maxsz: 6579
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 19]: offset: 613021, proc: 4096, rem: 1430, maxsz: 5526
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 20]: offset: 618547, proc: 4096, rem: 2231, maxsz: 6327
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 21]: offset: 624874, proc: 3304, rem: 0, maxsz: 3304
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 22]: offset: 628178, proc: 2627, rem: 0, maxsz: 2627
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 23]: offset: 630805, proc: 920, rem: 0, maxsz: 920
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 24]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 25]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 26]: offset: 631725, proc: 0, rem: 0, maxsz: 0
+>>> acts : [save][edge_maps_s,edgeu_maps_s][p_u: 27]: offset: 631725, proc: 0, rem: 0, maxsz: 4294335571
+[1m[37m>>> kernel time elapsed for iteration 0, launch_idx 0 : 168.00 ms, 168000.00 microsecs, [0m
+[1m[37m>>> num edges processed (sz1): 14155776, num edges updated (sz2): 4718592 [0m
+[1m[37m>>> average graph analytics throughput (MTEPS) = 84.26 MTEPS (0.08 BTEPS) [0m
+[1m[37m>>> average graph update throughput (MTEPS) = 28.09 MTEPS (0.03 BTEPS) [0m
+[1m[37m>>> total kernel time elapsed for current iteration : 493.00 ms, 493000.00 microsecs, [0m
+-------------------------+++++++++++++++++++++++++++--------------------- num_iterations_dense: 4, num_iterations: 4
+Waiting...
+[1m[37m>>> total kernel time elapsed for all iterations : 493.00 ms, 493000.00 microsecs, [0m
+host:: number of active vertices in iteration 0: 1
+host:: number of active vertices in iteration 1: 12
+host:: number of active vertices in iteration 2: 469
+host:: number of active vertices in iteration 3: 26611
+host:: total: 27093
+host:: number of edges processed in iteration 0: 12
+host:: number of edges processed in iteration 1: 561
+host:: number of edges processed in iteration 2: 36419
+host:: number of edges processed in iteration 3: 2588347
+host:: total # edges processed across entire run: 2625339
+[READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS]
+>>> [*0, *574508, *0, *0, *0, *0, *0][Per FPGA / iteration]
+[NUMBER_OF_EDGE_INSERTIONS, NUMBER_OF_EDGE_UPDATINGS, NUMBER_OF_EDGE_DELETIONS]
+>>> [*365552, *0, *0, ][Per FPGA / iteration]
+[IMPORT_BATCH_SIZE, EXPORT_BATCH_SIZE, NUM_UPARTITIONS, NUM_APPLYPARTITIONS]
+>>> [*0, *0, *0, *0, *24, *2, ][Per FPGA / iteration]
+[1m[37m>>> total processing achieved in 3 'iterations' | versus ideal 4 GAS iterations[0m
+host:: FPGA-Only mode
+--- 3073442 active vertices processed in iteration 0 in 123 ms  [FPGA]
+--- 3073442 active vertices processed in iteration 1 in 123 ms  [FPGA]
+--- 3073442 active vertices processed in iteration 2 in 123 ms  [FPGA]
+--- 3073442 active vertices processed in iteration 3 in 123 ms  [FPGA]
+
+[1m[37m>>> : Total # edges processed: 117187083, time elapsed per iteration = 123.25 ms [0m
+[1m[37m>>> : Average Throughput (MTEPS) = 950.81 MTEPS, Throughput (BTEPS) = 0.95 BTEPS [0m
+[1m[37m>>> : Average Edge-update Throughput (MUEPS) = 38.28 MUEPS, Throughput (BTEPS) = 0.04 BTEPS [0m
+host::run:: Graph: /home/oj2zf/Documents/dataset/com-Orkut/com-Orkut.mtx ran successfully.
+TEST PASSED
+
+TEST FINISHED
+HOSTPROCESS:: FINISHED RUNNING 0
+[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 85690166650[nanao seconds](Iteration 666)[0m
+[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 85690166[micro seconds](Iteration 666)[0m
+[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 85690[milli seconds](Iteration 666)[0m
+[1m[37m>>> HOSTPROCESS:: TIMING SUMMARY: TOTAL TIME ELAPSED: : Time Elapsed = 85[seconds](Iteration 666)[0m
+

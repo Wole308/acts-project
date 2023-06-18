@@ -185,8 +185,10 @@ unsigned int limits_eu[NUM_VALID_PEs];
 #pragma HLS ARRAY_PARTITION variable = limits_eu complete
 unsigned int max_sz = 0; 
 #ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-map2_t edge_maps_buffer[NUM_VALID_PEs][MAX_NUM_UPARTITIONS];	
+map_t edge_maps_buffer[NUM_VALID_PEs][MAX_NUM_UPARTITIONS];	
 #pragma HLS ARRAY_PARTITION variable=edge_maps_buffer complete dim=1
+map_t edgeu_maps_buffer[NUM_VALID_PEs][MAX_NUM_UPARTITIONS];	
+#pragma HLS ARRAY_PARTITION variable=edgeu_maps_buffer complete dim=1
 #endif 
 
 #ifdef FPGA_IMPL
