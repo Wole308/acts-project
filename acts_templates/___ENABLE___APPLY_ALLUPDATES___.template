@@ -98,8 +98,9 @@ TOP_APPLY_VERTEX_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOB
 					if(raw_edge_update.srcvid != INVALIDDATA && t < chunksz){
 						unsigned int edge_hashid = hash_edge(edge_update.srcvid, edge_update.dstvid, NAp); 
 						
-						bool en = true; if((t > 0) && (last_edge_hashid == edge_hashid)){ en = false; } 
-						last_edge_hashid = edge_hashid;
+						bool en = true; 
+						// if((t > 0) && (last_edge_hashid == edge_hashid)){ en = false; } 
+						// last_edge_hashid = edge_hashid;
 						#ifdef _DEBUGMODE_KERNELPRINTS//4 
 						if(inst==0 && p_u==0 && t<2){ cout<<"$$$ load-edge-updates::["<<inst<<"]["<<t<<"]["<<v<<"]: [edge_update-update: srcvid: "<<edge_update.srcvid<<", dstvid: "<<edge_update.dstvid<<"]---[edge_hashid: "<<edge_hashid<<"]"<<endl; }								
 						#endif	

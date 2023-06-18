@@ -2807,8 +2807,9 @@ TOP_APPLY_VERTEX_AND_EDGE_UPDATES: for(unsigned int p_u=0; p_u<globalparams[GLOB
 					if(raw_edge_update.srcvid != INVALIDDATA && t < chunksz){
 						unsigned int edge_hashid = hash_edge(edge_update.srcvid, edge_update.dstvid, NAp); 
 						
-						bool en = true; if((t > 0) && (last_edge_hashid == edge_hashid)){ en = false; } 
-						last_edge_hashid = edge_hashid;
+						bool en = true; 
+						// if((t > 0) && (last_edge_hashid == edge_hashid)){ en = false; } 
+						// last_edge_hashid = edge_hashid;
 						#ifdef _DEBUGMODE_KERNELPRINTS//4 
 						if(inst==0 && p_u==0 && t<2){ cout<<"$$$ load-edge-updates::["<<inst<<"]["<<t<<"]["<<v<<"]: [edge_update-update: srcvid: "<<edge_update.srcvid<<", dstvid: "<<edge_update.dstvid<<"]---[edge_hashid: "<<edge_hashid<<"]"<<endl; }								
 						#endif	
@@ -3290,7 +3291,6 @@ for(unsigned int t=0; t<16; t++){ _NUMCLOCKCYCLES_[0][t] = 0; }
 	#pragma HLS ARRAY_PARTITION variable=edge_maps_s complete
 	#pragma HLS ARRAY_PARTITION variable=edgeu_maps_s complete
 	for(unsigned int p_u=action.start_pu; p_u<action.start_pu + action.size_pu + 4; p_u+=action.skip_pu){
-	#pragma HLS PIPELINE II=1
 		for(unsigned int n=0; n<NUM_VALID_PEs; n++){
 			#pragma HLS UNROLL
 			edge_maps_s[n].offset = edge_maps_buffer[n][p_u].offset; edge_maps_s[n].size = edge_maps_buffer[n][p_u].size;
