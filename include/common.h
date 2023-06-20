@@ -11,8 +11,6 @@
  
 
  
-#define ___RUNNING_FPGA_SYNTHESIS___
- 
 #define ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifndef ___RUNNING_FPGA_SYNTHESIS___
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
@@ -20,13 +18,14 @@
 // #define PROOF_OF_CONCEPT_RUN ///////////////.............................................................
 
 #define MAX_NUM_FPGAS 8
-#define RUN_IN_ASYNC_MODE 1
+#define RUN_IN_ASYNC_MODE 0
 
 #define GRAPH_UPDATE_ONLY 1
 #define GRAPH_UPDATE_AND_ANALYTICS_ONLY 2
 
 ////////////////////////////////
 
+#define ___SYNC___
 	
 
 #define ALL_MODULES 222 
@@ -143,7 +142,7 @@
 
 #define MAX_NUM_PEs 12
 #define MAX_GLOBAL_NUM_PEs (MAX_NUM_FPGAS * MAX_NUM_PEs)
-#define NUM_PEs 1		
+#define NUM_PEs 12		
 #define NUM_VALID_PEs 1
 #define NUM_VALID_HBM_CHANNELS 1
 #define EDGE_PACK_SIZE_POW 4 // 1 4*
@@ -222,7 +221,7 @@
 	#endif 
 
 #define EDGE_UPDATES_PTR_MAXSIZE 2048
-#define EDGE_UPDATES_CHUNKSZ 512 // 512, 1024, 8192  
+#define EDGE_UPDATES_CHUNKSZ 2048 // 512 // 512, 1024, 8192  
 
 // #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 64) 
 #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 128) 

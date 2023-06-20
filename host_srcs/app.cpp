@@ -258,7 +258,7 @@ unsigned int read2_from_hbmchannel(unsigned int i, HBM_channelAXISW_t * HBM_axic
 }
 
 unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS], HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs], 
-		vector<edge3_type> (&partitioned_edges)[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS],
+		vector<edge3_type> (&partitioned_edges)[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS], map_t * edge_maps_large[MAX_GLOBAL_NUM_PEs],
 		unsigned int rootvid, unsigned int max_degree,
 		utility * utilityobj, universalparams_t universalparams, unsigned int globalparams[1024]){
 	
@@ -271,7 +271,6 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 	print_globalparams(globalparams, universalparams, utilityobj);
 	
 	map_t * edge_maps[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ edge_maps[i] = new map_t[MAX_NUM_UPARTITIONS * MAX_NUM_LLP_PER_UPARTITION]; }
-	map_t * edge_maps_large[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ edge_maps_large[i] = new map_t[MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS]; }
 	map_t * vu_map[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ vu_map[i] = new map_t[MAX_NUM_LLPSETS]; } 
 
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
@@ -366,8 +365,6 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 	for(unsigned int t=0; t<num_llpset; t++){		
 		unsigned int index = t;
 		for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
-			// HBM_axichannel[0][i][offset_updatesptrs + index].data[0] = vu_map[i][index].offset;
-			// HBM_axichannel[0][i][offset_updatesptrs + index].data[1] = vu_map[i][index].size;
 			write_to_hbmchannel(i, HBM_axichannel, offset_updatesptrs, index, vu_map[i][index].offset, universalparams);
 			write_to_hbmchannel(i, HBM_axichannel, offset_updatesptrs, index + 1, vu_map[i][index].size, universalparams);
 		}
@@ -412,7 +409,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs]; 
 	HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS]; 
 	unsigned int globalparams[1024];
-
+	
 	// allocate AXI HBM memory
 	cout<<"app: initializing HBM_axichannels..."<<endl;
 	for(unsigned int i=0; i<mock_universalparams.GLOBAL_NUM_PEs_; i++){ 
@@ -451,6 +448,8 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 
 	long double edges_processed[128];
 	long double vertices_processed[128];
+	map_t * edge_maps_large[MAX_GLOBAL_NUM_PEs]; 
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ edge_maps_large[i] = new map_t[MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS]; }
 	
 	vprop_dest_t * local_vertex_properties[64]; 
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ local_vertex_properties[i] = new vprop_dest_t[universalparams.NUM_VERTICES / universalparams.GLOBAL_NUM_PEs_]; } 
@@ -569,28 +568,6 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	}
 	// size_u32 = 0;
 	size_u32 = MAX_NUM_UPARTITIONS * MAX_NUM_LLPSETS;
-	/* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
-		for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS]; t++){ 
-			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-				utilityobj->checkoutofbounds("app::ERROR 71711a::", globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + t, HBM_CHANNEL_SIZE, t, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], NAp);
-				utilityobj->checkoutofbounds("app::ERROR 71711b::", globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS] + t, HBM_CHANNEL_SIZE, t, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES], NAp);
-				unsigned int data0 = read2_from_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + t, 2 * v, universalparams);
-				unsigned int data1 = read2_from_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + t, 2 * v + 1, universalparams);
-				cout<<"&&&&&&&&&&&&&&&&&&7 data0: "<<data0<<", data1: "<<data1<<endl; 
-				
-				
-				write2_to_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS] + t, 2 * v, data0, universalparams);
-				write2_to_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS] + t, 2 * v + 1, data1, universalparams);
-				
-				if(i==0){ size_u32 += 2; }
-			}
-		}
-	}
-	#endif 
-	// size_u32 = MAX_NUM_UPARTITIONS * MAX_NUM_UPARTITIONS;
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
 	// load vertex-updates ptrs
 	cout<<"loading vertex-updates ptrs..."<<endl;
@@ -643,7 +620,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	// load act-pack edges
 	for(unsigned int i=0; i<0*universalparams.GLOBAL_NUM_PEs_; i++){ cout<<"ideal act-pack edges:: PE: "<<i<<": act_pack_edgeupdates["<<i<<"].size(): "<<(universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_)<<""<<endl; }
 	unsigned int max_lenght = load_actpack_edges(HBM_axicenter, HBM_axichannel, 
-		partitioned_edges,
+		partitioned_edges, edge_maps_large,
 		rootvid, NAp,
 		utilityobj, universalparams, globalparams);
 	size_u32 = (max_lenght * EDGE_PACK_SIZE * 2) + (1024 * EDGE_PACK_SIZE * 2); // 'NOTE: second value ('1024') is padding'
@@ -729,28 +706,6 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	}	
 	cout<<"loading nfrontier: globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS]: "<<globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS]<<" (of "<<HBM_CHANNEL_SIZE<<")"<<endl;
 	
-	/* // fill 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
-		for(unsigned int t=0; t<globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKVPTRS]; t++){ 
-			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-				utilityobj->checkoutofbounds("app::ERROR 71711a::", globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + t, HBM_CHANNEL_SIZE, t, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], NAp);
-				utilityobj->checkoutofbounds("app::ERROR 71711b::", globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS] + t, HBM_CHANNEL_SIZE, t, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATES], NAp);
-				unsigned int data0 = read2_from_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + t, 2 * v, universalparams);
-				unsigned int data1 = read2_from_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + t, 2 * v + 1, universalparams);
-				cout<<"&&&&&&&&&&&&&&&&&&7 data0: "<<data0<<", data1: "<<data1<<endl; 
-				
-				
-				write2_to_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS] + t, 2 * v, data0, universalparams);
-				write2_to_hbmchannel(i, HBM_axichannel, globalparams[GLOBALPARAMSCODE__BASEOFFSET__EDGEUPDATESPTRS] + t, 2 * v + 1, data1, universalparams);
-			}
-		}
-	}
-	#endif 
-	// size_u32 = MAX_NUM_UPARTITIONS * MAX_NUM_UPARTITIONS;
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
-	
 	unsigned int lastww_addr2 = load_globalparams2(HBM_axichannel, globalparams, universalparams, rootvid, NAp, utilityobj);
 	print_globalparams(globalparams, universalparams, utilityobj);
 
@@ -758,7 +713,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	host * hostobj = new host(universalparams);
 	// unsigned int hbm_channel_wwsize = HBM_CHANNEL_SIZE;
 	unsigned int hbm_channel_wwsize = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS]; // HBM_CHANNEL_SIZE
-	hostobj->runapp(graph_path, binaryFile, edgedatabuffer, vertexptrbuffer, HBM_axichannel, HBM_axicenter, hbm_channel_wwsize, globalparams, universalparams);
+	hostobj->runapp(graph_path, binaryFile, edgedatabuffer, vertexptrbuffer, edge_maps_large, HBM_axichannel, HBM_axicenter, hbm_channel_wwsize, globalparams, universalparams);
 	
 	//Free 
 	// edgedatabuffer.clear();
