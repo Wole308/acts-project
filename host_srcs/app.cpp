@@ -377,10 +377,12 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 	if(max_lenght < lenght){ max_lenght = lenght; }
 	if(min_lenght > lenght){ min_lenght = lenght; }
 	total_lenght += lenght;
-		
+
 	unsigned int realized_lenght = total_lenght * EDGE_PACK_SIZE;
 	unsigned int ideal_lenght = universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_;
-	unsigned int percentage_increase = (((realized_lenght - ideal_lenght) * 100) / ideal_lenght);
+	cout<<"### app: realized_lenght: "<<realized_lenght<<", ideal_lenght: "<<ideal_lenght<<""<<endl;
+	unsigned int absolute_diff = std::abs((int)(realized_lenght - ideal_lenght));
+	unsigned int percentage_increase = ((absolute_diff * 100) / ideal_lenght);
 	cout<<"### app: max_lenght (ww): "<<max_lenght<<", max_lenght: "<<max_lenght * EDGE_PACK_SIZE<<endl;
 	cout<<"### app: min_lenght (ww): "<<min_lenght<<", min_lenght: "<<min_lenght * EDGE_PACK_SIZE<<endl;
 	cout<<"### app: total_lenght (ww): "<<total_lenght<<", total_lenght: "<<total_lenght * EDGE_PACK_SIZE<<" (ideal lenght: "<<universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_<<") (=>"<<percentage_increase<<" % increase)"<<endl;
@@ -422,7 +424,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	}
 	
 	cout<<"app: initializing HBM_axicenters"<<endl;
-	for(unsigned int i=0; i<MAX_NUM_FPGAS; i++){ 
+	for(unsigned int i=0; i<mock_universalparams.NUM_FPGAS_; i++){ // MAX_NUM_FPGAS
 		for(unsigned int n=0; n<2; n++){
 			cout<<"app: --- initializing HBM_axichannels... i: "<<i<<", n: "<<n<<endl;
 			HBM_axicenter[n][i] = new HBM_channelAXISW_t[HBM_CENTER_SIZE]; 

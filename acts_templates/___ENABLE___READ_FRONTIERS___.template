@@ -10,9 +10,7 @@ unsigned int offset_c = globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP
 checkoutofbounds("acts_kernel::ERROR 12073::", cfrontier_dram___size[p_u], MAX_APPLYPARTITION_VECSIZE+1, NAp, NAp, NAp);
 #endif 
 
-#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
 unsigned int sz = cfrontier_dram___size[p_u]; if(action.command == GRAPH_UPDATE_ONLY){ sz = 0; }
-#endif 
 
 READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<sz; t++){ 
 #pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1A']}}	

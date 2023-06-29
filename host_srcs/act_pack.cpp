@@ -7,6 +7,9 @@ act_pack::act_pack(universalparams_t _universalparams){
 }
 act_pack::~act_pack(){} 
 
+unsigned int get_local1(unsigned int vid, universalparams_t universalparams){
+	return vid / universalparams.GLOBAL_NUM_PEs_;
+}
 unsigned int get_local2(unsigned int vid, universalparams_t universalparams){
 	unsigned int W = (FOLD_SIZE * EDGE_PACK_SIZE) * universalparams.GLOBAL_NUM_PEs_;
 	unsigned int y = vid / W; 
@@ -21,9 +24,10 @@ unsigned int get_local7(unsigned int vid, universalparams_t universalparams){
 	return (vid / universalparams.GLOBAL_NUM_PEs_) + (vid % 234);
 }
 unsigned int get_local(unsigned int s, unsigned int vid, universalparams_t universalparams){
-	if(s==0){ return get_local2(vid, universalparams); }
-	else if (s==1){ return get_local4(vid, universalparams); }
-	else if (s==2){ return get_local7(vid, universalparams); } // FIXME.
+	if(s==0){ return get_local1(vid, universalparams); }
+	else if (s==1){ return get_local2(vid, universalparams); }
+	else if (s==2){ return get_local4(vid, universalparams); } // FIXME.
+	else if (s==2){ return get_local7(vid, universalparams); }
 	else { cout<<"act_pack: ERROR 2323: s("<<s<<") option is invalid. EXITING..."<<endl; exit(EXIT_FAILURE); }
 }
 
@@ -87,46 +91,47 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 	
 	bool satisfied=false;
 	unsigned int tryy=0;
-	for(tryy=2; tryy<3; tryy++){ // FIXME.
-		cout<<"+++ act_pack:: tryy: "<<tryy<<". "<<endl; 
-		unsigned int ping_pong = 0;
-		for(unsigned int vid=0; vid<universalparams.NUM_VERTICES-1; vid++){
-			edge_t vptr_begin = vertexptrbuffer[vid];
-			edge_t vptr_end = vertexptrbuffer[vid+1];
-			edge_t edges_size = vptr_end - vptr_begin;
-			// if(vptr_end < vptr_begin){ continue; }
-			if(vptr_end < vptr_begin){ edges_size = 0; }
+	// for(tryy=0; tryy<1; tryy++){ // FIXME.
+	cout<<"+++ act_pack:: tryy: "<<tryy<<". "<<endl; 
+	unsigned int ping_pong = 0;
+	for(unsigned int vid=0; vid<universalparams.NUM_VERTICES-1; vid++){
+		edge_t vptr_begin = vertexptrbuffer[vid];
+		edge_t vptr_end = vertexptrbuffer[vid+1];
+		edge_t edges_size = vptr_end - vptr_begin;
+		// if(vptr_end < vptr_begin){ continue; }
+		if(vptr_end < vptr_begin){ edges_size = 0; }
+		
+		for(unsigned int i=0; i<edges_size; i++){
+			edge3_type this_edge = edgedatabuffer[vptr_begin + i];
+			edge3_type edge; edge.srcvid = this_edge.srcvid; edge.dstvid = this_edge.dstvid; 
+			if(edge.srcvid >= universalparams.NUM_VERTICES || edge.dstvid >= universalparams.NUM_VERTICES){ continue; } 
 			
-			for(unsigned int i=0; i<edges_size; i++){
-				edge3_type this_edge = edgedatabuffer[vptr_begin + i];
-				edge3_type edge; edge.srcvid = this_edge.srcvid; edge.dstvid = this_edge.dstvid; 
-				if(edge.srcvid >= universalparams.NUM_VERTICES || edge.dstvid >= universalparams.NUM_VERTICES){ continue; } 
-				
-				unsigned int H=0;
-				if(tryy==0){ H = get_H2(edge.dstvid, universalparams); } 
-				else if(tryy==1){ H = get_H4(edge.dstvid, universalparams); }
-				else { H = get_H7(edge.dstvid, ping_pong, universalparams); ping_pong+=1; if(ping_pong >= universalparams.GLOBAL_NUM_PEs_){ ping_pong = 0; } }	// FIXME.				
-				utilityobj->checkoutofbounds("loadedges::ERROR 223::", H, universalparams.GLOBAL_NUM_PEs_, edge.srcvid, edge.dstvid, universalparams._MAX_UPARTITION_SIZE);
-				
-				edges_in_channel[H].push_back(edge);
-			}
+			unsigned int H=0;
+			if(tryy==0){ H = get_H1(edge.dstvid, universalparams); } 
+			else if(tryy==1){ H = get_H2(edge.dstvid, universalparams); } 
+			else if(tryy==2){ H = get_H4(edge.dstvid, universalparams); }				
+			else { H = get_H7(edge.dstvid, ping_pong, universalparams); ping_pong+=1; if(ping_pong >= universalparams.GLOBAL_NUM_PEs_){ ping_pong = 0; } }	// FIXME.				
+			utilityobj->checkoutofbounds("loadedges::ERROR 223::", H, universalparams.GLOBAL_NUM_PEs_, edge.srcvid, edge.dstvid, universalparams._MAX_UPARTITION_SIZE);
+			
+			edges_in_channel[H].push_back(edge);
 		}
-		#ifdef _DEBUGMODE_HOSTPRINTS4
-		for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ cout<<"act-pack edges:: PE: "<<i<<": edges_in_channel["<<i<<"].size(): "<<edges_in_channel[i].size()<<""<<endl; }
-		cout<<"----- ideal act-pack edges:: "<<(universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_)<<" ----- "<<endl;
-		#endif 
-		#ifdef PROOF_OF_CONCEPT_RUN
-		satisfied = true; break;
-		#else 
-		unsigned int max=0; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ if(max < edges_in_channel[i].size()){ max = edges_in_channel[i].size(); } }
-		unsigned int min=0xFFFFFFFE; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ if(min > edges_in_channel[i].size()){ min = edges_in_channel[i].size(); } }
-		if(((float)((float)(max - min) / (float)max) * 100) < 30){ cout<<"act_pack: SUCCESS 447. (min("<<min<<") / max("<<max<<")) * 100 < 30..."<<endl; satisfied = true; break; }
-		else { cout<<"act_pack: UNSATISFACTORY. 446. (min("<<min<<") / max("<<max<<")) * 100 > 40. TRYING AGAIN..."<<endl; }
-		#endif 
-		for(unsigned int h=0; h<universalparams.GLOBAL_NUM_PEs_; h++){ edges_in_channel[h].clear(); }
 	}
+	#ifdef _DEBUGMODE_HOSTPRINTS4
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ cout<<"act-pack edges:: PE: "<<i<<": edges_in_channel["<<i<<"].size(): "<<edges_in_channel[i].size()<<""<<endl; }
+	cout<<"----- ideal act-pack edges:: "<<(universalparams.NUM_EDGES / universalparams.GLOBAL_NUM_PEs_)<<" ----- "<<endl;
+	#endif 
+	#ifdef PROOF_OF_CONCEPT_RUN
+	satisfied = true;
+	#else 
+	unsigned int max=0; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ if(max < edges_in_channel[i].size()){ max = edges_in_channel[i].size(); } }
+	unsigned int min=0xFFFFFFFE; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ if(min > edges_in_channel[i].size()){ min = edges_in_channel[i].size(); } }
+	float frac = ((float)((float)(max - min) / (float)max) * 100); unsigned int limit = 50;
+	if(frac < limit){ cout<<"act_pack: SUCCESS 447. frac("<<frac<<")% < limit max: "<<max<<", min: "<<min<<"."<<endl; satisfied = true; } else { cout<<"act_pack: UNSATISFACTORY. 446. frac("<<frac<<")% > limit. max: "<<max<<", min: "<<min<<". TRYING AGAIN..."<<endl; }					
+	#endif 
+	// for(unsigned int h=0; h<universalparams.GLOBAL_NUM_PEs_; h++){ edges_in_channel[h].clear(); }
+	// }
 	if(satisfied == false){ cout<<"act_pack: ERROR 4452. satisfied == false. EXITING..."<<endl; exit(EXIT_FAILURE); } 
-	// exit(EXIT_SUCCESS);////////////////////////
+	// exit(EXIT_SUCCESS);
 	
 	#ifdef _DEBUGMODE_HOSTPRINTS4
 	cout<<"load_edges: loading edges [STAGE 2]: preparing edges..."<<endl;
@@ -168,7 +173,7 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 			}
 		} // iteration end: p_u
 		
-		#ifdef _DEBUGMODE_KERNELPRINTS//4
+		#ifdef _DEBUGMODE_KERNELPRINTS4
 		for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u++){
 			for(unsigned int llp_set=0; llp_set<1; llp_set++){ 
 				if(i==0 && final_edge_updates[i][p_u][llp_set].size() > 0){ cout<<">>> final_edge_updates["<<i<<"]["<<p_u<<"]["<<llp_set<<"].size(): "<<final_edge_updates[i][p_u][llp_set].size()<<""<<endl; }

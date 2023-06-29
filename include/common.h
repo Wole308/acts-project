@@ -2,16 +2,10 @@
 #define COMMON_H
 #include <string.h> 
 #include <cmath> 
-#include <ap_int.h>
-// #include "ap_fixed.h"	
-#include <vector> 
-#include<hls_vector.h> 
-#include<hls_stream.h> 
-#include <iostream> 
  
 
  
-#define ___ENABLE___DYNAMICGRAPHANALYTICS___
+// #define ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifndef ___RUNNING_FPGA_SYNTHESIS___
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 
@@ -57,7 +51,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define HW // SWEMU, HW, *SW
+#define SW // SWEMU, HW, *SW
 #if (defined(SWEMU) || defined(HW)) 
 #define FPGA_IMPL
 #endif 
@@ -221,7 +215,7 @@
 	#endif 
 
 #define EDGE_UPDATES_PTR_MAXSIZE 2048
-#define EDGE_UPDATES_CHUNKSZ 2048 // 512 // 512, 1024, 8192  
+#define EDGE_UPDATES_CHUNKSZ 2048 // 512 // 512, 1024, 2048*, 4096, 8192  
 
 // #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 64) 
 #define EDGE_UPDATES_DRAMBUFFER_LONGSIZE (8192 * 128) 

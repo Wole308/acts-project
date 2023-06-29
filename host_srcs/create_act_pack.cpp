@@ -704,7 +704,7 @@ unsigned int create_act_pack::create_actpack(
 	cout<<"create-actpack: FINISH: returned_volume_size: "<<returned_volume_size<<", returned_volume_size * EDGE_PACK_SIZE: "<<returned_volume_size * EDGE_PACK_SIZE<<endl;
 	for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"create-actpack: FINISH: returned_volume2_size["<<n<<"]: "<<returned_volume2_size[n]<<", returned_volume2_size["<<n<<"] * EDGE_PACK_SIZE: "<<returned_volume2_size[n] * EDGE_PACK_SIZE<<endl; }
 	#endif 
-	// exit(EXIT_SUCCsESS);
+	// exit(EXIT_SUCCESS);
 	return returned_volume2_size[0];
 }
 
