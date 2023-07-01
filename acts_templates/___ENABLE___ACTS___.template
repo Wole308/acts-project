@@ -490,9 +490,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	if(action.module == GATHER_FRONTIERS_MODULE || action.module == ALL_MODULES){
 		GATHER_FRONTIERS_MODULE_LOOP: for(unsigned int upartitionID=action.start_gv; upartitionID<action.start_gv + action.size_gv; upartitionID++){	
 			if(upartitionID >= globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]){ continue; } 
-			#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-			if(action.command == GRAPH_UPDATE_ONLY){ continue; }
-			#endif 
+			if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ continue; }
 			
 			#ifndef ___RUNNING_FPGA_SYNTHESIS___
 			if(action.fpga < num_prints){ cout<<"### gathering frontiers for upartitionID "<<upartitionID<<": [PEs "; for(unsigned int n=0; n<NUM_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS] / action.numfpgas<<"]"<<endl; }

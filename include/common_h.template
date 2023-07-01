@@ -24,7 +24,8 @@
 #define RUN_IN_ASYNC_MODE {{context['RUN_IN_ASYNC_MODE']}}
 
 #define GRAPH_UPDATE_ONLY 1
-#define GRAPH_UPDATE_AND_ANALYTICS_ONLY 2
+#define GRAPH_UPDATE_AND_ANALYTICS 2
+#define GRAPH_ANALYTICS_EXCLUDEVERTICES 3
 
 ////////////////////////////////
 

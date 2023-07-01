@@ -91,7 +91,6 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 	
 	bool satisfied=false;
 	unsigned int tryy=0;
-	// for(tryy=0; tryy<1; tryy++){ // FIXME.
 	cout<<"+++ act_pack:: tryy: "<<tryy<<". "<<endl; 
 	unsigned int ping_pong = 0;
 	for(unsigned int vid=0; vid<universalparams.NUM_VERTICES-1; vid++){
@@ -129,7 +128,6 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 	if(frac < limit){ cout<<"act_pack: SUCCESS 447. frac("<<frac<<")% < limit max: "<<max<<", min: "<<min<<"."<<endl; satisfied = true; } else { cout<<"act_pack: UNSATISFACTORY. 446. frac("<<frac<<")% > limit. max: "<<max<<", min: "<<min<<". TRYING AGAIN..."<<endl; }					
 	#endif 
 	// for(unsigned int h=0; h<universalparams.GLOBAL_NUM_PEs_; h++){ edges_in_channel[h].clear(); }
-	// }
 	if(satisfied == false){ cout<<"act_pack: ERROR 4452. satisfied == false. EXITING..."<<endl; exit(EXIT_FAILURE); } 
 	// exit(EXIT_SUCCESS);
 	
@@ -160,18 +158,18 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 		
 		for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u++){
 			if(debug){ cout<<"load_edges: STAGE 2: [i: "<<i<<", v-partition "<<p_u<<"] => partition into last-level-partitions (LLPsets)"<<endl; } 
-			for(unsigned int t=0; t<edgesin_srcvp[p_u].size(); t++){
-				edge3_type edge = edgesin_srcvp[p_u][t];
-				unsigned int local_dstvid = get_local(tryy, edge.dstvid, universalparams); // FIXME.
-				#ifdef _DEBUGMODE_HOSTCHECKS3
+			for(unsigned int t=0; t<edgesin_srcvp[p_u].size(); t++){	
+				edge3_type edge = edgesin_srcvp[p_u][t];	
+				unsigned int local_dstvid = get_local(tryy, edge.dstvid, universalparams); // FIXME.	
+				#ifdef _DEBUGMODE_HOSTCHECKS3	
 				utilityobj->checkoutofbounds("act_pack::ERROR 2234c::", local_dstvid, universalparams.NUM_APPLYPARTITIONS * universalparams._MAX_APPLYPARTITION_SIZE, edge.srcvid, edge.srcvid, local_dstvid);
-				#endif 
-				unsigned int llp_set = local_dstvid / universalparams._MAX_APPLYPARTITION_SIZE;
-				llp_set = 0; // FIXME.
-				edge.dstvid = local_dstvid; 
-				final_edge_updates[i][p_u][llp_set].push_back(edge);
-			}
-		} // iteration end: p_u
+				#endif 	
+				unsigned int llp_set = local_dstvid / universalparams._MAX_APPLYPARTITION_SIZE;	
+				llp_set = 0; // FIXME.	
+				edge.dstvid = local_dstvid; 	
+				final_edge_updates[i][p_u][llp_set].push_back(edge);	
+			}	
+		} // iteration end: p_u	
 		
 		#ifdef _DEBUGMODE_KERNELPRINTS4
 		for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u++){

@@ -12,14 +12,14 @@
 // #define PROOF_OF_CONCEPT_RUN ///////////////.............................................................
 
 #define MAX_NUM_FPGAS 8
-#define RUN_IN_ASYNC_MODE 0
+#define RUN_IN_ASYNC_MODE 1
 
 #define GRAPH_UPDATE_ONLY 1
-#define GRAPH_UPDATE_AND_ANALYTICS_ONLY 2
+#define GRAPH_UPDATE_AND_ANALYTICS 2
+#define GRAPH_ANALYTICS_EXCLUDEVERTICES 3
 
 ////////////////////////////////
 
-#define ___SYNC___
 	
 
 #define ALL_MODULES 222 

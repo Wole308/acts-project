@@ -899,7 +899,9 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = 0; }
 		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_ONLY; __command__ = GRAPH_UPDATE_ONLY; }
-		// for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_AND_ANALYTICS_ONLY;  __command__ = GRAPH_UPDATE_AND_ANALYTICS_ONLY; }
+		// for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_AND_ANALYTICS;  __command__ = GRAPH_UPDATE_AND_ANALYTICS; }
+		// #else 
+		// for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_ONLY; } // GRAPH_ANALYTICS_EXCLUDEVERTICES; }	
 		#endif 
 		
 		if(iters_idx[0][0] >= num_iterations_dense && action[0].module == PROCESS_EDGES_MODULE){ cout<<"host: FINISH: maximum iteration reached. breaking out..."<<endl; break; }
@@ -1172,7 +1174,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		unsigned int sz2 = num_edges_updated[epoch] * EDGE_PACK_SIZE * NUM_PEs;
 		std::cout << TIMINGRESULTSCOLOR << ">>> "<<"num edges processed (sz1): " << sz1 << ", num edges updated (sz2): " << sz2 << " "<< RESET << std::endl; 
 		std::cout << TIMINGRESULTSCOLOR << ">>> "<<"average graph update throughput (MTEPS) = " << (sz2 / end_time6) / 1000 << " MTEPS (" << (sz2 / end_time6) / 1000000 << " BTEPS) "<< RESET << std::endl; 
-		if(action[0].command == GRAPH_UPDATE_AND_ANALYTICS_ONLY){ std::cout << TIMINGRESULTSCOLOR << ">>> "<<"average graph analytics throughput (MTEPS) = " << (sz1 / end_time6) / 1000 << " MTEPS (" << (sz1 / end_time6) / 1000000 << " BTEPS) "<< RESET << std::endl; }
+		if(action[0].command == GRAPH_UPDATE_AND_ANALYTICS){ std::cout << TIMINGRESULTSCOLOR << ">>> "<<"average graph analytics throughput (MTEPS) = " << (sz1 / end_time6) / 1000 << " MTEPS (" << (sz1 / end_time6) / 1000000 << " BTEPS) "<< RESET << std::endl; }
 		total_million_edges_processed += (sz1 / 1000000);
 		total_edges_updated += sz2;
 		if(sz2 > 0){ total_kernel_time_elapsed += end_time6; } else { break; }
@@ -1419,7 +1421,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	unsigned int sz2 = universalparams.NUM_EDGES;
 	std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Total # edges updated: " << total_edges_updated << ", Total # edges processed (millions): "<<total_million_edges_processed<<", total time elapsed = " << total_kernel_time_elapsed << " ms "<< RESET << std::endl;			
 	std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Edge-update Throughput (MUEPS) = " << (total_edges_updated / total_kernel_time_elapsed) / 1000 << " MUEPS, Throughput (BUEPS) = " << (total_edges_updated / total_kernel_time_elapsed) / 1000000 << " BUEPS "<< RESET << std::endl;			
-	if(__command__ == GRAPH_UPDATE_AND_ANALYTICS_ONLY){ std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Graph Analytics Throughput (MTEPS) = " << (total_million_edges_processed / total_kernel_time_elapsed) * 1000 << " MTEPS, Throughput (BUEPS) = " << (total_million_edges_processed / total_kernel_time_elapsed) << " BTEPS "<< RESET << std::endl; }			
+	if(__command__ == GRAPH_UPDATE_AND_ANALYTICS){ std::cout << TIMINGRESULTSCOLOR << ">>> "<<": Average Graph Analytics Throughput (MTEPS) = " << (total_million_edges_processed / total_kernel_time_elapsed) * 1000 << " MTEPS, Throughput (BUEPS) = " << (total_million_edges_processed / total_kernel_time_elapsed) << " BTEPS "<< RESET << std::endl; }			
 	#endif 
 	
 	// Copy Result from Device Global Memory to Host Local Memory

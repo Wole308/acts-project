@@ -44,6 +44,14 @@
 # ./host pr 8 1 0 20 /home/oj2zf/Documents/acts-project-debug/outputs/vector_addition.xclbin /home/oj2zf/Documents/dataset/uk-2005/uk-2005.mtx
 # exit
 
+# ./burst_rw kernels_grasu/GraSU.xclbin /home/oj2zf/dataset/com-Orkut/com-Orkut.mtx result.out (48 MTEPS, 2428 ms)
+# ./burst_rw kernels_grasu/GraSU.xclbin /home/oj2zf/dataset/soc-LiveJournal1/soc-LiveJournal1.mtx result.out (48 MTEPS, 1429 ms)
+# ./burst_rw kernels_grasu/GraSU.xclbin /home/oj2zf/dataset/soc-Pokec/soc-Pokec.mtx result.out (48 MTEPS, 635 ms)
+# ./burst_rw kernels_grasu/GraSU.xclbin /home/oj2zf/dataset/sx-stackoverflow/sx-stackoverflow.mtx result.out (48 MTEPS, 751 ms)
+# ./burst_rw kernels_grasu/GraSU.xclbin /home/oj2zf/dataset/ljournal-2008/ljournal-2008.mtx result.out (48 MTEPS, 1636 ms)
+# ./burst_rw kernels_grasu/GraSU.xclbin /home/oj2zf/dataset/kron_g500-logn20/kron_g500-logn20.mtx result.out (48 MTEPS, 925 ms)
+# ./burst_rw kernels_grasu/GraSU.xclbin /home/oj2zf/dataset/wiki-Vote/wiki-Vote.mtx result.out (27 MTEPS, 3.7 ms)
+
 # xilinx_u280_gen3x16_xdma_base_1
 
 # Synthesize to generate xclbin...
@@ -51,7 +59,7 @@
 # ./evaluate_datasets.sh 2 1 1
 # ./evaluate_datasets.sh 2 12 1
 # vi ~/.bashrc
-# make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_base_1/xilinx_u280_gen3x16_xdma_base_1.xpfm
+# make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
 
 # make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
 # make host PLATFORM=/opt/xilinx/platforms/xilinx_u280_xdma_201920_3/xilinx_u280_xdma_201920_3.xpfm
@@ -60,19 +68,25 @@
 DATASET_BASEDIR="/home/oj2zf/Documents/dataset"
 		
 DATSETS=(
-		com-Orkut
+		# com-Orkut
+		# soc-LiveJournal1
 		# soc-Pokec
+		# sx-stackoverflow
+		# ljournal-2008
+		# kron_g500-logn20 
 		
-		kron_g500-logn20 
+		uk-2002
+
+		# kron_g500-logn20 
 		# rmat_16m_256m 
 		# it-2004 
 		# GAP-twitter
 		
-		indochina-2004 
+		# indochina-2004 
 		# twitter7 
 		# uk-2005 
 		# soc-sinaweibo
-		webbase-2001
+		# webbase-2001
 		# rmat_8m_1024m
 		# rmat_16m_1024m
 		# rmat_32m_1024m
@@ -88,25 +102,28 @@ NUM_FPGAS=(
 		
 NUM_PES=(
 		# 1 
+		# 6
 		12
 		)
 		
 XCLBINS=(
-		"outputs/vector_addition.xclbin"
+		# "outputs/vector_addition_dynamic_x1.xclbin"
 		# "outputs/vector_addition_static_x1.xclbin"
-		# "outputs/vector_addition_dynamic_x1.xclbin"	
 		# "outputs/vector_addition_static_1fpga_x1.xclbin"	
 		# "outputs/vector_addition_vtx16.xclbin"	
 		# "outputs/vector_addition_vtx32.xclbin"	
+		"outputs/vector_addition.xclbin"
 		)
 		
 RUN_IN_ASYNC_MODE=(
-		# 1	
-		0
+		1	
+		# 0
 		)
+		
+GRAPH_IS_UNDIRECTED=0 #1
 	
 XWARE_ID=0 # 0, 1
-MAX_NUM_ITERATIONS=16
+MAX_NUM_ITERATIONS=1
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do	
@@ -116,35 +133,27 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 			
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host pr ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				./host pr ${NUM_FPGAS[c]} 1 $GRAPH_IS_UNDIRECTED $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_edgeupdates/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				sleep 2
 				cp -rf summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				exit
 			done	
 			
-			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
-				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host spmv ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_spmv/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
-				sleep 2
-				cp -rf summary.csv results/results_spmv/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				exit
-			done	
-			
-			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
-				echo hits algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host hits ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
-				sleep 2
-				cp -rf summary.csv results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
+				# echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
+				# ./host spmv ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_spmv/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				# sleep 2
+				# cp -rf summary.csv results/results_spmv/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				# exit
-			done
+			# done	
 			
 			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
-				# echo sssp algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				# ./host sssp ${NUM_FPGAS[c]} 13 0 $MAX_NUM_ITERATIONS /home/oj2zf/Documents/dataset/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out			
+				# echo hits algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
+				# ./host hits ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				# sleep 2
-				# cp -rf summary.csv results/results_sssp/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				# exit 
-			# done	
+				# cp -rf summary.csv results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				# exit
+			# done
 		done 
 	done
 done

@@ -33,7 +33,7 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 				}
 				URAM_vprop[inst][v][dstvid_lpv].prop = newprop.prop; 
 				#ifdef _DEBUGMODE_CHECKS3
-				if(inst==0 && v==0){ update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___APPLYUPDATES___, 2); }
+				if(inst==0 && v==0){ update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___APPLYUPDATES___, 1); }
 				#endif 
 			}
 		}

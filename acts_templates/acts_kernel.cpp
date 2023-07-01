@@ -2266,7 +2266,7 @@ unsigned int offset_c = globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP
 checkoutofbounds("acts_kernel::ERROR 12073::", cfrontier_dram___size[p_u], MAX_APPLYPARTITION_VECSIZE+1, NAp, NAp, NAp);
 #endif 
 
-unsigned int sz = cfrontier_dram___size[p_u]; if(action.command == GRAPH_UPDATE_ONLY){ sz = 0; }
+unsigned int sz = cfrontier_dram___size[p_u]; if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ sz = 0; }
 
 READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<sz; t++){ 
 #pragma HLS PIPELINE II=1	
@@ -2623,7 +2623,7 @@ for(unsigned int n=0; n<NUM_VALID_PEs; n++){ vpartition_vertices[n][llp_set].cou
 vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
 #pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
 
-unsigned int sz = MAX_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY){ sz = 0; }
+unsigned int sz = MAX_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ sz = 0; }
 
 READ_DEST_PROPERTIES_LOOP2B: for(unsigned int t=0; t<sz; t++){
 #pragma HLS PIPELINE II=1
@@ -2692,7 +2692,7 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 				}
 				URAM_vprop[inst][v][dstvid_lpv].prop = newprop.prop; 
 				#ifdef _DEBUGMODE_CHECKS3
-				if(inst==0 && v==0){ update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___APPLYUPDATES___, 2); }
+				if(inst==0 && v==0){ update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___APPLYUPDATES___, 1); }
 				#endif 
 			}
 		}
@@ -3251,7 +3251,7 @@ COLLECT_AND_SAVE_FRONTIERS_LOOP1: for(unsigned int local_subpartitionID=0; local
 vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
 #pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
 
-unsigned int sz = MAX_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY){ sz = 0; }
+unsigned int sz = MAX_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ sz = 0; }
 
 SAVE_DEST_PROPERTIES_LOOP2: for(unsigned int t=0; t<sz; t++){
 #pragma HLS PIPELINE II=1
@@ -3281,9 +3281,7 @@ SAVE_DEST_PROPERTIES_LOOP2: for(unsigned int t=0; t<sz; t++){
 	if(action.module == GATHER_FRONTIERS_MODULE || action.module == ALL_MODULES){
 		GATHER_FRONTIERS_MODULE_LOOP: for(unsigned int upartitionID=action.start_gv; upartitionID<action.start_gv + action.size_gv; upartitionID++){	
 			if(upartitionID >= globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]){ continue; } 
-			#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-			if(action.command == GRAPH_UPDATE_ONLY){ continue; }
-			#endif 
+			if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ continue; }
 			
 			#ifndef ___RUNNING_FPGA_SYNTHESIS___
 			if(action.fpga < num_prints){ cout<<"### gathering frontiers for upartitionID "<<upartitionID<<": [PEs "; for(unsigned int n=0; n<NUM_PEs; n++){ cout<<n<<", "; } cout<<"] [target FPGAs "; for(unsigned int n=0; n<action.numfpgas; n++){ cout<<n<<", "; } cout<<"] [max "<<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS] / action.numfpgas<<"]"<<endl; }
