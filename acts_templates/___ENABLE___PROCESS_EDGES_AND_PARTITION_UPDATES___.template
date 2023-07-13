@@ -173,7 +173,8 @@ PROCESS_EDGES_MAINLOOP1C: for(unsigned int t1=0; t1<(max_sz + batch_size - 1) / 
 			unsigned int offset___ = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[partition].offset + updatesptrs[partition].size + t;
 			
 			#ifdef _DEBUGMODE_CHECKS3	
-			checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[partition].size, NAp); 
+			// checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[partition].size, NAp); 
+			checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, HBM_CHANNEL_SIZE, NAp, updatesptrs[partition].size, NAp); 
 			#endif
 			dinsertmany_updatesdram(offset___, update_out, {% include '___HBM___ARGS___.template' %});
 		}

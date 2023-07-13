@@ -27,7 +27,7 @@ unsigned int get_local(unsigned int s, unsigned int vid, universalparams_t unive
 	if(s==0){ return get_local1(vid, universalparams); }
 	else if (s==1){ return get_local2(vid, universalparams); }
 	else if (s==2){ return get_local4(vid, universalparams); } // FIXME.
-	else if (s==2){ return get_local7(vid, universalparams); }
+	else if (s==3){ } // return get_local7(vid, universalparams); }
 	else { cout<<"act_pack: ERROR 2323: s("<<s<<") option is invalid. EXITING..."<<endl; exit(EXIT_FAILURE); }
 }
 

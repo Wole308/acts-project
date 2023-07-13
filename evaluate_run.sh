@@ -75,7 +75,12 @@ DATSETS=(
 		# ljournal-2008
 		# kron_g500-logn20 
 		
-		uk-2002
+		# uk-2002
+		
+		rmat_16_28 # 268
+		rmat_16_29 # 512
+		rmat_16_30 # 1024
+		rmat_16_31 # 2048
 
 		# kron_g500-logn20 
 		# rmat_16m_256m 
@@ -94,10 +99,9 @@ DATSETS=(
 		
 NUM_FPGAS=(
 		1
-		# 2
-		# 3
-		# 4
-		# 8
+		2
+		4
+		8
 		)
 		
 NUM_PES=(
@@ -108,11 +112,8 @@ NUM_PES=(
 		
 XCLBINS=(
 		# "outputs/vector_addition_dynamic_x1.xclbin"
-		# "outputs/vector_addition_static_x1.xclbin"
-		# "outputs/vector_addition_static_1fpga_x1.xclbin"	
-		# "outputs/vector_addition_vtx16.xclbin"	
-		# "outputs/vector_addition_vtx32.xclbin"	
-		"outputs/vector_addition.xclbin"
+		"outputs/vector_addition_static_x1_tmp.xclbin"	
+		# "outputs/vector_addition.xclbin"
 		)
 		
 RUN_IN_ASYNC_MODE=(
@@ -122,8 +123,8 @@ RUN_IN_ASYNC_MODE=(
 		
 GRAPH_IS_UNDIRECTED=0 #1
 	
-XWARE_ID=0 # 0, 1
-MAX_NUM_ITERATIONS=1
+XWARE_ID=1 # 0, 1
+MAX_NUM_ITERATIONS=16
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do	
@@ -133,10 +134,10 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 			
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host pr ${NUM_FPGAS[c]} 1 $GRAPH_IS_UNDIRECTED $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/results_edgeupdates/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				./host pr ${NUM_FPGAS[c]} 1 $GRAPH_IS_UNDIRECTED $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/graph-analytics-scaling/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out			
 				sleep 2
 				cp -rf summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				exit
+				# exit
 			done	
 			
 			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
@@ -152,6 +153,14 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 				# ./host hits ${NUM_FPGAS[c]} 1 0 $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
 				# sleep 2
 				# cp -rf summary.csv results/results_hits/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
+				# exit
+			# done
+			
+			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
+				# echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
+				# ./host pr ${NUM_FPGAS[c]} 1 $GRAPH_IS_UNDIRECTED $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/results_edgeupdates/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out
+				# sleep 2
+				# cp -rf summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				# exit
 			# done
 		done 

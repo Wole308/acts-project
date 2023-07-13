@@ -65,7 +65,11 @@ app::~app(){
 }
 	
 bool is_valid(unsigned int i){
-	return (i % NUM_PEs == 0);
+	#ifdef PROOF_OF_CONCEPT_RUN
+	return (i % NUM_PEs == 0); 
+	#else 
+	return true;
+	#endif 
 }
 
 universalparams_t get_universalparams(std::string algo, unsigned int num_fpgas, unsigned int numiterations, unsigned int rootvid, unsigned int num_vertices, unsigned int num_edges, bool graphisundirected){
@@ -203,16 +207,16 @@ unsigned int load_globalparams2(HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBA
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PREPAREEDGEUPDATES].data[0] = 1; //
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PROCESSEDGEUPDATES].data[0] = 1; //
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___PROCESSEDGES].data[0] = 1; // 1
-		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___READ_FRONTIER_PROPERTIES].data[0] = 1; // 1
+		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___READ_FRONTIER_PROPERTIES].data[0] = 1; // 1 // FIXME.
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___VCPROCESSEDGES].data[0] = 1; 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___ECUPDATEEDGES].data[0] = 1; 
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___SAVEVCUPDATES].data[0] = 1; // FIXME? CAUSE OF HANGING?
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___COLLECTACTIVEDSTVIDS].data[0] = 1;
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___APPLYUPDATESMODULE].data[0] = 1; 
-		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___READ_DEST_PROPERTIES].data[0] = 1;
+		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___READ_DEST_PROPERTIES].data[0] = 1; // FIXME.
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___APPLYUPDATES].data[0] = 1; ////////////////////
 		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES].data[0] = 1; 
-		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___SAVE_DEST_PROPERTIES].data[0] = 1; 
+		HBM_axichannel[0][i][GLOBALPARAMSCODE___ENABLE___SAVE_DEST_PROPERTIES].data[0] = 1;  // FIXME.
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -418,6 +422,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 		for(unsigned int n=0; n<2; n++){
 			cout<<"app: *** initializing HBM_axichannels... i: "<<i<<", n: "<<n<<endl;
 			unsigned int sz = 0; if(is_valid(i)){ sz = HBM_CHANNEL_SIZE; } else { sz = 2048; }
+			// unsigned int sz = HBM_CHANNEL_SIZE; // FIXME.
 			HBM_axichannel[n][i] = new HBM_channelAXISW_t[sz]; 
 			for(unsigned int t=0; t<sz; t++){ for(unsigned int v=0; v<HBM_AXI_PACK_SIZE; v++){ HBM_axichannel[n][i][t].data[v] = 0; }}
 		}
@@ -437,7 +442,7 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	bool graphisundirected_bool = true; if(graphisundirected == 0){ graphisundirected_bool = false; }
 	
 	prepare_graph * prepare_graphobj = new prepare_graph();
-	tuple_t graph_size = prepare_graphobj->start(GRAPH_PATH, edgedatabuffer, vertexptrbuffer, graphisundirected_bool);
+	tuple_t graph_size = prepare_graphobj->start(GRAPH_PATH, edgedatabuffer, vertexptrbuffer, graphisundirected_bool, num_fpgas);
 	// unsigned int num_edges = edgedatabuffer.size();
 	unsigned int num_vertices = vertexptrbuffer.size();
 	// unsigned int num_vertices = graph_size.A;

@@ -92,7 +92,7 @@ using std::vector;
 #define NUM_HBMC_ARGS 2
 #define NUM_HBMIO_ARGS 2
 
-#define RUN_SW_KERNEL
+// #define RUN_SW_KERNEL
 #define RUN_FPGA_KERNEL
 
 #define ___PRE_RUN___
@@ -205,6 +205,7 @@ void _set_args___actions(cl::Kernel * kernels, action_t action, unsigned int mas
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 20, int(action.status)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 21, int(universalparams.NUM_FPGAS_)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 22, int(action.command)));
+	// OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 22, int(GRAPH_ANALYTICS_EXCLUDEVERTICES)));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 23, int(mask_i[0])));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 24, int(mask_i[1])));
 	OCL_CHECK(err, err = kernels->setArg(NUM_HBM_ARGS + NUM_HBMC_ARGS + NUM_HBMIO_ARGS + 25, int(mask_i[2])));
@@ -343,7 +344,7 @@ unsigned int load_actions_coarse(unsigned int fpga, action_t * actions[MAX_NUM_F
 	
 	action.start_pv_fpga = NAp;
 	action.start_pv = 0;
-	action.size_pv = universalparams.NUM_APPLYPARTITIONS;; // FIXME.
+	action.size_pv = universalparams.NUM_APPLYPARTITIONS; // FIXME.
 	
 	action.start_gv_fpga = NAp;
 	action.start_gv = 0; 
@@ -453,6 +454,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	cout<<"host::run::  AU_BATCH_SIZE: "<<_AU_BATCH_SIZE<<endl;
 	cout<<"host::run::  IMPORT_BATCH_SIZE: "<<_IMPORT_BATCH_SIZE<<endl;
 	cout<<"host::run::  EXPORT_BATCH_SIZE: "<<_EXPORT_BATCH_SIZE<<endl;
+	cout<<"host::run::  NUM_VALID_HBM_CHANNELS: "<<NUM_VALID_HBM_CHANNELS<<endl;
 	
 	unsigned int num_edges_updated[128]; for(unsigned int t=0; t<128; t++){ num_edges_updated[t] = 0; }
 	for(unsigned int iter=0; iter<universalparams.NUM_ITERATIONS; iter++){ // universalparams.NUM_ITERATIONS
@@ -780,7 +782,11 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		if(universalparams.NUM_FPGAS_ == 1){ num_launches = load_actions_coarse(fpga, actions, _PE_BATCH_SIZE, _AU_BATCH_SIZE, _IMPORT_BATCH_SIZE, universalparams); } 
 		else { num_launches = load_actions_fine(fpga, actions, _PE_BATCH_SIZE, _AU_BATCH_SIZE, _IMPORT_BATCH_SIZE, universalparams); }
 	}
-
+	
+	tuple_t active_vertices_in_iteration[2][128]; for(unsigned int i=0; i<128; i++){ active_vertices_in_iteration[0][i].A = 0; active_vertices_in_iteration[0][i].B = 0; active_vertices_in_iteration[1][i].A = 0; active_vertices_in_iteration[1][i].B = 0; } 
+	tuple_t active_edges_in_iteration[2][128]; for(unsigned int i=0; i<128; i++){ active_edges_in_iteration[0][i].A = 0; active_edges_in_iteration[0][i].B = 0; active_edges_in_iteration[1][i].A = 0; active_edges_in_iteration[1][i].B = 0; } 
+	unsigned int GraphIter;
+	
 	// Run kernel in CPU-only environment
 	#ifdef RUN_SW_KERNEL
 	actvvs.clear(); actvvs_nextit.clear(); 
@@ -789,10 +795,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	for(unsigned int i=0; i<universalparams.NUM_VERTICES; i++){ vdatas[i] = 0xFFFFFFFF; }
 	for(unsigned int i=0; i<actvvs.size(); i++){ vdatas[actvvs[i]] = 0; }
 	for(unsigned int t=0; t<MAX_NUM_UPARTITIONS; t++){ vpartition_stats[t].A = 0; vpartition_stats[t].B = 0; }
-	tuple_t active_vertices_in_iteration[2][128]; for(unsigned int i=0; i<128; i++){ active_vertices_in_iteration[0][i].A = 0; active_vertices_in_iteration[0][i].B = 0; active_vertices_in_iteration[1][i].A = 0; active_vertices_in_iteration[1][i].B = 0; } 
-	tuple_t active_edges_in_iteration[2][128]; for(unsigned int i=0; i<128; i++){ active_edges_in_iteration[0][i].A = 0; active_edges_in_iteration[0][i].B = 0; active_edges_in_iteration[1][i].A = 0; active_edges_in_iteration[1][i].B = 0; } 
 	active_vertices_in_iteration[0][0].A = 1;
-	unsigned int GraphIter;
 	for (GraphIter = 0; GraphIter < 16; GraphIter++){
 		std::chrono::steady_clock::time_point begin_time0 = std::chrono::steady_clock::now();
 		
@@ -898,10 +901,9 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga] = actions[fpga][launch_idx]; }
 		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = 0; }
 		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_ONLY; __command__ = GRAPH_UPDATE_ONLY; }
-		// for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_AND_ANALYTICS;  __command__ = GRAPH_UPDATE_AND_ANALYTICS; }
-		// #else 
-		// for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_ONLY; } // GRAPH_ANALYTICS_EXCLUDEVERTICES; }	
+		for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_UPDATE_ONLY; __command__ = GRAPH_UPDATE_ONLY; } // GRAPH_UPDATE_ONLY, GRAPH_UPDATE_AND_ANALYTICS
+		#else 
+		// for(unsigned int fpga=0; fpga<universalparams.NUM_FPGAS_; fpga++){ action[fpga].command = GRAPH_ANALYTICS_EXCLUDEVERTICES; } // FIXME.
 		#endif 
 		
 		if(iters_idx[0][0] >= num_iterations_dense && action[0].module == PROCESS_EDGES_MODULE){ cout<<"host: FINISH: maximum iteration reached. breaking out..."<<endl; break; }
@@ -1127,7 +1129,8 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 					OCL_CHECK(err, err = kernel_events[fpga][flag].wait()); 
 					#else 
 					std::vector<cl::Event> waitList; if(enable_import == true){ waitList.push_back(write_event[fpga]); }
-					OCL_CHECK(err, err = q[fpga].enqueueNDRangeKernel(kernels[fpga], 0, 1, 1, &waitList, &kernel_events[fpga][flag]));
+					if(universalparams.NUM_FPGAS_>1){ OCL_CHECK(err, err = q[fpga].enqueueNDRangeKernel(kernels[fpga], 0, 1, 1, &waitList, &kernel_events[fpga][flag])); }
+					else { OCL_CHECK(err, err = q[fpga].enqueueNDRangeKernel(kernels[fpga], 0, 1, 1, NULL, &kernel_events[fpga][flag])); }
 					set_callback(kernel_events[fpga][flag], "ooo_queue");
 					#endif 	
 				}
@@ -1168,6 +1171,12 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 				}
 			}
 		#endif 
+		
+		// cl_ulong start_time = kernel_events[0][fpag].getProfilingInfo<CL_PROFILING_COMMAND_START>();
+        // cl_ulong end_time = kernel_events[0][fpag].getProfilingInfo<CL_PROFILING_COMMAND_END>();
+		// double kernel_time_elapsed = end_time - start_time;	
+		// std::cout << ">>>(((((((((((((((((((((( kernel time elapsed for: "<<kernel_time_elapsed<<endl; ///////////////////////////////
+		
 		double end_time6 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time6).count()) / 1000;	
 		if(true || profiling1_timing == true){ std::cout << TIMINGRESULTSCOLOR << ">>> kernel time elapsed for iteration "<<iters_idx[0][launch_idx]<<", launch_idx "<<launch_idx<<" : "<<end_time6<<" ms, "<<(end_time6 * 1000)<<" microsecs, "<< RESET <<std::endl; }
 		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
@@ -1307,13 +1316,6 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	} // epoch
 	double end_time1 = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time1).count()) / 1000;	
 	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for current iteration : "<<end_time1<<" ms, "<<(end_time1 * 1000)<<" microsecs, "<< RESET << std::endl;
-	
-	cout<<"-------------------------+++++++++++++++++++++++++++--------------------- num_iterations_dense: "<<num_iterations_dense<<", num_iterations: "<<num_iterations<<endl;
-	for(unsigned int iter=0; iter<num_iterations; iter+=1){ // FIXME (num_launches * num_iterations * 2)
-		active_vertices_in_iteration[1][iter].A = universalparams.NUM_VERTICES;
-		active_vertices_in_iteration[1][iter].B = end_time1 / num_iterations_dense; // num_iterations;
-		if(true){ active_edges_in_iteration[1][iter].A = universalparams.NUM_EDGES; }
-	}
 	#endif 
 	
 	#ifdef _DEBUGMODE_HOSTPRINTS//4
@@ -1330,12 +1332,18 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	#endif 
 	
 	#ifndef ___ENABLE___DYNAMICGRAPHANALYTICS___
-	double end_time = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time).count()) / 1000;	
+	double end_time = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - begin_time).count()) / 1000;
 	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<end_time<<" ms, "<<(end_time * 1000)<<" microsecs, "<< RESET << std::endl;
-	std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<total_kernel_time_elapsed<<" ms, "<<(total_kernel_time_elapsed * 1000)<<" microsecs, "<< RESET << std::endl;
-		
-	unsigned int total_vertices_processed = 0; for(unsigned int iter=0; iter<num_iterations; iter++){ total_vertices_processed += vertices_processed[iter]; cout<<"host:: number of active vertices in iteration "<<iter<<": "<<(unsigned int)vertices_processed[iter]<<endl; } cout<<"host:: total: "<<total_vertices_processed<<endl;
-	unsigned int total_edges_processed = 0; for(unsigned int iter=0; iter<num_iterations; iter++){ total_edges_processed += edges_processed[iter]; cout<<"host:: number of edges processed in iteration "<<iter<<": "<<(unsigned int)edges_processed[iter]<<endl; } cout<<"host:: total # edges processed across entire run: "<<total_edges_processed<<endl;
+	
+	cout<<"-------------------------+++++++++++++++++++++++++++--------------------- end_time: "<<end_time<<", num_iterations_dense: "<<num_iterations_dense<<", num_iterations: "<<num_iterations<<endl;
+	for(unsigned int iter=0; iter<num_iterations; iter+=1){ // FIXME (num_launches * num_iterations * 2)
+		active_vertices_in_iteration[1][iter].A = universalparams.NUM_VERTICES;
+		active_vertices_in_iteration[1][iter].B = end_time / num_iterations_dense; // num_iterations;
+		if(true){ active_edges_in_iteration[1][iter].A = universalparams.NUM_EDGES; }
+	}
+	
+	// unsigned int total_vertices_processed = 0; for(unsigned int iter=0; iter<num_iterations; iter++){ total_vertices_processed += vertices_processed[iter]; cout<<"host:: number of active vertices in iteration "<<iter<<": "<<(unsigned int)vertices_processed[iter]<<endl; } cout<<"host:: total: "<<total_vertices_processed<<endl;
+	// unsigned int total_edges_processed = 0; for(unsigned int iter=0; iter<num_iterations; iter++){ total_edges_processed += edges_processed[iter]; cout<<"host:: number of edges processed in iteration "<<iter<<": "<<(unsigned int)edges_processed[iter]<<endl; } cout<<"host:: total # edges processed across entire run: "<<total_edges_processed<<endl;
 	
 	cout<<"[READ_FRONTIERS, PROCESSEDGES, READ_DESTS, APPLYUPDATES, COLLECT_FRONTIERS, SAVE_DEST, GATHER_FRONTIERS]"<<endl;																									
 	cout<<">>> [";
@@ -1378,6 +1386,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 	}	
 	if(all_vertices_active_in_all_iterations == false){ std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<tmp<<" ms, "<<(tmp * 1000)<<" microsecs, "<< RESET << std::endl; }
 	
+	#ifdef RUN_SW_KERNEL
 	if(all_vertices_active_in_all_iterations == false){ 
 		cout<<"host:: Software-Only mode"<<endl;
 		unsigned int tmp = 0;
@@ -1406,6 +1415,7 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 		cout<<"---+++++++++++++++++++++++++++++++++++++++++++++++++ total_edges_traversed: "<<total_edges_traversed<<endl; 
 		std::cout << TIMINGRESULTSCOLOR <<">>> total kernel time elapsed for all iterations : "<<total_time_elapsed<<" ms, "<<(total_time_elapsed * 1000)<<" microsecs, "<< RESET << std::endl;
 	}
+	#endif 
 
 	if(all_vertices_active_in_all_iterations == true){ 
 		std::cout << endl << TIMINGRESULTSCOLOR << ">>> "<<": Total # edges processed: " << universalparams.NUM_EDGES << ", time elapsed per iteration = " << end_time / num_iterations << " ms "<< RESET << std::endl;			

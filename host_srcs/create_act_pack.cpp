@@ -17,6 +17,14 @@ create_act_pack::create_act_pack(universalparams_t _universalparams){
 }
 create_act_pack::~create_act_pack(){} 
 
+bool is_valid3(unsigned int i){
+	#ifdef PROOF_OF_CONCEPT_RUN
+	return (i % NUM_PEs == 0); 
+	#else 
+	return true;
+	#endif 
+}
+
 void checkoutofbounds_(string message, unsigned int data, unsigned int upper_bound, unsigned int msgdata1, unsigned int msgdata2, unsigned int msgdata3){
 	#ifdef _DEBUGMODE_CHECKS3
 	if(data >= upper_bound){ std::cout<<"utility::checkoutofbounds_: ERROR. out of bounds. message: "<<message<<", data: "<<data<<", upper_bound: "<<upper_bound<<", msgdata1: "<<msgdata1<<", msgdata2: "<<msgdata2<<", msgdata3: "<<msgdata3<<std::endl; exit(EXIT_FAILURE); }			
@@ -375,7 +383,7 @@ int save_tmp_edges(edge_dtype * URAM_edges[EDGE_PACK_SIZE], map_t stats[EDGE_PAC
 	return index;
 }	
 
-void save_final_edges(unsigned int cmd, unsigned int base_offset, map_t * edges_allmap, map_t stats[EDGE_PACK_SIZE][EDGE_PACK_SIZE], edge_dtype * URAM_edges[EDGE_PACK_SIZE], map_t * edges_map, map_t edges_dmap[NUM_LLP_PER_LLPSET], HBM_channelAXISW_t * HBM_channelA, HBM_channelAXISW_t * HBM_channelB, universalparams_t universalparams){
+void save_final_edges(unsigned int cmd, unsigned int i, unsigned int base_offset, map_t * edges_allmap, map_t stats[EDGE_PACK_SIZE][EDGE_PACK_SIZE], edge_dtype * URAM_edges[EDGE_PACK_SIZE], map_t * edges_map, map_t edges_dmap[NUM_LLP_PER_LLPSET], HBM_channelAXISW_t * HBM_channelA, HBM_channelAXISW_t * HBM_channelB, universalparams_t universalparams){
 	unsigned int offset_p[EDGE_PACK_SIZE];
 	unsigned int p_[EDGE_PACK_SIZE];
 	edge_dtype edge[EDGE_PACK_SIZE];	
@@ -407,14 +415,25 @@ void save_final_edges(unsigned int cmd, unsigned int base_offset, map_t * edges_
 				#endif 
 			}
 			
-			for(unsigned int v=0; v<EDGE_PACK_SIZE/2; v++){				
-				HBM_channelA[offset + t].data[2*v] = edge[v].srcvid;
-				HBM_channelA[offset + t].data[2*v + 1] = edge[v].dstvid;
+			if(is_valid3(i)){ 
+				for(unsigned int v=0; v<EDGE_PACK_SIZE/2; v++){				
+					HBM_channelA[offset + t].data[2*v] = edge[v].srcvid;
+					HBM_channelA[offset + t].data[2*v + 1] = edge[v].dstvid;
+				}
+				for(unsigned int v=0; v<EDGE_PACK_SIZE/2; v++){				
+					HBM_channelB[offset + t].data[2*v] = edge[EDGE_PACK_SIZE/2 + v].srcvid;
+					HBM_channelB[offset + t].data[2*v + 1] = edge[EDGE_PACK_SIZE/2 + v].dstvid;
+				}
 			}
-			for(unsigned int v=0; v<EDGE_PACK_SIZE/2; v++){				
-				HBM_channelB[offset + t].data[2*v] = edge[EDGE_PACK_SIZE/2 + v].srcvid;
-				HBM_channelB[offset + t].data[2*v + 1] = edge[EDGE_PACK_SIZE/2 + v].dstvid;
-			}
+			
+			// for(unsigned int v=0; v<EDGE_PACK_SIZE/2; v++){				
+				// HBM_channelA[0].data[2*v] = edge[v].srcvid;
+				// HBM_channelA[0].data[2*v + 1] = edge[v].dstvid;
+			// }
+			// for(unsigned int v=0; v<EDGE_PACK_SIZE/2; v++){				
+				// HBM_channelB[0].data[2*v] = edge[EDGE_PACK_SIZE/2 + v].srcvid;
+				// HBM_channelB[0].data[2*v + 1] = edge[EDGE_PACK_SIZE/2 + v].dstvid;
+			// }
 		}		
 		
 		edges_map[llp_id].size += max;
@@ -608,7 +627,7 @@ unsigned int create_act_pack::create_actpack(
 					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (before): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
 					#endif 	
 					for(unsigned int i=0; i<NUM_VALID_PEs; i++){
-						save_final_edges(cmd, offset_dest, &edges_allmap, stats[i], URAM_edges[i], edges_map[i], edges_dmap[i], HBM_channelA[i], HBM_channelB[i], universalparams);	
+						save_final_edges(cmd, i, offset_dest, &edges_allmap, stats[i], URAM_edges[i], edges_map[i], edges_dmap[i], HBM_channelA[i], HBM_channelB[i], universalparams);	
 					}
 					#ifdef _DEBUGMODE_KERNELPRINTS4_CREATEACTPACT
 					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (after): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}

@@ -380,12 +380,6 @@ MY_IFDEF_TOPLEVELFUNC(){
 	#ifdef ___ENABLE___PROCESSEDGES___
 	if(action.module == PROCESS_EDGES_MODULE || action.module == ALL_MODULES){
 	PROCESS_EDGES_MODULE_LOOP1B: for(unsigned int local_pu=action.start_pu; local_pu<action.start_pu + action.size_pu; local_pu+=action.skip_pu){
-		
-		#ifdef __NOT_YET_IMPL__
-		unsigned int bit_2 = BitVal(mask[local_pu / 32], local_pu % 32);
-		cout<<"### processing edges in upartition ---------------------------+++++++++++++++++++++++++++-------------------------------------  "<<bit_2<<endl;
-		#endif
-		
 		unsigned int p_u = local_pu; 
 		action.id_process = p_u; 
 		MASK_CODE_PE = ((1 + GraphIter) * MAX_NUM_UPARTITIONS) + p_u;

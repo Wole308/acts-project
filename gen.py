@@ -15,7 +15,7 @@ context['NUM_PEs'] = int(sys.argv[3])
 context['RUN_IN_ASYNC_MODE'] = int(sys.argv[4])
 
 context['FPGA_IMPL'] = 0
-context['NUM_VALID_PEs'] = 1         
+context['NUM_VALID_PEs'] = 1 #12         
 # context['NUM_VALID_PEs'] = context['NUM_PEs']
 context['NUM_VALID_HBM_CHANNELS'] = context['NUM_VALID_PEs'] # context['NUM_PEs'] #6, context['NUM_PEs']*
 context['EDGE_PACK_SIZE_POW'] = 4 

@@ -2199,12 +2199,6 @@ CLEAR_COUNTERS_LOOP1: for(unsigned int p_v=0; p_v<__NUM_APPLYPARTITIONS; p_v++){
 	#ifdef ___ENABLE___PROCESSEDGES___
 	if(action.module == PROCESS_EDGES_MODULE || action.module == ALL_MODULES){
 	PROCESS_EDGES_MODULE_LOOP1B: for(unsigned int local_pu=action.start_pu; local_pu<action.start_pu + action.size_pu; local_pu+=action.skip_pu){
-		
-		#ifdef __NOT_YET_IMPL__
-		unsigned int bit_2 = BitVal(mask[local_pu / 32], local_pu % 32);
-		cout<<"### processing edges in upartition ---------------------------+++++++++++++++++++++++++++-------------------------------------  "<<bit_2<<endl;
-		#endif
-		
 		unsigned int p_u = local_pu; 
 		action.id_process = p_u; 
 		MASK_CODE_PE = ((1 + GraphIter) * MAX_NUM_UPARTITIONS) + p_u;
@@ -2554,7 +2548,8 @@ PROCESS_EDGES_MAINLOOP1C: for(unsigned int t1=0; t1<(max_sz + batch_size - 1) / 
 			unsigned int offset___ = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] + updatesptrs[partition].offset + updatesptrs[partition].size + t;
 			
 			#ifdef _DEBUGMODE_CHECKS3	
-			checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[partition].size, NAp); 
+			// checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, globalparams_debug[GLOBALPARAMSCODE__BASEOFFSET__VDATAS], NAp, updatesptrs[partition].size, NAp); 
+			checkoutofbounds("acts_kernel::process-edges::ERROR 8813rrr::", offset___, HBM_CHANNEL_SIZE, NAp, updatesptrs[partition].size, NAp); 
 			#endif
 			dinsertmany_updatesdram(offset___, update_out,  HBM_channelA0, HBM_channelB0);
 		}

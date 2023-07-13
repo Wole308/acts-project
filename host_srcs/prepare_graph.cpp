@@ -6,7 +6,7 @@ prepare_graph::~prepare_graph(){}
 
 bool is_valid2(unsigned int i){
 	#ifdef PROOF_OF_CONCEPT_RUN
-	return (i % NUM_PEs == 0); // FIXME.
+	return (i % NUM_PEs == 0); 
 	#else 
 	return true;
 	#endif 
@@ -54,7 +54,7 @@ void prepare_graph::create_graph(string graphpath, vector<edge3_type> &edgesbuff
 	exit(EXIT_SUCCESS);
 }
 
-tuple_t prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup, bool graphisundirected){
+tuple_t prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_dup, vector<edge_t> &vptr_dup, bool graphisundirected, unsigned int num_fpgas){
 	cout<<"prepare_graph:: preparing graph @ "<<graphpath<<"..."<<endl;
 	unsigned int srcv = 0;
 	unsigned int dstv = 0;
@@ -76,6 +76,8 @@ tuple_t prepare_graph::start(string graphpath, vector<edge3_type> &edgesbuffer_d
 				sscanf(line.c_str(), "%i %i %i", &num_vertices, &num_vertices2, &num_edges);
 				num_vertices += 1000; num_vertices2 += 1000; num_edges += 1000;
 				cout<<"prepare_graph:: dataset header: num_vertices: "<<num_vertices<<", num_vertices2: "<<num_vertices2<<", num_edges: "<<num_edges<<endl;
+				// if(((num_edges / num_fpgas) / NUM_PEs) > ((1 * HBM_CHANNEL_SIZE * EDGE_PACK_SIZE) / 3)){ cout<<"PREPARE GRAPH: GRAPH MIGHT BE TOO LARGE TO FIT IN FPGAS. EXITING..."<<endl; exit(EXIT_SUCCESS); }
+				if(((num_edges / num_fpgas) / NUM_PEs) > ((1 * HBM_CHANNEL_SIZE * EDGE_PACK_SIZE) / 2)){ cout<<"PREPARE GRAPH: GRAPH MIGHT BE TOO LARGE TO FIT IN FPGAS. EXITING..."<<endl; exit(EXIT_SUCCESS); }
 				// exit(EXIT_SUCCESS);
 				linecount++; continue; }	
 			if (linecount % 100000000 == 0){ cout<<"prepare_graph: loading edges "<<linecount<<endl; } 
