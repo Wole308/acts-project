@@ -692,12 +692,6 @@ long double host::runapp(string graph_path, std::string binaryFile__[2],
 			OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_src[i]}, 0));
 			#endif 
 		}
-		// for (int i = 0; i < NUM_HBMC_ARGS; i++) {
-			// std::cout << "Copying data @ center channel "<<i<<" (Host to Device)..." << std::endl;
-			// #ifdef FPGA_IMPL
-			// OCL_CHECK(err, err = q[fpga].enqueueMigrateMemObjects({buffer_hbmc[i]}, 0));
-			// #endif 
-		// }
 		#ifdef FPGA_IMPL
 		OCL_CHECK(err, err = q[fpga].finish());
 		#endif 

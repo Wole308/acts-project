@@ -2,11 +2,19 @@
 #define COMMON_H
 #include <string.h> 
 #include <cmath> 
+#include <ap_int.h>
+// #include "ap_fixed.h"	
+#include <vector> 
+#include<hls_vector.h> 
+#include<hls_stream.h> 
+#include <iostream> 
  
 
 // only-for-synthesis-tests
 #define POW_VALID_VDATA 1 // 1,0 // FIXME^
 
+ 
+#define ___RUNNING_FPGA_SYNTHESIS___
  
 // #define ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifndef ___RUNNING_FPGA_SYNTHESIS___
@@ -14,7 +22,7 @@
 #endif 
 // #define PROOF_OF_CONCEPT_RUN ///////////////.............................................................
 #define ENABLE_SHARING_SRCs
-#define NUM_VALID_HBM_CHANNELS_PER_SLR (15 / 3)
+#define NUM_VALID_HBM_CHANNELS_PER_SLR (5 / 3)
 
 #define MAX_NUM_FPGAS 8
 #define RUN_IN_ASYNC_MODE 1
@@ -55,7 +63,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define SW // SWEMU, HW, *SW
+#define HW // SWEMU, HW, *SW
 #if (defined(SWEMU) || defined(HW)) 
 #define FPGA_IMPL
 #endif 
@@ -140,9 +148,9 @@
 
 #define MAX_NUM_PEs 12
 #define MAX_GLOBAL_NUM_PEs (MAX_NUM_FPGAS * MAX_NUM_PEs)
-#define NUM_PEs 15		
-#define NUM_VALID_PEs 15
-#define NUM_VALID_HBM_CHANNELS 15
+#define NUM_PEs 5		
+#define NUM_VALID_PEs 5
+#define NUM_VALID_HBM_CHANNELS 5
 #define EDGE_PACK_SIZE_POW 4 // 1 4*
 #define EDGE_PACK_SIZE (1 << EDGE_PACK_SIZE_POW) // 2, 16*
 #define HBM_CHANNEL_PACK_SIZE (EDGE_PACK_SIZE * 2) // 32*

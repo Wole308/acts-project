@@ -640,11 +640,6 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ 
 		globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES] = (size_u32 / HBM_CHANNEL_PACK_SIZE) + 16;
 		globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES];	
-		// #ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-		// globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES];
-		// #else 
-		// globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + 0; // act-pack edges occupy 1/2 of hbmchannel
-		// #endif 
 	}
 	cout<<"checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]: "<<globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]<<" (of "<<HBM_CHANNEL_SIZE<<")"<<endl;
 	

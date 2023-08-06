@@ -95,9 +95,12 @@ PROCESS_EDGES_MAINLOOP1C: for(unsigned int t1=0; t1<(max_sz + batch_size - 1) / 
 		}
 		unsigned int s = p_u % NUM_VALID_HBM_CHANNELS;
 		unsigned int rotatebys[4]; rotatebys[0] = 0; rotatebys[1] = 0; rotatebys[2] = 0; rotatebys[3] = 0;
-		if(s == 1){ rearrangeLayoutV16x16B(rotatebys[1], out[0], out[1]); } 
-		if(s == 2){ rearrangeLayoutV16x16B(rotatebys[2], out[1], out[2]); } 
-		if(s == 3){ rearrangeLayoutV16x16B( rotatebys[3], out[2], out[3]); }
+		// if(s == 1){ rearrangeLayoutV16x16B(rotatebys[1], out[0], out[1]); } 
+		// if(s == 2){ rearrangeLayoutV16x16B(rotatebys[2], out[1], out[2]); } 
+		// if(s == 3){ rearrangeLayoutV16x16B( rotatebys[3], out[2], out[3]); }
+		if(s == 1){ rearrangeLayoutV16x16B(0, out[0], out[1]); } 
+		if(s == 2){ rearrangeLayoutV16x16B(0, out[1], out[2]); } 
+		if(s == 3){ rearrangeLayoutV16x16B(0, out[2], out[3]); }
 		#endif 
 		
 		EC_PROCESS_EDGES_LOOP1F: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){

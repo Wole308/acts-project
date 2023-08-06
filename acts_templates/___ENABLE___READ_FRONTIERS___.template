@@ -12,25 +12,6 @@ unsigned int sz = MAXVALID_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UP
 if(action.fpga < num_prints){ cout<<"``` reading "<<(sz << POW_VALID_VDATA) * EDGE_PACK_SIZE<<" frontiers from HBM in upartition "<<p_u<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; }
 #endif 
 
-/* READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<sz; t++){ // FIXME^
-#pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1A']}}	
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	data[{{v}}] = HBM_centerA[uoffset + t].data[{{v}}];
-	{%endfor%}
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	data[{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_centerB[uoffset + t].data[{{v}}];
-	{%endfor%}	
-	
-	{%for n in context['NUM_VALID_PEs_seq']%}
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	HBM_channelA{{n % context['HBM_FANOUT']}}[offset_c + t].data[{{v}}] = data[{{v}}];
-	{%endfor%}
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	HBM_channelB{{n % context['HBM_FANOUT']}}[offset_c + t].data[{{v}}] = data[{{context['HBM_AXI_PACK_SIZE'] + v}}];
-	{%endfor%}
-	{%endfor%}	
-} */
-
 // parallel-read and map active frontiers [done]
 READ_FRONTIERS_LOOP2: for(unsigned int t=0; t<sz; t++){ 
 #pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1B']}}	
