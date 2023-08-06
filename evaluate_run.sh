@@ -1,6 +1,16 @@
 #!/bin/bash
 #!/bin/bash
 
+#define POW_VALID_VDATA 1 // 1,0 // FIXME^
+# context['NUM_VALID_PEs'] = 4 #12  # FIXME^  
+#pragma HLS INTERFACE m_axi port = HBM_import offset = slave bundle = gmem{{2*context['NUM_VALID_HBM_CHANNELS']+0}} // FIXME^
+# READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<sz; t++){ // FIXME^
+// #define ___ENABLE___GATHER_FRONTIERINFOS___ // FIXME^
+# if(___ENABLE___READ_FRONTIER_PROPERTIES___BOOL___ == 1){ 
+			# // if(p_u % 2==0){ # FIXME^  
+
+# /home/oj2zf/Documents/acts-project/overlap_hbm/_x.hw.xilinx_u280_gen3x16_xdma_1_202211_1/reports/vadd/hls_reports/top_function_csynth.rpt
+
 # srun -w lynx07 -p gpu --reservation=YOURRESEVATION --gres=gpu:4 --pty bash -i -l -
 # srun -w cheetah04 -p gpu --reservation=oj2zf_71 --gres=gpu:4 --pty bash -i -l -
 # srun -w jaguar01 -p gpu --reservation=bg9qq_72 --gres=gpu:4 --pty bash -i -l -
@@ -57,6 +67,8 @@
 # Synthesize to generate xclbin...
 # "USAGE: ./host [--xware] [--num_pes] [--running synthesis]"
 # ./evaluate_datasets.sh 2 1 1
+# ./evaluate_datasets.sh 2 3 1
+# ./evaluate_datasets.sh 2 4 1
 # ./evaluate_datasets.sh 2 12 1
 # vi ~/.bashrc
 # make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
@@ -77,13 +89,13 @@ DATSETS=(
 		
 		# uk-2002
 		
-		rmat_16_28 # 268
-		rmat_16_29 # 512
-		rmat_16_30 # 1024
-		rmat_16_31 # 2048
+		# rmat_16_28 # 268
+		# rmat_16_29 # 512
+		# rmat_16_30 # 1024
+		# rmat_16_31 # 2048
 
 		# kron_g500-logn20 
-		# rmat_16m_256m 
+		rmat_16m_256m 
 		# it-2004 
 		# GAP-twitter
 		
@@ -99,15 +111,18 @@ DATSETS=(
 		
 NUM_FPGAS=(
 		1
-		2
-		4
-		8
+		# 2
+		# 3
+		# 4
+		# 8
 		)
 		
 NUM_PES=(
 		# 1 
+		# 5
 		# 6
-		12
+		# 12
+		15
 		)
 		
 XCLBINS=(
@@ -123,8 +138,8 @@ RUN_IN_ASYNC_MODE=(
 		
 GRAPH_IS_UNDIRECTED=0 #1
 	
-XWARE_ID=1 # 0, 1
-MAX_NUM_ITERATIONS=16
+XWARE_ID=0 # 0, 1
+MAX_NUM_ITERATIONS=1
 
 # "USAGE: ./host [--algo] [--num fpgas] [--rootvid] [--direction] [--numiterations] [--graph_path] [--XCLBINS...] "
 for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do	
@@ -134,10 +149,10 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 			
 			for ((i = 0; i < ${#DATSETS[@]}; i++)) do
 				echo pagerank algorithm running...: dataset: ${DATSETS[i]}, num fpgas: ${NUM_FPGAS[c]}, xclbin: ${XCLBINS[k]} num_iterations: $MAX_NUM_ITERATIONS
-				./host pr ${NUM_FPGAS[c]} 1 $GRAPH_IS_UNDIRECTED $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} > results/graph-analytics-scaling/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out			
+				./host pr ${NUM_FPGAS[c]} 1 $GRAPH_IS_UNDIRECTED $MAX_NUM_ITERATIONS ${DATASET_BASEDIR}/${DATSETS[i]}/${DATSETS[i]}.mtx ${XCLBINS[k]} #> results/graph-analytics-scaling/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.out			
 				sleep 2
 				cp -rf summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
-				# exit
+				exit
 			done	
 			
 			# for ((i = 0; i < ${#DATSETS[@]}; i++)) do
@@ -163,6 +178,12 @@ for ((c = 0; c < ${#NUM_FPGAS[@]}; c++)) do
 				# cp -rf summary.csv results/results_pr/${DATSETS[i]}_fpgas${NUM_FPGAS[c]}_pes${NUM_PES[k]}_async${RUN_IN_ASYNC_MODE[n]}.csv
 				# exit
 			# done
+			
+			# ./evaluate_datasets.sh 2 4 1
+			# make cleanall
+			# rm -rf acts_vitishls3
+			# faketime -f "-1y" vitis_hls -f script.tcl
+			# exit
 		done 
 	done
 done

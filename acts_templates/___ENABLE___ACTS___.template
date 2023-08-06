@@ -6,19 +6,20 @@
 #define ___ENABLE___ECPROCESSEDGES___II1___ 
 #define ___ENABLE___APPLYUPDATESMODULE___ 
 #define ___ENABLE___READ_DEST_PROPERTIES___ 	
-	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
 		#define ___ENABLE___APPLYVERTEXUPDATES_AND_APPLYEDGES___II1___
 	#else 
 		#define ___ENABLE___APPLYUPDATES___II1___
 	#endif 
 	#define ___ENABLE___COLLECT_AND_SAVE_FRONTIER_PROPERTIES___ 
 	#define ___ENABLE___SAVE_DEST_PROPERTIES___ 
-#define ___ENABLE___GATHER_FRONTIERINFOS___ 
+// #define ___ENABLE___GATHER_FRONTIERINFOS___ // FIXME^
 #define ___ENABLE___REPORT_STATISTICS___
-#define ___ENABLE___IMPORT_EXPORT___
+// #define ___ENABLE___IMPORT_EXPORT___
 #define _____DEBUG_____	
 
 #define MAXVALID_APPLYPARTITION_VECSIZE (MAX_APPLYPARTITION_VECSIZE >> POW_VALID_VDATA)
+#define MAXVALID_VERTEXUPDATES_BUFFER_SIZE (VERTEXUPDATES_BUFFER_SIZE >> POW_VALID_VDATA)
 
 unsigned int num_prints = 1;	
 
@@ -31,11 +32,6 @@ unsigned int num_prints = 1;
 #define MY_IFDEF_EDGESBUFFER() edge3_type edges_buffer[EDGE_PACK_SIZE][EDGE_BUFFER_SIZE]
 #define MY_IFDEF_EDGEUPDATESBUFFER() edge_update_type URAM_edges[EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE]
 #define MY_IFDEF_VDATABUFFER() vprop_t URAM_vprop[EDGE_PACK_SIZE][MAXVALID_APPLYPARTITION_VECSIZE]
-#define MY_IFDEF_TOPLEVELFUNC() void top_function({% include '___HBM___PARAMS___.template' %}, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB, \
-	HBM_channelAXI_t * HBM_import, HBM_channelAXI_t * HBM_export, \
-	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, unsigned int command, \
-	unsigned int mask0, unsigned int mask1, unsigned int mask2, unsigned int mask3, unsigned int mask4, unsigned int mask5, unsigned int mask6, unsigned int mask7 \
-	)
 #else
 #define MY_IFDEF_NFRONTIER() keyvalue_t * nfrontier_buffer[EDGE_PACK_SIZE]
 #define MY_IFDEF_CFRONTIER_TMP() keyvalue_t * URAM_frontiers[EDGE_PACK_SIZE]
@@ -44,9 +40,36 @@ unsigned int num_prints = 1;
 #define MY_IFDEF_VPTRBUFFER() vtr_t * vptr_buffer
 #define MY_IFDEF_EDGESBUFFER() edge3_type * edges_buffer[EDGE_PACK_SIZE]
 #define MY_IFDEF_EDGEUPDATESBUFFER() edge_update_type * URAM_edges[EDGE_PACK_SIZE]
-#define MY_IFDEF_VDATABUFFER() vprop_t * URAM_vprop[EDGE_PACK_SIZE]
+#define MY_IFDEF_VDATABUFFER() vprop_t * URAM_vprop[EDGE_PACK_SIZE]			
+#endif
+
+#ifdef ___NOT___YET___IMPLEMENTED___
+#ifdef ___RUNNING_FPGA_SYNTHESIS___ // FPGA_IMPL
+#define MY_IFDEF_TOPLEVELFUNC() void top_function({% include '___HBM___PARAMS___.template' %}, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB, \
+	HBM_channelAXI_t * HBM_import, HBM_channelAXI_t * HBM_export, \
+	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, unsigned int command, \
+	unsigned int mask0, unsigned int mask1, unsigned int mask2, unsigned int mask3, unsigned int mask4, unsigned int mask5, unsigned int mask6, unsigned int mask7 \
+	)
+#else
 #define MY_IFDEF_TOPLEVELFUNC() unsigned int acts_kernel::top_function({% include '___HBM___PARAMS___.template' %}, HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB, \
 	HBM_channelAXI_t * HBM_import, HBM_channelAXI_t * HBM_export, \
+	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, unsigned int command, \
+	unsigned int mask0, unsigned int mask1, unsigned int mask2, unsigned int mask3, unsigned int mask4, unsigned int mask5, unsigned int mask6, unsigned int mask7, \
+	unsigned int report_statistics[64])					
+#endif
+#endif 
+
+#ifdef ___RUNNING_FPGA_SYNTHESIS___ // FPGA_IMPL
+#define MY_IFDEF_TOPLEVELFUNC() void top_function( \
+	{% include '___HBM___PARAMS___.template' %}, \
+	{% include '___HBM___PARAMS___SRC___.template' %}, \
+	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, unsigned int command, \
+	unsigned int mask0, unsigned int mask1, unsigned int mask2, unsigned int mask3, unsigned int mask4, unsigned int mask5, unsigned int mask6, unsigned int mask7 \
+	)
+#else
+#define MY_IFDEF_TOPLEVELFUNC() unsigned int acts_kernel::top_function( \
+	{% include '___HBM___PARAMS___.template' %}, \
+	{% include '___HBM___PARAMS___SRC___.template' %}, \
 	unsigned int fpga, unsigned int module, unsigned int graph_iteration, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int start_pv_fpga, unsigned int start_pv, unsigned int size_pv, unsigned int start_llpset, unsigned int size_llpset, unsigned int start_llpid, unsigned int size_llpid, unsigned int start_gv_fpga, unsigned int start_gv, unsigned int size_gv, unsigned int id_process, unsigned int id_import, unsigned int id_export, unsigned int size_import_export, unsigned int status, unsigned int numfpgas, unsigned int command, \
 	unsigned int mask0, unsigned int mask1, unsigned int mask2, unsigned int mask3, unsigned int mask4, unsigned int mask5, unsigned int mask6, unsigned int mask7, \
 	unsigned int report_statistics[64])					
@@ -173,23 +196,22 @@ void gather_frontiers(unsigned int inst, unsigned int upartitionID, unsigned int
 extern "C" {	
 MY_IFDEF_TOPLEVELFUNC(){	
 {%for i in context['NUM_VALID_HBM_CHANNELS_seq']%}
-#pragma HLS INTERFACE m_axi port = HBM_channelA{{i}} offset = slave bundle = gmem{{(2*i) % context['HBM_FANOUT_CHANNELS']}}
-#pragma HLS INTERFACE m_axi port = HBM_channelB{{i}} offset = slave bundle = gmem{{(2*i+1) % context['HBM_FANOUT_CHANNELS']}}
+#pragma HLS INTERFACE m_axi port = HBM_channelA{{i}} offset = slave bundle = gmem{{2*i}}
+#pragma HLS INTERFACE m_axi port = HBM_channelB{{i}} offset = slave bundle = gmem{{2*i+1}}
 {%endfor%}
-#pragma HLS INTERFACE m_axi port = HBM_centerA offset = slave bundle = gmem{{2*context['NUM_VALID_HBM_CHANNELS']}}
-#pragma HLS INTERFACE m_axi port = HBM_centerB offset = slave bundle = gmem{{2*context['NUM_VALID_HBM_CHANNELS']+1}}
-#pragma HLS INTERFACE m_axi port = HBM_import offset = slave bundle = gmem{{2*context['NUM_VALID_HBM_CHANNELS']+2}}
-#pragma HLS INTERFACE m_axi port = HBM_export offset = slave bundle = gmem{{2*context['NUM_VALID_HBM_CHANNELS']+3}}
-
+{%for i in context['NUM_VALID_HBM_CHANNELS_seq']%}
+#pragma HLS INTERFACE m_axi port = HBM_SRCA{{i}} offset = slave bundle = gmem{{2*i}}
+#pragma HLS INTERFACE m_axi port = HBM_SRCB{{i}} offset = slave bundle = gmem{{2*i+1}}
+{%endfor%}
 
 {%for i in context['NUM_VALID_HBM_CHANNELS_seq']%}
 #pragma HLS INTERFACE s_axilite port = HBM_channelA{{i}}
 #pragma HLS INTERFACE s_axilite port = HBM_channelB{{i}}
 {%endfor%}
-#pragma HLS INTERFACE s_axilite port = HBM_centerA
-#pragma HLS INTERFACE s_axilite port = HBM_centerB
-#pragma HLS INTERFACE s_axilite port = HBM_import
-#pragma HLS INTERFACE s_axilite port = HBM_export
+{%for i in context['NUM_VALID_HBM_CHANNELS_seq']%}
+#pragma HLS INTERFACE s_axilite port = HBM_SRCA{{i}}
+#pragma HLS INTERFACE s_axilite port = HBM_SRCB{{i}}
+{%endfor%}
 
 #pragma HLS INTERFACE s_axilite port = fpga
 #pragma HLS INTERFACE s_axilite port = module
@@ -299,6 +321,7 @@ MY_IFDEF_TOPLEVELFUNC(){
 	
 	// initialize variables 
 	{% include '___ENABLE___INITIALIZE___.template' %}	
+	// return 0; ///////////////////////////////////////// REMOVEME.
 
 	// resets
 	if(___ENABLE___RESETBUFFERSATSTART___BOOL___ == 1){
@@ -392,13 +415,8 @@ MY_IFDEF_TOPLEVELFUNC(){
 		// read & map frontier properties 
 		#ifdef ___ENABLE___READ_FRONTIER_PROPERTIES___
 		if(___ENABLE___READ_FRONTIER_PROPERTIES___BOOL___ == 1){ 
-			if(p_u % 2==0){
-				#if NUM_PEs==1
-				unsigned int voffset = globalparams[GLOBALPARAMSCODE__BASEOFFSET__VDATAS] + (p_u * globalparams[GLOBALPARAMSCODE__PARAM__MAX_APPLYPARTITION_VECSIZE]);
-				{% include '___ENABLE___READ_DEST_PROPERTIES_1PE___.template' %}	
-				#else 
+			if(p_u % NUM_VALID_HBM_CHANNELS_PER_SLR==0){ // sharing reduces number of reads. FIXME^
 				{% include '___ENABLE___READ_FRONTIERS___.template' %}		
-				#endif 
 			}
 		}
 		#endif
@@ -411,14 +429,13 @@ MY_IFDEF_TOPLEVELFUNC(){
 		#endif
 	}
 	}
-	#endif 
-	// exit(EXIT_SUCCESS); 
+	#endif
 
 	unsigned int totalactvvs2 = 0; 
 	frontier_t actvv[EDGE_PACK_SIZE]; 
 	for(unsigned int p_u=0; p_u<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]; p_u++){ upartition_vertices[p_u].count = 0; }
 	for(unsigned int p_u=0; p_u<globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS]; p_u++){ cfrontier_dram___size[p_u] = 0; } // reset
-
+	
 	// apply updates 
 	#ifdef ___ENABLE___APPLYUPDATESMODULE___ 
 	if(action.module == APPLY_UPDATES_MODULE || action.module == ALL_MODULES){

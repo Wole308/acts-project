@@ -13,6 +13,10 @@ keyvalue_t update_out2[NUM_VALID_PEs][EDGE_PACK_SIZE];
 #pragma HLS ARRAY_PARTITION variable = update_out2 complete dim=0
 bool ens2[NUM_VALID_PEs];
 #pragma HLS ARRAY_PARTITION variable = ens2 complete
+keyvalue_t out[4][NUM_VALID_HBM_CHANNELS][EDGE_PACK_SIZE];
+#pragma HLS ARRAY_PARTITION variable = out complete dim=1
+#pragma HLS ARRAY_PARTITION variable = out complete dim=2
+#pragma HLS ARRAY_PARTITION variable = out complete dim=3
 			
 unsigned int import_offset = id_import * action.size_import_export;
 unsigned int export_offset = id_export * action.size_import_export;
@@ -36,17 +40,17 @@ if(action.fpga < num_prints){ for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<
 
 unsigned int sz = edge_maps[0].size; unsigned int max_num_edges = 0;
 #ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-max_num_edges = edge_maps_buffer[0][p_u+1].offset - edge_maps_buffer[0][p_u].offset;
+max_num_edges = edge_maps_buffer[0][p_u+1].offset - edge_maps_buffer[0][p_u].offset; 
 if((action.command == GRAPH_UPDATE_ONLY) && (edge_maps[0].size == max_num_edges)){ for(unsigned int n=0; n<NUM_VALID_PEs; n++){ sz = 0; max_sz = 0; }}
 #endif 
 
-#ifdef _DEBUGMODE_KERNELPRINTS4
+#ifdef _DEBUGMODE_KERNELPRINTS4 
 if(action.fpga < num_prints){ cout<<"+++ processing "<<sz * EDGE_PACK_SIZE<<" edges (of "<<max_num_edges * EDGE_PACK_SIZE<<") in upartition "<<p_u<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; }
 #endif 
 
 // process edges and save vertex updates 
 unsigned int batch_size = 4096; // 512;
-unsigned int packsz = 1; // 2; // FIXME. 
+unsigned int packsz = 1; unsigned int pack_id=0; // 2; // FIXME. 
 PROCESS_EDGES_MAINLOOP1C: for(unsigned int t1=0; t1<(max_sz + batch_size - 1) / batch_size; t1++){ 
 	// resets 		
 	for(unsigned int partition=0; partition<globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; partition++){ 
@@ -66,7 +70,7 @@ PROCESS_EDGES_MAINLOOP1C: for(unsigned int t1=0; t1<(max_sz + batch_size - 1) / 
 	unsigned int placeholder_partition = 0;
 	
 	// process edges 
-	PROCESS_EDGES_MAINLOOP1D: for(unsigned int t2=0; t2<process_size / packsz; t2++){ 
+	PROCESS_EDGES_MAINLOOP1DAAA: for(unsigned int t2=0; t2<process_size / packsz; t2++){ 
 	#pragma HLS PIPELINE II={{context['II_PROCESS_EDGES_MAINLOOP1D']}}
 		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 		#pragma HLS UNROLL
@@ -77,65 +81,78 @@ PROCESS_EDGES_MAINLOOP1C: for(unsigned int t1=0; t1<(max_sz + batch_size - 1) / 
 			}
 		}
 		
-		PROCESS_EDGES_MAINLOOP1E: for(unsigned int pack_id=0; pack_id<packsz; pack_id++){ 
-		#pragma HLS PIPELINE II=1
-			unsigned int t = readoffset + t2*packsz + pack_id;
-			dretrievemany_edges(globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES], offsets, t, edge3_vecs, {% include '___HBM___ARGS___.template' %});
-			
-			EC_PROCESS_EDGES_LOOP1F: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+		unsigned int t = readoffset + t2*packsz + pack_id;
+		dretrievemany_edges(globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES], offsets, t, edge3_vecs, {% include '___HBM___ARGS___.template' %});
+		
+		#ifdef ENABLE_SHARING_SRCs
+		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+		#pragma HLS UNROLL
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 			#pragma HLS UNROLL
-				bool en = true; if(t >= limits[inst]){ en = false; } else { en = true; } 
-				edge3_vec_dt edge_vec = edge3_vecs[inst];
-				unsigned int rotateby = 0;
+				unsigned int src = edge3_vecs[inst].data[v].srcvid;
+				if(src < MAX_UPARTITION_VECSIZE){ out[0][inst][v].key = URAM_vprop[inst][v][src].prop; out[0][inst][v].value = URAM_vprop[inst][v][src].gvid; }
+			}
+		}
+		unsigned int s = p_u % NUM_VALID_HBM_CHANNELS;
+		unsigned int rotatebys[4]; rotatebys[0] = 0; rotatebys[1] = 0; rotatebys[2] = 0; rotatebys[3] = 0;
+		if(s == 1){ rearrangeLayoutV16x16B(rotatebys[1], out[0], out[1]); } 
+		if(s == 2){ rearrangeLayoutV16x16B(rotatebys[2], out[1], out[2]); } 
+		if(s == 3){ rearrangeLayoutV16x16B( rotatebys[3], out[2], out[3]); }
+		#endif 
+		
+		EC_PROCESS_EDGES_LOOP1F: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+		#pragma HLS UNROLL
+			bool en = true; if(t >= limits[inst]){ en = false; } else { en = true; } 
+			edge3_vec_dt edge_vec = edge3_vecs[inst];
+			unsigned int rotateby = 0;
+			
+			#ifdef _DEBUGMODE_CHECKS3
+			checkoutofbounds("acts_kernel::ERROR 213::", rotateby, EDGE_PACK_SIZE, NAp, NAp, NAp);
+			#endif
+			
+			// read source properties and process edge to form vertex-updates 
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL
+				edge3_type edge = edge_vec.data[v];
+				unsigned int srcvid_lpv = edge.srcvid; 
 				
-				#ifdef _DEBUGMODE_CHECKS3
-				checkoutofbounds("acts_kernel::ERROR 213::", rotateby, EDGE_PACK_SIZE, NAp, NAp, NAp);
-				#endif
+				#ifdef ENABLE_SHARING_SRCs
+				vprop_t uprop; uprop.prop = out[3][inst][v].key; uprop.degree = out[3][inst][v].value; 
+				#else 
+				vprop_t uprop; if(edge.srcvid != INVALIDDATA && edge.srcvid < MAX_UPARTITION_VECSIZE){ uprop.prop = URAM_vprop[inst][v][srcvid_lpv].prop; uprop.degree = URAM_vprop[inst][v][srcvid_lpv].gvid; }
+				#endif 
 				
-				// read source properties and process edge to form vertex-updates 
-				for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-				#pragma HLS UNROLL
-					edge3_type edge = edge_vec.data[v];
-					unsigned int srcvid_lpv = edge.srcvid; 
-					vprop_t uprop; if(edge.srcvid != INVALIDDATA && edge.srcvid < MAX_UPARTITION_VECSIZE){ uprop.prop = URAM_vprop[inst][v][srcvid_lpv].prop; uprop.degree = URAM_vprop[inst][v][srcvid_lpv].gvid; }
-					
-					if(edge.srcvid != INVALIDDATA && edge.srcvid < MAX_UPARTITION_VECSIZE){ 
-						unsigned int res = process_funcG(uprop, 1, globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM]);
-						#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
-						update_in[inst][v].key = edge.dstvid; update_in[inst][v].value = edge.srcvid;
-						#else 
-						update_in[inst][v].key = edge.dstvid; update_in[inst][v].value = res;
-						#endif 
-						#ifdef _DEBUGMODE_CHECKS//3
-						checkoutofbounds("acts_kernel::ERROR 1213c::", edge.srcvid, MAX_UPARTITION_VECSIZE, inst, NAp, NAp);
-						checkoutofbounds("acts_kernel::ERROR 1213d::", edge.dstvid, MAX_UPARTITION_VECSIZE, inst, NAp, NAp);
-						#endif
-						#ifdef _DEBUGMODE_KERNELPRINTS_TRACE3
-						std::cout<<"EC - PROCESS EDGE SEEN @: inst: ["<<inst<<"], [srcvid_lpv: "<<srcvid_lpv<<", dstvid: "<<edge.dstvid % MAX_APPLYPARTITION_SIZE<<"], [edge.srcvid: "<<edge.srcvid<<", dstvid: "<<edge.dstvid<<"]"<<std::endl; 
-						#endif 
-					} else {
-						update_in[inst][v].key = INVALIDDATA; update_in[inst][v].value = INVALIDDATA;
-					}
-				}
-				
-				// circular shift >>>
-				rearrangeLayoutVx16B(rotateby, update_in[inst], update_out[inst]); 
-				
-				for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-				#pragma HLS UNROLL
+				if(edge.srcvid != INVALIDDATA && edge.srcvid < MAX_UPARTITION_VECSIZE){ 
+					unsigned int res = process_funcG(uprop, 1, globalparams[GLOBALPARAMSCODE__PARAM__ALGORITHM]);
 					#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___ 
-					update_out2[inst][v].key = update_out[inst][v].key;
-					update_out2[inst][v].value = update_out[inst][v].value;
+					update_in[inst][v].key = edge.dstvid; update_in[inst][v].value = edge.srcvid;
 					#else 
-					update_out2[inst][v].key += update_out[inst][v].key;
-					update_out2[inst][v].value += update_out[inst][v].value;
+					update_in[inst][v].key = edge.dstvid; update_in[inst][v].value = res;
 					#endif 
-				}	
+					#ifdef _DEBUGMODE_CHECKS//3
+					checkoutofbounds("acts_kernel::ERROR 1213c::", edge.srcvid, MAX_UPARTITION_VECSIZE, inst, NAp, NAp);
+					checkoutofbounds("acts_kernel::ERROR 1213d::", edge.dstvid, MAX_UPARTITION_VECSIZE, inst, NAp, NAp);
+					#endif
+					#ifdef _DEBUGMODE_KERNELPRINTS_TRACE3
+					std::cout<<"EC - PROCESS EDGE SEEN @: inst: ["<<inst<<"], [srcvid_lpv: "<<srcvid_lpv<<", dstvid: "<<edge.dstvid % MAX_APPLYPARTITION_SIZE<<"], [edge.srcvid: "<<edge.srcvid<<", dstvid: "<<edge.dstvid<<"]"<<std::endl; 
+					#endif 
+				} else {
+					update_in[inst][v].key = INVALIDDATA; update_in[inst][v].value = INVALIDDATA;
+				}
 			}
 			
-			update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___ECPROCESSEDGES___, 1);
+			// circular shift >>>
+			rearrangeLayoutVx16B(rotateby, update_in[inst], update_out[inst]); 
+			
+			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
+			#pragma HLS UNROLL
+				update_out2[inst][v].key = update_out[inst][v].key;
+				update_out2[inst][v].value = update_out[inst][v].value; 
+			}	
 		}
 		
+		update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___ECPROCESSEDGES___, 1);
+	
 		// buffer updates 
 		for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 		#pragma HLS UNROLL

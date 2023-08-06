@@ -1,26 +1,3 @@
-//////////////////////////////////////////////////////////////////
-void master_centerinsert_vec(unsigned int offset, unsigned int data[HBM_CHANNEL_PACK_SIZE], HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB){
-	#pragma HLS INLINE 
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	HBM_centerA[offset].data[{{v}}] = data[{{v}}];
-	{%endfor%}
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	HBM_centerB[offset].data[{{v}}] = data[{{context['HBM_AXI_PACK_SIZE'] + v}}];
-	{%endfor%}
-	return;
-}
-void master_centerretrieve_vec(unsigned int offset, unsigned int data[HBM_CHANNEL_PACK_SIZE], HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB){
-	#pragma HLS INLINE 
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	data[{{v}}] = HBM_centerA[offset].data[{{v}}];
-	{%endfor%}
-	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	data[{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_centerB[offset].data[{{v}}];
-	{%endfor%}
-	return;
-}
-
-//////////////////////////////////////////////////////////////////
 void master_insertmany_vec(unsigned int offsets[NUM_VALID_PEs], unsigned int data[NUM_VALID_PEs][HBM_CHANNEL_PACK_SIZE], {% include '___HBM___PARAMS___.template' %}){
 	#pragma HLS INLINE // FIXME_HARDWARE
 	{%for n in context['NUM_VALID_PEs_seq']%}	
@@ -127,31 +104,6 @@ void save_vupdate_map(unsigned int offset, unsigned int index, map_t data, {% in
 	HBM_channelA0[offset + index].data[{{2*v+1}}] = data.size;
 	{%endfor%}	
 	return;
-}
-
-//////////////////////////////////////////////////////////////////
-void insert_cfrontierdram(unsigned int p_u, unsigned int t, keyvalue_t data[EDGE_PACK_SIZE], HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB){
-	#pragma HLS INLINE
-	unsigned int data_[HBM_CHANNEL_PACK_SIZE];
-	#pragma HLS ARRAY_PARTITION variable=data_ complete
-	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
-	#pragma HLS UNROLL
-		data_[2*v] = data[v].key;
-		data_[2*v + 1] = data[v].value;
-	}
-	master_centerinsert_vec(t, data_, HBM_centerA, HBM_centerB);
-}
-void retrieve_cfrontierdram(unsigned int p_u, unsigned int t, keyvalue_t data[EDGE_PACK_SIZE], HBM_channelAXI_t * HBM_centerA, HBM_channelAXI_t * HBM_centerB){
-	#pragma HLS INLINE
-	unsigned int data_[HBM_CHANNEL_PACK_SIZE];
-	#pragma HLS ARRAY_PARTITION variable=data_ complete
-	master_centerretrieve_vec(t, data_, HBM_centerA, HBM_centerB); 
-	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
-	#pragma HLS UNROLL
-		data[v].key = data_[2*v];
-		data[v].value = data_[2*v+1];
-	}
-	return; 
 }
 
 ////////////////////////////////////////////////////////////////

@@ -6,13 +6,13 @@ keyvalue_t kvdatas[NUM_VALID_PEs][EDGE_PACK_SIZE];
 #pragma HLS ARRAY_PARTITION variable = kvdatas complete dim=0
 unsigned int offset_c = globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP];
 
-#ifdef _DEBUGMODE_CHECKS3
-checkoutofbounds("acts_kernel::ERROR 12073::", cfrontier_dram___size[p_u], MAX_APPLYPARTITION_VECSIZE+1, NAp, NAp, NAp);
+unsigned int sz = MAXVALID_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ sz = 0; }
+
+#ifdef _DEBUGMODE_KERNELPRINTS4
+if(action.fpga < num_prints){ cout<<"``` reading "<<(sz << POW_VALID_VDATA) * EDGE_PACK_SIZE<<" frontiers from HBM in upartition "<<p_u<<": [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; }
 #endif 
 
-unsigned int sz = cfrontier_dram___size[p_u]; if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ sz = 0; }
-
-READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<sz; t++){ 
+/* READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<sz; t++){ // FIXME^
 #pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1A']}}	
 	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
 	data[{{v}}] = HBM_centerA[uoffset + t].data[{{v}}];
@@ -29,13 +29,12 @@ READ_FRONTIERS_LOOP1: for(unsigned int t=0; t<sz; t++){
 	HBM_channelB{{n % context['HBM_FANOUT']}}[offset_c + t].data[{{v}}] = data[{{context['HBM_AXI_PACK_SIZE'] + v}}];
 	{%endfor%}
 	{%endfor%}	
-}
+} */
 
 // parallel-read and map active frontiers [done]
 READ_FRONTIERS_LOOP2: for(unsigned int t=0; t<sz; t++){ 
 #pragma HLS PIPELINE II={{context['II_READ_FRONTIERS_1B']}}	
-	dretrievemany_cfrontierdram_tmp(globalparams[GLOBALPARAMSCODE__BASEOFFSET__CFRONTIERSTMP], t, kvdatas, {% include '___HBM___ARGS___.template' %});
-	insertvec_cfrontierbuffer_tmp(t, kvdatas[0], URAM_frontiers); // NEW
+	dretrievemany_cfrontierdram_tmp(0, t, kvdatas, {% include '___HBM___ARGS___SRC___.template' %});
 	for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
 	#pragma HLS UNROLL 
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){

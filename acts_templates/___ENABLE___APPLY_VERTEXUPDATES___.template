@@ -16,11 +16,12 @@ APPLY_UPDATES_LOOP1: for(unsigned int t=0; t<max_limit; t++){
 			for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){		
 			#pragma HLS UNROLL
 				unsigned int dstvid_lp; if(algo == HITS && edge_dir == 1){ dstvid_lp = updates_vecs[inst].data[v].key * 2; } else { dstvid_lp = updates_vecs[inst].data[v].key; }
-				if(dstvid_lp >= MAX_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
+				// if(dstvid_lp >= MAXVALID_APPLYPARTITION_SIZE){ dstvid_lp = 0; }
 				unsigned int dstvid_lpv = dstvid_lp / EDGE_PACK_SIZE;	
+				if(dstvid_lpv >= MAXVALID_APPLYPARTITION_VECSIZE){ dstvid_lpv = 0; }
 				
 				#ifdef _DEBUGMODE_CHECKS3
-				if(t < limits[inst]){ checkoutofbounds("acts_kernel::ERROR 727a::", dstvid_lp, MAX_APPLYPARTITION_SIZE, NAp, inst, updates_vecs[inst].data[v].key); checkoutofbounds("acts_kernel::ERROR 727b::", dstvid_lpv, MAX_APPLYPARTITION_VECSIZE, NAp, inst, updates_vecs[inst].data[v].key); }					
+				if(t < limits[inst]){ checkoutofbounds("acts_kernel::ERROR 727a::", dstvid_lpv, MAXVALID_APPLYPARTITION_VECSIZE, NAp, inst, updates_vecs[inst].data[v].key); checkoutofbounds("acts_kernel::ERROR 727b::", dstvid_lpv, MAXVALID_APPLYPARTITION_VECSIZE, NAp, inst, updates_vecs[inst].data[v].key); }					
 				#endif
 				vprop_dest_t vprop = URAM_vprop[inst][v][dstvid_lpv];
 				vprop_dest_t newprop; newprop.prop = INVALIDDATA; 

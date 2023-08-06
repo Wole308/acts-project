@@ -1,7 +1,7 @@
 vprop_dest_t vprop[NUM_VALID_PEs][EDGE_PACK_SIZE]; 
 #pragma HLS ARRAY_PARTITION variable = vprop complete dim=0
 
-unsigned int sz = MAX_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ sz = 0; }
+unsigned int sz = MAXVALID_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UPDATE_ONLY || action.command == GRAPH_ANALYTICS_EXCLUDEVERTICES){ sz = 0; }
 
 READ_DEST_PROPERTIES_LOOP2B: for(unsigned int t=0; t<sz; t++){
 #pragma HLS PIPELINE II={{context['II_READ_DEST_PROPERTIES_LOOP2B']}}
@@ -11,7 +11,7 @@ READ_DEST_PROPERTIES_LOOP2B: for(unsigned int t=0; t<sz; t++){
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
 		#pragma HLS UNROLL
 			#ifdef _DEBUGMODE_CHECKS3
-			checkoutofbounds("acts_kernel::ERROR 104::", t, MAX_UPARTITION_VECSIZE, NAp, NAp, NAp);
+			checkoutofbounds("acts_kernel::ERROR 104::", t, MAXVALID_APPLYPARTITION_VECSIZE, NAp, NAp, NAp);
 			#endif 
 			URAM_vprop[inst][v][t] = vprop[inst][v];
 		}

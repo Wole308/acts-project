@@ -2,13 +2,10 @@
 #define COMMON_H
 #include <string.h> 
 #include <cmath> 
-#include <ap_int.h>
-// #include "ap_fixed.h"	
-#include <vector> 
-#include<hls_vector.h> 
-#include<hls_stream.h> 
-#include <iostream> 
  
+
+// only-for-synthesis-tests
+#define POW_VALID_VDATA 1 // 1,0 // FIXME^
 
  
 // #define ___ENABLE___DYNAMICGRAPHANALYTICS___
@@ -16,6 +13,8 @@
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 
 // #define PROOF_OF_CONCEPT_RUN ///////////////.............................................................
+#define ENABLE_SHARING_SRCs
+#define NUM_VALID_HBM_CHANNELS_PER_SLR (15 / 3)
 
 #define MAX_NUM_FPGAS 8
 #define RUN_IN_ASYNC_MODE 1
@@ -43,7 +42,6 @@
 // #define BAKE_SSSP_ALGORITHM_FUNCS
 
 #define ___FORCE_SUCCESS___
-#define POW_VALID_VDATA 0 // 1,0 // FIXME
 #define ___FORCE_SUCCESS_SINGLE_CHANNEL___
 // #define ADJUSTMENT_TO_MEET_VHLS_TIMING
 #define ___PARTIAL___HBM___ACCESSES___
@@ -57,7 +55,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define HW // SWEMU, HW, *SW
+#define SW // SWEMU, HW, *SW
 #if (defined(SWEMU) || defined(HW)) 
 #define FPGA_IMPL
 #endif 
@@ -142,9 +140,9 @@
 
 #define MAX_NUM_PEs 12
 #define MAX_GLOBAL_NUM_PEs (MAX_NUM_FPGAS * MAX_NUM_PEs)
-#define NUM_PEs 12		
-#define NUM_VALID_PEs 1
-#define NUM_VALID_HBM_CHANNELS 1
+#define NUM_PEs 15		
+#define NUM_VALID_PEs 15
+#define NUM_VALID_HBM_CHANNELS 15
 #define EDGE_PACK_SIZE_POW 4 // 1 4*
 #define EDGE_PACK_SIZE (1 << EDGE_PACK_SIZE_POW) // 2, 16*
 #define HBM_CHANNEL_PACK_SIZE (EDGE_PACK_SIZE * 2) // 32*
@@ -152,21 +150,13 @@
 #define HBM_AXI_PACK_BITSIZE (HBM_AXI_PACK_SIZE * 32) // 512* // NEW**
 #define HBM_CHANNEL_BYTESIZE (1 << 28)
 #define HBM_CHANNEL_INTSIZE (HBM_CHANNEL_BYTESIZE / 4)
-#if NUM_PEs==1
-	#define HBM_CHANNEL_SIZE 100000000 // (((HBM_CHANNEL_BYTESIZE / 4) / EDGE_PACK_SIZE) * MAX_NUM_PEs) 
-	#else 
-	#define HBM_CHANNEL_SIZE ((HBM_CHANNEL_BYTESIZE / 4) / EDGE_PACK_SIZE) // {4194304 EDGE_PACK_SIZEs, 67108864 uints, 256MB}
-	#endif 
+#define HBM_CHANNEL_SIZE ((HBM_CHANNEL_BYTESIZE / 4) / EDGE_PACK_SIZE) // {4194304 EDGE_PACK_SIZEs, 67108864 uints, 256MB}
 #define HBM_CENTER_SIZE ((HBM_CHANNEL_BYTESIZE / 4) / EDGE_PACK_SIZE) // {4194304 EDGE_PACK_SIZEs, 67108864 uints, 256MB}
 #define FOLD_SIZE 1
 // #define MAX_NUM_UPARTITIONS 512 // 1024 // 512	// NEWCHANGE.
 #define MAX_NUM_UPARTITIONS 1024 	
 // #define MAX_NUM_UPARTITIONS 512	
-#if NUM_PEs==1
-	#define MAX_NUM_APPLYPARTITIONS (48 * MAX_NUM_PEs)
-	#else 
-	#define MAX_NUM_APPLYPARTITIONS 48 
-	#endif 
+#define MAX_NUM_APPLYPARTITIONS 48 
 #define MAX_NUM_LLPSETS 1 // 32 
 #define NUM_LLP_PER_LLPSET EDGE_PACK_SIZE
 #define MAX_NUM_LLP_PER_UPARTITION (MAX_NUM_LLPSETS * NUM_LLP_PER_LLPSET)
@@ -214,11 +204,7 @@
 #define EDGE_BUFFER_SIZE 512   //8192// 512 // FIXME.
 #define UPDATES_BUFFER_SIZE 512	
 #endif 	
-#if NUM_PEs==1
-	#define VERTEXUPDATES_BUFFER_SIZE (8192 * MAX_NUM_PEs)
-	#else
-	#define VERTEXUPDATES_BUFFER_SIZE 8192
-	#endif 
+#define VERTEXUPDATES_BUFFER_SIZE 8192
 
 #define EDGE_UPDATES_PTR_MAXSIZE 2048
 #define EDGE_UPDATES_CHUNKSZ 2048 // 512 // 512, 1024, 2048*, 4096, 8192  

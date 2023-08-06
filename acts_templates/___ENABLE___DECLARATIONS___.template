@@ -12,23 +12,26 @@
 	#pragma HLS ARRAY_PARTITION variable=updates_buffer2 complete dim=1
 	#pragma HLS ARRAY_PARTITION variable=updates_buffer2 complete dim=2
 
-	keyvalue_t URAM_frontiers[EDGE_PACK_SIZE][MAXVALID_APPLYPARTITION_VECSIZE]; 
-	#pragma HLS resource variable=URAM_frontiers core=XPM_MEMORY uram
-	#pragma HLS ARRAY_PARTITION variable=URAM_frontiers complete dim=1
+	/* keyvalue_t URAM_frontiers[EDGE_PACK_SIZE][MAXVALID_APPLYPARTITION_VECSIZE]; 
+	// #pragma HLS resource variable=URAM_frontiers core=XPM_MEMORY uram
+	#pragma HLS BIND_STORAGE variable=URAM_frontiers type=RAM_1P impl=URAM
+	#pragma HLS ARRAY_PARTITION variable=URAM_frontiers complete dim=1 */
 
 	vprop_dest_t URAM_vprop[NUM_VALID_PEs][EDGE_PACK_SIZE][MAXVALID_APPLYPARTITION_VECSIZE];
-	#pragma HLS resource variable=URAM_vprop core=XPM_MEMORY uram 
+	// #pragma HLS resource variable=URAM_vprop core=XPM_MEMORY uram 
+	#pragma HLS BIND_STORAGE variable=URAM_vprop type=RAM_1P impl=URAM
 	#pragma HLS ARRAY_PARTITION variable=URAM_vprop complete dim=1
 	#pragma HLS ARRAY_PARTITION variable=URAM_vprop complete dim=2 
 	// #pragma HLS aggregate variable=URAM_vprop 
 
-	map_t URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE];
-	#pragma HLS resource variable=URAM_map core=XPM_MEMORY uram 
-	#pragma HLS ARRAY_PARTITION variable=URAM_map complete dim=1	
-	#pragma HLS ARRAY_PARTITION variable=URAM_map complete dim=2	
+	// map_t URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_UPDATES_DRAMBUFFER_SIZE];
+	// #pragma HLS resource variable=URAM_map core=XPM_MEMORY uram 
+	// #pragma HLS ARRAY_PARTITION variable=URAM_map complete dim=1	
+	// #pragma HLS ARRAY_PARTITION variable=URAM_map complete dim=2	
 	
-	keyvalue_t URAM_updates[NUM_VALID_PEs][EDGE_PACK_SIZE][VERTEXUPDATES_BUFFER_SIZE];
-	#pragma HLS resource variable=URAM_updates core=XPM_MEMORY uram 
+	keyvalue_t URAM_updates[NUM_VALID_PEs][EDGE_PACK_SIZE][MAXVALID_VERTEXUPDATES_BUFFER_SIZE]; 
+	// #pragma HLS resource variable=URAM_updates core=XPM_MEMORY uram 
+	#pragma HLS BIND_STORAGE variable=URAM_updates type=RAM_1P impl=URAM
 	#pragma HLS ARRAY_PARTITION variable=URAM_updates complete dim=1	
 	#pragma HLS ARRAY_PARTITION variable=URAM_updates complete dim=2		
 	
@@ -37,7 +40,7 @@
 	keyvalue_t * URAM_frontiers[EDGE_PACK_SIZE]; 
 	vtr_t * vptr_buffer[NUM_VALID_PEs]; 
 	edge3_type * edges_buffer[NUM_VALID_PEs][EDGE_PACK_SIZE];
-	map_t * URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE];
+	// map_t * URAM_map[NUM_VALID_PEs][EDGE_PACK_SIZE];
 	keyvalue_t * updates_buffer2[NUM_VALID_PEs][UPDATES_BUFFER_PACK_SIZE]; 
 	vprop_dest_t * URAM_vprop[NUM_VALID_PEs][EDGE_PACK_SIZE];
 	keyvalue_t * URAM_updates[NUM_VALID_PEs][EDGE_PACK_SIZE];	
@@ -45,7 +48,7 @@
 	for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_frontiers[v] = new keyvalue_t[MAX_APPLYPARTITION_VECSIZE]; }	
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ vptr_buffer[i] = new vtr_t[VPTR_BUFFER_SIZE]; }
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ edges_buffer[i][v] = new edge3_type[EDGE_BUFFER_SIZE]; }}
-	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_map[i][v] = new map_t[EDGE_UPDATES_DRAMBUFFER_SIZE]; }}
+	// for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_map[i][v] = new map_t[EDGE_UPDATES_DRAMBUFFER_SIZE]; }}
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<UPDATES_BUFFER_PACK_SIZE; v++){ updates_buffer2[i][v] = new keyvalue_t[UPDATES_BUFFER_SIZE]; }}
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_vprop[i][v] = new vprop_dest_t[MAXVALID_APPLYPARTITION_VECSIZE]; }}
 	for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_updates[i][v] = new keyvalue_t[8192]; }}

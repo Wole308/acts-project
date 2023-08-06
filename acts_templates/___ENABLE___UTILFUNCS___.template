@@ -8,7 +8,6 @@ void checkoutofbounds(string message, unsigned int data, unsigned int upper_boun
 #endif 
 
 unsigned int hash_edge(unsigned int srcvid, unsigned int dstvid, unsigned int index){
-	
 	unsigned int group = dstvid % 512;
 	// unsigned int edge_hashid = (group * 16) + (dstvid % 16);
 	unsigned int edge_hashid = (group * 16) + (srcvid % 16);
@@ -35,23 +34,25 @@ unsigned int hash2_edge(map_t URAM_map, unsigned int srcvid, unsigned int dstvid
 	return edge_hashid;							
 }
 
-void {{context['classname__acts']}}rearrangeLayoutVx16B(unsigned int s, keyvalue_t in[EDGE_PACK_SIZE], keyvalue_t out[EDGE_PACK_SIZE]){
-	#ifndef FPGA_IMPL
-	// checkoutofbounds("acts_kernel::rearrangeLayoutVx16B::ERROR 2925::", s, EDGE_PACK_SIZE, NAp, NAp, NAp);
-	#endif 
-	{%for v in context['EDGE_PACK_SIZE_seq']%}
-	{%if(v>0)%}else{%endif%} {%if(v<context['EDGE_PACK_SIZE']-1)%}if(s=={{v}}){%endif%}{ 
-		{%for v2 in context['EDGE_PACK_SIZE_seq']%}
-		out[{{    (v+v2) %  (context['EDGE_PACK_SIZE'])  }}] = in[{{v2}}]; 
+void {{context['classname__acts']}}rearrangeLayoutV16x16B(unsigned int s, keyvalue_t in[NUM_VALID_HBM_CHANNELS][EDGE_PACK_SIZE], keyvalue_t out[NUM_VALID_HBM_CHANNELS][EDGE_PACK_SIZE]){
+	if(s==1){
+		{%for v2 in context['NUM_VALID_HBM_CHANNELS_seq']%}
+		{%for v3 in context['EDGE_PACK_SIZE_seq']%}
+		out[{{    (1+v2) %  (context['NUM_VALID_HBM_CHANNELS'])  }}][{{v3}}] = in[{{v2}}][{{v3}}]; 
+		{%endfor%}	
+		{%endfor%}
+	} else {
+		{%for v2 in context['NUM_VALID_HBM_CHANNELS_seq']%}
+		{%for v3 in context['EDGE_PACK_SIZE_seq']%}
+		out[{{v2}}][{{v3}}] = in[{{v2}}][{{v3}}]; 
+		{%endfor%}	
 		{%endfor%}
 	}
-	{%endfor%}
 	return;
 }
-
-void {{context['classname__acts']}}rearrangeLayoutVx16(unsigned int s, edge2_type in[EDGE_PACK_SIZE], edge2_type out[EDGE_PACK_SIZE]){
+void {{context['classname__acts']}}rearrangeLayoutVx16B(unsigned int s, keyvalue_t in[EDGE_PACK_SIZE], keyvalue_t out[EDGE_PACK_SIZE]){
 	#ifndef FPGA_IMPL
-	// checkoutofbounds("acts_kernel::rearrangeLayoutVx16::ERROR 2125::", s, EDGE_PACK_SIZE, NAp, NAp, NAp);
+	checkoutofbounds("acts_kernel::rearrangeLayoutVx16B::ERROR 2925::", s, EDGE_PACK_SIZE, NAp, NAp, NAp);
 	#endif 
 	{%for v in context['EDGE_PACK_SIZE_seq']%}
 	{%if(v>0)%}else{%endif%} {%if(v<context['EDGE_PACK_SIZE']-1)%}if(s=={{v}}){%endif%}{ 

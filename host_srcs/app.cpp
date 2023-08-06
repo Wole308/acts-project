@@ -303,6 +303,7 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 				0, universalparams.NUM_UPARTITIONS, 1, 
 					globalparams[GLOBALPARAMSCODE__COMMANDS__COMMAND0]
 		);
+	// exit(EXIT_SUCCESS); ///////////////////////////////////////////////
 	
 	// load edge map 
 	for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u+=1){
@@ -638,11 +639,12 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	cout<<"loading vertex updates..."<<endl;
 	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ 
 		globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES] = (size_u32 / HBM_CHANNEL_PACK_SIZE) + 16;
-		#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
-		globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES];
-		#else 
-		globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + 0; // act-pack edges occupy 1/2 of hbmchannel
-		#endif 
+		globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES];	
+		// #ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___
+		// globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + globalparams[GLOBALPARAMSCODE__WWSIZE__ACTPACKEDGES];
+		// #else 
+		// globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES] = globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKEDGES] + 0; // act-pack edges occupy 1/2 of hbmchannel
+		// #endif 
 	}
 	cout<<"checkpoint: loading vertex updates: globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]: "<<globalparams[GLOBALPARAMSCODE__BASEOFFSET__VERTEXUPDATES]<<" (of "<<HBM_CHANNEL_SIZE<<")"<<endl;
 	
