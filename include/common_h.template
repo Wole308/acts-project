@@ -22,8 +22,8 @@
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 
 // #define PROOF_OF_CONCEPT_RUN ///////////////.............................................................
-#define ENABLE_SHARING_SRCs
-#define NUM_VALID_HBM_CHANNELS_PER_SLR ({{context['NUM_VALID_HBM_CHANNELS']}} / 3)
+// #define ENABLE_SHARING_SRCs
+#define NUM_VALID_HBM_CHANNELS_PER_SLR {{context['NUM_VALID_HBM_CHANNELS']}} // ({{context['NUM_VALID_HBM_CHANNELS']}} / 3)
 
 #define MAX_NUM_FPGAS 8
 #define RUN_IN_ASYNC_MODE {{context['RUN_IN_ASYNC_MODE']}}

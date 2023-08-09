@@ -14,18 +14,16 @@
 #define POW_VALID_VDATA 1 // 1,0 // FIXME^
 
  
-#define ___RUNNING_FPGA_SYNTHESIS___
- 
 // #define ___ENABLE___DYNAMICGRAPHANALYTICS___
 #ifndef ___RUNNING_FPGA_SYNTHESIS___
 	#define ___CREATE_ACTPACK_FROM_VECTOR___
 #endif 
 // #define PROOF_OF_CONCEPT_RUN ///////////////.............................................................
-#define ENABLE_SHARING_SRCs
-#define NUM_VALID_HBM_CHANNELS_PER_SLR (5 / 3)
+// #define ENABLE_SHARING_SRCs
+#define NUM_VALID_HBM_CHANNELS_PER_SLR 5 // (5 / 3)
 
 #define MAX_NUM_FPGAS 8
-#define RUN_IN_ASYNC_MODE 1
+#define RUN_IN_ASYNC_MODE 0
 
 #define GRAPH_UPDATE_ONLY 1
 #define GRAPH_UPDATE_AND_ANALYTICS 2
@@ -33,6 +31,7 @@
 
 ////////////////////////////////
 
+#define ___SYNC___
 	
 
 #define ALL_MODULES 222 

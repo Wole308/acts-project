@@ -35,19 +35,19 @@ unsigned int hash2_edge(map_t URAM_map, unsigned int srcvid, unsigned int dstvid
 }
 
 void {{context['classname__acts']}}rearrangeLayoutV16x16B(unsigned int s, keyvalue_t in[NUM_VALID_HBM_CHANNELS][EDGE_PACK_SIZE], keyvalue_t out[NUM_VALID_HBM_CHANNELS][EDGE_PACK_SIZE]){
-	if(s==1){
-		{%for v2 in context['NUM_VALID_HBM_CHANNELS_seq']%}
-		{%for v3 in context['EDGE_PACK_SIZE_seq']%}
-		out[{{    (1+v2) %  (context['NUM_VALID_HBM_CHANNELS'])  }}][{{v3}}] = in[{{v2}}][{{v3}}]; 
-		{%endfor%}	
-		{%endfor%}
-	} else {
+	// if(s==1){
+		// {%for v2 in context['NUM_VALID_HBM_CHANNELS_seq']%}
+		// {%for v3 in context['EDGE_PACK_SIZE_seq']%}
+		// out[{{    (1+v2) %  (context['NUM_VALID_HBM_CHANNELS'])  }}][{{v3}}] = in[{{v2}}][{{v3}}]; 
+		// {%endfor%}	
+		// {%endfor%}
+	// } else {	
 		{%for v2 in context['NUM_VALID_HBM_CHANNELS_seq']%}
 		{%for v3 in context['EDGE_PACK_SIZE_seq']%}
 		out[{{v2}}][{{v3}}] = in[{{v2}}][{{v3}}]; 
 		{%endfor%}	
 		{%endfor%}
-	}
+	// }	
 	return;
 }
 void {{context['classname__acts']}}rearrangeLayoutVx16B(unsigned int s, keyvalue_t in[EDGE_PACK_SIZE], keyvalue_t out[EDGE_PACK_SIZE]){

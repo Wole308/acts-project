@@ -380,7 +380,7 @@ int save_tmp_edges(edge_dtype * URAM_edges[EDGE_PACK_SIZE], map_t stats[EDGE_PAC
 }	
 
 // [NUM_VALID_PEs]
-void save_final_edges(unsigned int cmd, unsigned int i, unsigned int base_offset, map_t edges_allmap[NUM_VALID_PEs], map_t stats[EDGE_PACK_SIZE][EDGE_PACK_SIZE], edge_dtype * URAM_edges[EDGE_PACK_SIZE], map_t * edges_map, map_t edges_dmap[NUM_LLP_PER_LLPSET], HBM_channelAXISW_t * HBM_channelA, HBM_channelAXISW_t * HBM_channelB, universalparams_t universalparams){
+void save_final_edges(unsigned int cmd, unsigned int i, unsigned int base_offset, map_t edges_allmap[MAX_GLOBAL_NUM_PEs], map_t stats[EDGE_PACK_SIZE][EDGE_PACK_SIZE], edge_dtype * URAM_edges[EDGE_PACK_SIZE], map_t * edges_map, map_t edges_dmap[NUM_LLP_PER_LLPSET], HBM_channelAXISW_t * HBM_channelA, HBM_channelAXISW_t * HBM_channelB, universalparams_t universalparams){
 	unsigned int offset_p[EDGE_PACK_SIZE];
 	unsigned int p_[EDGE_PACK_SIZE];
 	edge_dtype edge[EDGE_PACK_SIZE];	
@@ -436,22 +436,22 @@ void save_final_edges(unsigned int cmd, unsigned int i, unsigned int base_offset
 	// exit(EXIT_SUCCESS);
 }
 
-unsigned int create_act_pack::create_actpack(
+unsigned int create_act_pack::create_actpack( // universalparams.GLOBAL_NUM_PEs_
 		vector<edge3_type> (&partitioned_edges)[MAX_GLOBAL_NUM_PEs][MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS], HBM_channelAXISW_t * HBM_channelA[MAX_GLOBAL_NUM_PEs], HBM_channelAXISW_t * HBM_channelB[MAX_GLOBAL_NUM_PEs], map_t * returned_edge_maps[MAX_GLOBAL_NUM_PEs], map_t * returned_vu_map[MAX_GLOBAL_NUM_PEs], unsigned int offset_dest, 
 		unsigned int num_upartitions, unsigned int num_llpset, unsigned int start_pu, unsigned int size_pu, unsigned int skip_pu, unsigned int cmd
 		){		
 
-	edge_dtype * URAM_edges[NUM_VALID_PEs][EDGE_PACK_SIZE];for(unsigned int i=0; i<NUM_VALID_PEs; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_edges[i][v] = new edge_dtype[EDGE_UPDATES_DRAMBUFFER_LONGSIZE]; }}
-	edge_vec_dtype * HBM_channelTmp[NUM_VALID_PEs]; for(unsigned int i=0; i<NUM_VALID_PEs; i++){ HBM_channelTmp[i] = new edge_vec_dtype[EDGE_UPDATES_DRAMBUFFER_LONGSIZE]; }
+	edge_dtype * URAM_edges[MAX_GLOBAL_NUM_PEs][EDGE_PACK_SIZE];for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ URAM_edges[i][v] = new edge_dtype[EDGE_UPDATES_DRAMBUFFER_LONGSIZE]; }}
+	edge_vec_dtype * HBM_channelTmp[MAX_GLOBAL_NUM_PEs]; for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ HBM_channelTmp[i] = new edge_vec_dtype[EDGE_UPDATES_DRAMBUFFER_LONGSIZE]; }
 
 	unsigned int _MAX_BUFFER_SIZE = EDGE_UPDATES_DRAMBUFFER_LONGSIZE; 
 	unsigned int _MAX_WORKBUFFER_SIZE = EDGE_UPDATES_DRAMBUFFER_LONGSIZE; 
 	
-	map_t stats[NUM_VALID_PEs][EDGE_PACK_SIZE][EDGE_PACK_SIZE]; 
-	map_t edges_map[NUM_VALID_PEs][NUM_LLP_PER_LLPSET];
-	unsigned int temp_size[NUM_VALID_PEs];
+	map_t stats[MAX_GLOBAL_NUM_PEs][EDGE_PACK_SIZE][EDGE_PACK_SIZE]; 
+	map_t edges_map[MAX_GLOBAL_NUM_PEs][NUM_LLP_PER_LLPSET];
+	unsigned int temp_size[MAX_GLOBAL_NUM_PEs];
 	unsigned int total_sz = 0;
-	unsigned int running_offset[NUM_VALID_PEs]; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ running_offset[n] = 0; }
+	unsigned int running_offset[MAX_GLOBAL_NUM_PEs]; for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ running_offset[n] = 0; }
 	
 	map_t vupdates_map[MAX_NUM_UPARTITIONS][MAX_NUM_LLPSETS];
 	for(unsigned int p_u=0; p_u<num_upartitions; p_u++){	
@@ -467,12 +467,12 @@ unsigned int create_act_pack::create_actpack(
 		}
 	}
 	
-	map_t edges_allmap[NUM_VALID_PEs]; for(unsigned int n=0; n<NUM_VALID_PEs; n+=1){ edges_allmap[n].offset = 0; edges_allmap[n].size = 0; }
+	map_t edges_allmap[MAX_GLOBAL_NUM_PEs]; for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n+=1){ edges_allmap[n].offset = 0; edges_allmap[n].size = 0; }
 	
-	unsigned int returned_volume_size = 0; unsigned int returned_volume2_size[NUM_VALID_PEs]; for(unsigned int t=0; t<NUM_VALID_PEs; t++){ returned_volume2_size[t] = 0; }
+	unsigned int returned_volume_size = 0; unsigned int returned_volume2_size[MAX_GLOBAL_NUM_PEs]; for(unsigned int t=0; t<universalparams.GLOBAL_NUM_PEs_; t++){ returned_volume2_size[t] = 0; }
 	CREATE_ACTPACK_BASELOOP1: for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u+=1){ 
 		#ifdef _DEBUGMODE_KERNELPRINTS4
-		cout<<"### creating act-pack in upartition "<<p_u<<" (of "<<universalparams.NUM_UPARTITIONS<<"): [PEs "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<n<<", "; } cout<<"]"<<endl; 
+		cout<<"### creating act-pack in upartition "<<p_u<<" (of "<<universalparams.NUM_UPARTITIONS<<"): [PEs "; for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ cout<<n<<", "; } cout<<"]"<<endl; 
 		#endif 
 		CREATE_ACTPACK_BASELOOP1B: for(unsigned int llp_set=0; llp_set<num_llpset; llp_set++){ // num_llpset
 			if(partitioned_edges[0][p_u][llp_set].size() == 0){ continue; } 	
@@ -483,24 +483,24 @@ unsigned int create_act_pack::create_actpack(
 			if(llp_set <= 4){ cout<<">>> creating act-pack in upartition "<<p_u<<", llp_set: "<<llp_set<<"...."<<endl; }
 			#endif 
 			for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ 
-				for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
+				for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ 
 					edges_map[n][llp_id].offset = 0; edges_map[n][llp_id].size = 0;
 				}
 			}
 			
-			map_t edges_dmap[NUM_VALID_PEs][NUM_LLP_PER_LLPSET]; 
+			map_t edges_dmap[MAX_GLOBAL_NUM_PEs][NUM_LLP_PER_LLPSET]; 
 			for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ 
-				for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
+				for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ 
 					edges_dmap[n][llp_id].offset = 0; edges_dmap[n][llp_id].size = 0;
 				}
 			}
 			
-			map_t rawedge_maps[NUM_VALID_PEs];
-			for(unsigned int n=0; n<NUM_VALID_PEs; n++){ rawedge_maps[n].size = partitioned_edges[n][p_u][llp_set].size() / EDGE_PACK_SIZE; }
+			map_t rawedge_maps[MAX_GLOBAL_NUM_PEs];
+			for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ rawedge_maps[n].size = partitioned_edges[n][p_u][llp_set].size() / EDGE_PACK_SIZE; }
 			
 			for(unsigned int c=0; c<2; c++){
-				unsigned int maxnum_rawedges = 0; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ if(maxnum_rawedges < rawedge_maps[n].size){ maxnum_rawedges = rawedge_maps[n].size; }}
-				unsigned int maxnum_preprocedges = 0; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ if(maxnum_preprocedges < temp_size[n]){ maxnum_preprocedges = temp_size[n]; }}
+				unsigned int maxnum_rawedges = 0; for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ if(maxnum_rawedges < rawedge_maps[n].size){ maxnum_rawedges = rawedge_maps[n].size; }}
+				unsigned int maxnum_preprocedges = 0; for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ if(maxnum_preprocedges < temp_size[n]){ maxnum_preprocedges = temp_size[n]; }}
 				unsigned int work_size;	if(c==0){ work_size = maxnum_rawedges; } else { work_size = maxnum_preprocedges; }
 				#ifdef _DEBUGMODE_CHECKS3
 				if(work_size > _MAX_BUFFER_SIZE){ cout<<"ALERT: c("<<c<<")=="<<c<<" && work_size("<<work_size<<") > _MAX_BUFFER_SIZE("<<_MAX_BUFFER_SIZE<<"). EDGE_UPDATES_DRAMBUFFER_LONGSIZE("<<EDGE_UPDATES_DRAMBUFFER_LONGSIZE<<" EXITING..."<<endl; exit(EXIT_FAILURE); }
@@ -508,14 +508,14 @@ unsigned int create_act_pack::create_actpack(
 				
 				#ifdef _DEBUGMODE_KERNELPRINTS4_CREATEACTPACT
 				cout<<">>> create_act_pack::prepare-edge-updates:: c: "<<c<<", p_u: "<<p_u<<", llp_set: "<<llp_set<<", work_size: "<<work_size<<", _MAX_BUFFER_SIZE: "<<_MAX_BUFFER_SIZE<<", partitioned_edges[0]["<<p_u<<"]["<<llp_set<<"].size(): "<<partitioned_edges[0][p_u][llp_set].size() / EDGE_PACK_SIZE<<endl; 
-				cout<<"create_act_pack::prepare-edge-updates:: rawedges_maps: "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<rawedge_maps[n].size<<", "; } cout<<endl;
-				if(c==1){ cout<<"create_act_pack::prepare-edge-updates:: temp_size: "; for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<temp_size[n]<<", "; } cout<<endl; }
+				cout<<"create_act_pack::prepare-edge-updates:: rawedges_maps: "; for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ cout<<rawedge_maps[n].size<<", "; } cout<<endl;
+				if(c==1){ cout<<"create_act_pack::prepare-edge-updates:: temp_size: "; for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ cout<<temp_size[n]<<", "; } cout<<endl; }
 				#endif 
 				
 				// reset
 				LOOP1734: for(unsigned int t=0; t<EDGE_PACK_SIZE; t++){
 					for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
-						for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+						for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){
 							stats[n][v][t].offset = 0;
 							stats[n][v][t].size = 0;
 						}
@@ -523,9 +523,9 @@ unsigned int create_act_pack::create_actpack(
 				}
 			
 				// partition stage 1
-				edge_vec_dtype edges_vec[NUM_VALID_PEs];
+				edge_vec_dtype edges_vec[MAX_GLOBAL_NUM_PEs];
 				CREATE_ACTPACK_LOOP1: for(unsigned int t=0; t<work_size; t++){
-					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
+					for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ 
 						for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 							if(c==0){
 								edges_vec[n].data[v].srcvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].srcvid % universalparams._MAX_UPARTITION_SIZE; // NOTE: converted vid to local partition vid 
@@ -536,7 +536,7 @@ unsigned int create_act_pack::create_actpack(
 						}
 					}
 					
-					for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+					for(unsigned int inst=0; inst<universalparams.GLOBAL_NUM_PEs_; inst++){
 						for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 							if(edges_vec[inst].data[v].srcvid != INVALIDDATA){
 								#ifdef _DEBUGMODE_KERNELPRINTS//4
@@ -560,7 +560,7 @@ unsigned int create_act_pack::create_actpack(
 				// calculate counts offsets 
 				for(unsigned int p=1; p<EDGE_PACK_SIZE; p++){ 
 					for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
-						for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+						for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){
 							stats[n][v][p].offset = stats[n][v][p-1].offset + stats[n][v][p-1].size;					
 							#ifdef _DEBUGMODE_CHECKS3
 							if(stats[0][v][p-1].offset + stats[0][v][p-1].size > _MAX_BUFFER_SIZE){ cout<<"prepare-edge-updates:: ALERT: stats[0]["<<v<<"]["<<p-1<<"].offset ("<<stats[0][v][p-1].offset<<") + stats[0]["<<v<<"]["<<p-1<<"].size ("<<stats[0][v][p-1].size<<") (:"<<stats[0][v][p-1].offset + stats[0][v][p-1].size<<":) >= EDGE_UPDATES_DRAMBUFFER_SIZE. EXITING..."<<endl; exit(EXIT_FAILURE); }					
@@ -575,7 +575,7 @@ unsigned int create_act_pack::create_actpack(
 				// reset counts sizes
 				LOOP1234: for(unsigned int p=0; p<EDGE_PACK_SIZE; p++){ 
 					for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 
-						for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+						for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){
 							stats[n][v][p].size = 0;
 						}
 					}
@@ -583,7 +583,7 @@ unsigned int create_act_pack::create_actpack(
 
 				// partition stage 2
 				CREATE_ACTPACK_LOOP2: for(unsigned int t=0; t<work_size; t++){ 
-					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ 
+					for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ 
 						for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 							if(c==0){
 								edges_vec[n].data[v].srcvid = partitioned_edges[n][p_u][llp_set][t*EDGE_PACK_SIZE + v].srcvid % universalparams._MAX_UPARTITION_SIZE; 
@@ -593,7 +593,7 @@ unsigned int create_act_pack::create_actpack(
 							}
 						}
 					}
-					for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){
+					for(unsigned int inst=0; inst<universalparams.GLOBAL_NUM_PEs_; inst++){
 						for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){
 							if(edges_vec[inst].data[v].srcvid != INVALIDDATA){ 
 								unsigned int data = 0; if(c==0){ data = edges_vec[inst].data[v].srcvid; } else { data = edges_vec[inst].data[v].dstvid; }
@@ -614,26 +614,26 @@ unsigned int create_act_pack::create_actpack(
 			
 				// store edge updates
 				if(c==0){ 
-					for(unsigned int i=0; i<NUM_VALID_PEs; i++){
+					for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
 						temp_size[i] = save_tmp_edges(URAM_edges[i], stats[i], HBM_channelTmp[i]);	
 					}
 				} else {
 					#ifdef _DEBUGMODE_KERNELPRINTS4_CREATEACTPACT // NUM_LLP_PER_LLPSET
-					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (before): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
+					for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (before): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
 					#endif 	
-					for(unsigned int i=0; i<NUM_VALID_PEs; i++){
+					for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){
 						// cout<<"----------------------------------------------- i: "<<i<<" --------------------------------------------"<<endl;
 						save_final_edges(cmd, i, offset_dest, edges_allmap, stats[i], URAM_edges[i], edges_map[i], edges_dmap[i], HBM_channelA[i], HBM_channelB[i], universalparams);	
 					}
 					#ifdef _DEBUGMODE_KERNELPRINTS4_CREATEACTPACT
-					for(unsigned int n=0; n<NUM_VALID_PEs; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (after): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
+					for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){ cout<<"prepare-edge-updates (after): edges_map["<<n<<"]["<<llp_id<<"]: p_u: "<<p_u<<", llp_set: "<<llp_set<<", llp_id: "<<llp_id<<", offset: "<<edges_map[n][llp_id].offset<<", size: "<<edges_map[n][llp_id].size<<""<<endl; }}
 					#endif 
 				}	
 
 				// update edge maps
 				if(c == 1){ 
 					SAVE_EDGEMAPS_LOOP1: for(unsigned int llp_id=0; llp_id<NUM_LLP_PER_LLPSET; llp_id++){	
-						for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+						for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){
 							edges_map[n][llp_id].offset = running_offset[n]; // set offset
 							#ifdef _DEBUGMODE_KERNELPRINTS//4
 							cout<<"create-actpack: create-actpack: edges_map["<<n<<"]["<<llp_id<<"].offset: "<<edges_map[n][llp_id].offset<<", edges_map["<<n<<"]["<<llp_id<<"].size: "<<edges_map[n][llp_id].size<<""<<endl; 
@@ -643,8 +643,8 @@ unsigned int create_act_pack::create_actpack(
 							returned_volume2_size[n] += edges_map[n][llp_id].size;
 						}
 						
-						map_t edge_map_vec[NUM_VALID_PEs];
-						for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+						map_t edge_map_vec[MAX_GLOBAL_NUM_PEs];
+						for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){
 							edge_map_vec[n] = edges_map[n][llp_id];
 							returned_edge_maps[n][p_u*MAX_NUM_LLP_PER_UPARTITION + llp_set*NUM_LLP_PER_LLPSET + llp_id] = edges_map[n][llp_id];
 						}
@@ -653,7 +653,7 @@ unsigned int create_act_pack::create_actpack(
 						returned_volume_size += edges_dmap[0][llp_id].size;
 						
 						#ifdef _DEBUGMODE_KERNELPRINTS//4
-						for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"create-actpack: edges_map["<<n<<"]["<<llp_id<<"].offset: "<<edges_map[n][llp_id].offset<<", edges_map["<<n<<"]["<<llp_id<<"].size: "<<edges_map[n][llp_id].size<<""<<endl; }
+						for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ cout<<"create-actpack: edges_map["<<n<<"]["<<llp_id<<"].offset: "<<edges_map[n][llp_id].offset<<", edges_map["<<n<<"]["<<llp_id<<"].size: "<<edges_map[n][llp_id].size<<""<<endl; }
 						#endif
 					}
 				}
@@ -705,7 +705,7 @@ unsigned int create_act_pack::create_actpack(
 		vertex_updates_map[t].size = 0;	
 		vertex_updates2_map[t].size = 0;	
 	}
-	for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+	for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){
 		for(unsigned int t=0; t<num_llpset; t++){		
 			unsigned int index = t;
 			returned_vu_map[n][index] = vertex_updates2_map[t];
@@ -716,7 +716,7 @@ unsigned int create_act_pack::create_actpack(
 	}
 	#ifdef _DEBUGMODE_KERNELPRINTS4
 	cout<<"create-actpack: FINISH: returned_volume_size: "<<returned_volume_size<<", returned_volume_size * EDGE_PACK_SIZE: "<<returned_volume_size * EDGE_PACK_SIZE<<endl;
-	for(unsigned int n=0; n<NUM_VALID_PEs; n++){ cout<<"create-actpack: FINISH: returned_volume2_size["<<n<<"]: "<<returned_volume2_size[n]<<", returned_volume2_size["<<n<<"] * EDGE_PACK_SIZE: "<<returned_volume2_size[n] * EDGE_PACK_SIZE<<endl; }
+	for(unsigned int n=0; n<universalparams.GLOBAL_NUM_PEs_; n++){ cout<<"create-actpack: FINISH: returned_volume2_size["<<n<<"]: "<<returned_volume2_size[n]<<", returned_volume2_size["<<n<<"] * EDGE_PACK_SIZE: "<<returned_volume2_size[n] * EDGE_PACK_SIZE<<endl; }
 	#endif 
 	// exit(EXIT_SUCCESS);
 	return returned_volume2_size[0];

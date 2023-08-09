@@ -171,10 +171,10 @@ void act_pack::load_edges(vector<edge_t> &vertexptrbuffer, vector<edge3_type> &e
 			}	
 		} // iteration end: p_u	
 		
-		#ifdef _DEBUGMODE_KERNELPRINTS4
+		#ifdef _DEBUGMODE_KERNELPRINTS//4
 		for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u++){
 			for(unsigned int llp_set=0; llp_set<1; llp_set++){ 
-				if(i==0 && final_edge_updates[i][p_u][llp_set].size() > 0){ cout<<">>> final_edge_updates["<<i<<"]["<<p_u<<"]["<<llp_set<<"].size(): "<<final_edge_updates[i][p_u][llp_set].size()<<""<<endl; }
+				if(i>=0 && final_edge_updates[i][p_u][llp_set].size() > 0){ cout<<">>> final_edge_updates["<<i<<"]["<<p_u<<"]["<<llp_set<<"].size(): "<<final_edge_updates[i][p_u][llp_set].size()<<""<<endl; }
 			}
 		}
 		#endif 

@@ -27,7 +27,7 @@ using namespace std;
 #define MAXVALID_APPLYPARTITION_VECSIZE (MAX_APPLYPARTITION_VECSIZE >> POW_VALID_VDATA)
 #define MAXVALID_VERTEXUPDATES_BUFFER_SIZE (VERTEXUPDATES_BUFFER_SIZE >> POW_VALID_VDATA)
 
-unsigned int num_prints = 1;	
+unsigned int num_prints = 16;	
 
 #ifdef ___RUNNING_FPGA_SYNTHESIS___ // FPGA_IMPL
 #define MY_IFDEF_NFRONTIER() keyvalue_t nfrontier_buffer[EDGE_PACK_SIZE][MAX_VDATA_SUBPARTITION_VECSIZE]
@@ -135,93 +135,93 @@ unsigned int hash2_edge(map_t URAM_map, unsigned int srcvid, unsigned int dstvid
 }
 
 void rearrangeLayoutV16x16B(unsigned int s, keyvalue_t in[NUM_VALID_HBM_CHANNELS][EDGE_PACK_SIZE], keyvalue_t out[NUM_VALID_HBM_CHANNELS][EDGE_PACK_SIZE]){
-	if(s==1){
-		out[1][0] = in[0][0]; 
-		out[1][1] = in[0][1]; 
-		out[1][2] = in[0][2]; 
-		out[1][3] = in[0][3]; 
-		out[1][4] = in[0][4]; 
-		out[1][5] = in[0][5]; 
-		out[1][6] = in[0][6]; 
-		out[1][7] = in[0][7]; 
-		out[1][8] = in[0][8]; 
-		out[1][9] = in[0][9]; 
-		out[1][10] = in[0][10]; 
-		out[1][11] = in[0][11]; 
-		out[1][12] = in[0][12]; 
-		out[1][13] = in[0][13]; 
-		out[1][14] = in[0][14]; 
-		out[1][15] = in[0][15]; 
-	
-		out[2][0] = in[1][0]; 
-		out[2][1] = in[1][1]; 
-		out[2][2] = in[1][2]; 
-		out[2][3] = in[1][3]; 
-		out[2][4] = in[1][4]; 
-		out[2][5] = in[1][5]; 
-		out[2][6] = in[1][6]; 
-		out[2][7] = in[1][7]; 
-		out[2][8] = in[1][8]; 
-		out[2][9] = in[1][9]; 
-		out[2][10] = in[1][10]; 
-		out[2][11] = in[1][11]; 
-		out[2][12] = in[1][12]; 
-		out[2][13] = in[1][13]; 
-		out[2][14] = in[1][14]; 
-		out[2][15] = in[1][15]; 
-	
-		out[3][0] = in[2][0]; 
-		out[3][1] = in[2][1]; 
-		out[3][2] = in[2][2]; 
-		out[3][3] = in[2][3]; 
-		out[3][4] = in[2][4]; 
-		out[3][5] = in[2][5]; 
-		out[3][6] = in[2][6]; 
-		out[3][7] = in[2][7]; 
-		out[3][8] = in[2][8]; 
-		out[3][9] = in[2][9]; 
-		out[3][10] = in[2][10]; 
-		out[3][11] = in[2][11]; 
-		out[3][12] = in[2][12]; 
-		out[3][13] = in[2][13]; 
-		out[3][14] = in[2][14]; 
-		out[3][15] = in[2][15]; 
-	
-		out[4][0] = in[3][0]; 
-		out[4][1] = in[3][1]; 
-		out[4][2] = in[3][2]; 
-		out[4][3] = in[3][3]; 
-		out[4][4] = in[3][4]; 
-		out[4][5] = in[3][5]; 
-		out[4][6] = in[3][6]; 
-		out[4][7] = in[3][7]; 
-		out[4][8] = in[3][8]; 
-		out[4][9] = in[3][9]; 
-		out[4][10] = in[3][10]; 
-		out[4][11] = in[3][11]; 
-		out[4][12] = in[3][12]; 
-		out[4][13] = in[3][13]; 
-		out[4][14] = in[3][14]; 
-		out[4][15] = in[3][15]; 
-	
-		out[0][0] = in[4][0]; 
-		out[0][1] = in[4][1]; 
-		out[0][2] = in[4][2]; 
-		out[0][3] = in[4][3]; 
-		out[0][4] = in[4][4]; 
-		out[0][5] = in[4][5]; 
-		out[0][6] = in[4][6]; 
-		out[0][7] = in[4][7]; 
-		out[0][8] = in[4][8]; 
-		out[0][9] = in[4][9]; 
-		out[0][10] = in[4][10]; 
-		out[0][11] = in[4][11]; 
-		out[0][12] = in[4][12]; 
-		out[0][13] = in[4][13]; 
-		out[0][14] = in[4][14]; 
-		out[0][15] = in[4][15]; 
-	
-	} else {
+	// if(s==1){
+		// 		// 		// out[1][0] = in[0][0]; 
+		// 		// out[1][1] = in[0][1]; 
+		// 		// out[1][2] = in[0][2]; 
+		// 		// out[1][3] = in[0][3]; 
+		// 		// out[1][4] = in[0][4]; 
+		// 		// out[1][5] = in[0][5]; 
+		// 		// out[1][6] = in[0][6]; 
+		// 		// out[1][7] = in[0][7]; 
+		// 		// out[1][8] = in[0][8]; 
+		// 		// out[1][9] = in[0][9]; 
+		// 		// out[1][10] = in[0][10]; 
+		// 		// out[1][11] = in[0][11]; 
+		// 		// out[1][12] = in[0][12]; 
+		// 		// out[1][13] = in[0][13]; 
+		// 		// out[1][14] = in[0][14]; 
+		// 		// out[1][15] = in[0][15]; 
+		// 	
+		// 		// 		// out[2][0] = in[1][0]; 
+		// 		// out[2][1] = in[1][1]; 
+		// 		// out[2][2] = in[1][2]; 
+		// 		// out[2][3] = in[1][3]; 
+		// 		// out[2][4] = in[1][4]; 
+		// 		// out[2][5] = in[1][5]; 
+		// 		// out[2][6] = in[1][6]; 
+		// 		// out[2][7] = in[1][7]; 
+		// 		// out[2][8] = in[1][8]; 
+		// 		// out[2][9] = in[1][9]; 
+		// 		// out[2][10] = in[1][10]; 
+		// 		// out[2][11] = in[1][11]; 
+		// 		// out[2][12] = in[1][12]; 
+		// 		// out[2][13] = in[1][13]; 
+		// 		// out[2][14] = in[1][14]; 
+		// 		// out[2][15] = in[1][15]; 
+		// 	
+		// 		// 		// out[3][0] = in[2][0]; 
+		// 		// out[3][1] = in[2][1]; 
+		// 		// out[3][2] = in[2][2]; 
+		// 		// out[3][3] = in[2][3]; 
+		// 		// out[3][4] = in[2][4]; 
+		// 		// out[3][5] = in[2][5]; 
+		// 		// out[3][6] = in[2][6]; 
+		// 		// out[3][7] = in[2][7]; 
+		// 		// out[3][8] = in[2][8]; 
+		// 		// out[3][9] = in[2][9]; 
+		// 		// out[3][10] = in[2][10]; 
+		// 		// out[3][11] = in[2][11]; 
+		// 		// out[3][12] = in[2][12]; 
+		// 		// out[3][13] = in[2][13]; 
+		// 		// out[3][14] = in[2][14]; 
+		// 		// out[3][15] = in[2][15]; 
+		// 	
+		// 		// 		// out[4][0] = in[3][0]; 
+		// 		// out[4][1] = in[3][1]; 
+		// 		// out[4][2] = in[3][2]; 
+		// 		// out[4][3] = in[3][3]; 
+		// 		// out[4][4] = in[3][4]; 
+		// 		// out[4][5] = in[3][5]; 
+		// 		// out[4][6] = in[3][6]; 
+		// 		// out[4][7] = in[3][7]; 
+		// 		// out[4][8] = in[3][8]; 
+		// 		// out[4][9] = in[3][9]; 
+		// 		// out[4][10] = in[3][10]; 
+		// 		// out[4][11] = in[3][11]; 
+		// 		// out[4][12] = in[3][12]; 
+		// 		// out[4][13] = in[3][13]; 
+		// 		// out[4][14] = in[3][14]; 
+		// 		// out[4][15] = in[3][15]; 
+		// 	
+		// 		// 		// out[0][0] = in[4][0]; 
+		// 		// out[0][1] = in[4][1]; 
+		// 		// out[0][2] = in[4][2]; 
+		// 		// out[0][3] = in[4][3]; 
+		// 		// out[0][4] = in[4][4]; 
+		// 		// out[0][5] = in[4][5]; 
+		// 		// out[0][6] = in[4][6]; 
+		// 		// out[0][7] = in[4][7]; 
+		// 		// out[0][8] = in[4][8]; 
+		// 		// out[0][9] = in[4][9]; 
+		// 		// out[0][10] = in[4][10]; 
+		// 		// out[0][11] = in[4][11]; 
+		// 		// out[0][12] = in[4][12]; 
+		// 		// out[0][13] = in[4][13]; 
+		// 		// out[0][14] = in[4][14]; 
+		// 		// out[0][15] = in[4][15]; 
+		// 	
+		// 	// } else {	
 		out[0][0] = in[0][0]; 
 		out[0][1] = in[0][1]; 
 		out[0][2] = in[0][2]; 
@@ -307,7 +307,7 @@ void rearrangeLayoutV16x16B(unsigned int s, keyvalue_t in[NUM_VALID_HBM_CHANNELS
 		out[4][14] = in[4][14]; 
 		out[4][15] = in[4][15]; 
 	
-	}
+	// }	
 	return;
 }
 void rearrangeLayoutVx16B(unsigned int s, keyvalue_t in[EDGE_PACK_SIZE], keyvalue_t out[EDGE_PACK_SIZE]){
@@ -2591,6 +2591,30 @@ for(unsigned int t=0; t<1024; t++){
 		if(action.fpga < num_prints){ cout<<"acts: start: updatesptrs["<<t<<"].offset: "<<updatesptrs[t].offset<<", updatesptrs["<<t<<"].size: "<<updatesptrs[t].size<<endl; }
 		#endif 
 	}
+	
+	/* ///////////////////// REMOVEME
+	map_t edge_maps_ll[NUM_VALID_PEs];
+	for(unsigned int p_u=action.start_pu; p_u<action.start_pu + action.size_pu + 4; p_u+=action.skip_pu){
+		// load_edgemaps((p_u * MAX_NUM_LLPSETS) + 0, globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS], edge_maps_ll,  HBM_channelA0, HBM_channelB0, HBM_channelA1, HBM_channelB1, HBM_channelA2, HBM_channelB2, HBM_channelA3, HBM_channelB3, HBM_channelA4, HBM_channelB4); 
+		unsigned int index = ((p_u * MAX_NUM_LLPSETS)) * 2; // '*2' because data is dual: i.e., offset and size
+		edge_maps_ll[0].offset = HBM_channelA0[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[1].offset = HBM_channelA1[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[2].offset = HBM_channelA2[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[3].offset = HBM_channelA3[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[4].offset = HBM_channelA4[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[0].size = HBM_channelA0[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[1].size = HBM_channelA1[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[2].size = HBM_channelA2[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[3].size = HBM_channelA3[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)];
+		edge_maps_ll[4].size = HBM_channelA4[globalparams[GLOBALPARAMSCODE__BASEOFFSET__ACTPACKVPTRS] + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)];
+		for(unsigned int n=0; n<NUM_VALID_PEs; n++){
+			#ifdef _DEBUGMODE_KERNELPRINTS4
+			cout<<">>> ------------------------  acts : [load] edge_maps_ll["<<n<<"]["<<p_u<<"].offset: "<<edge_maps_ll[n].offset<<", edge_maps_ll["<<n<<"]["<<p_u<<"].size: "<<edge_maps_ll[n].size<<endl;
+			#endif 
+		}
+	}
+	exit(EXIT_SUCCESS);
+	///////////////////// REMOVEME */
 	
 	// load edge map 
 	#ifdef ___ENABLE___DYNAMICGRAPHANALYTICS___

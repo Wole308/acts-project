@@ -303,7 +303,6 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 				0, universalparams.NUM_UPARTITIONS, 1, 
 					globalparams[GLOBALPARAMSCODE__COMMANDS__COMMAND0]
 		);
-	// exit(EXIT_SUCCESS); ///////////////////////////////////////////////
 	
 	// load edge map 
 	for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS; p_u+=1){
@@ -336,16 +335,17 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 			edge_maps_large[i][t].offset = edge_maps_large[i][t - 1].offset + edge_maps_large[i][t - 1].size;
 		}
 	}
-	#ifdef _DEBUGMODE_HOSTPRINTS4
-	for(unsigned int i=0; i<1; i++){ 
+	#ifdef _DEBUGMODE_HOSTPRINTS//4
+	for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ 
 		for(unsigned int k=0; k<universalparams.NUM_UPARTITIONS; k++){
 			for(unsigned int t=0; t<num_llpset; t++){ // MAX_NUM_LLPSETS
 				unsigned int t1 = k*MAX_NUM_LLPSETS + t;
-				if(false){ cout<<"~~~ edge_maps_large["<<i<<"]["<<t1<<"].offset: "<<edge_maps_large[i][t1].offset<<", edge_maps_large["<<i<<"]["<<t1<<"].size: "<<edge_maps_large[i][t1].size<<endl; }
+				if(true){ cout<<"~~~ edge_maps_large["<<i<<"]["<<t1<<"].offset: "<<edge_maps_large[i][t1].offset<<", edge_maps_large["<<i<<"]["<<t1<<"].size: "<<edge_maps_large[i][t1].size<<endl; }
 			}
 		}
 	}
 	#endif 
+	
 	for(unsigned int p_u=0; p_u<universalparams.NUM_UPARTITIONS + 4; p_u+=1){
 		for(unsigned int llp_set=0; llp_set<num_llpset; llp_set++){ 
 			unsigned int index = ((p_u * MAX_NUM_LLPSETS) + llp_set) * 2; // '*2' because data is dual: i.e., offset and size
@@ -364,7 +364,6 @@ unsigned int load_actpack_edges(HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FP
 			}
 		}
 	}
-	// exit(EXIT_SUCCESS);/////////////////////////////
 	
 	// load vertex update map	
 	for(unsigned int t=0; t<num_llpset; t++){		
@@ -719,10 +718,6 @@ void app::run(std::string algo, unsigned int num_fpgas, unsigned int rootvid, in
 	unsigned int hbm_channel_wwsize = globalparams[GLOBALPARAMSCODE__BASEOFFSET__NFRONTIERS] + globalparams[GLOBALPARAMSCODE__WWSIZE__NFRONTIERS]; // HBM_CHANNEL_SIZE
 	hostobj->runapp(graph_path, binaryFile, edgedatabuffer, vertexptrbuffer, edge_maps_large, HBM_axichannel, HBM_axicenter, hbm_channel_wwsize, globalparams, universalparams);
 	
-	//Free 
-	// edgedatabuffer.clear();
-	// vertexptrbuffer.clear();
-	// for(unsigned int i=0; i<universalparams.GLOBAL_NUM_PEs_; i++){ for(unsigned int p_u=0; p_u<MAX_NUM_UPARTITIONS; p_u++){ for(unsigned int llp_set=0; llp_set<MAX_NUM_LLPSETS; llp_set++){ partitioned_edges[i][p_u][llp_set].clear(); }}}
 	return;
 }
 
