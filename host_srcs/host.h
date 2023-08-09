@@ -32,9 +32,9 @@ public:
 	host(universalparams_t _universalparams);
 	~host();
 	
-	long double runapp(string graph_path, std::string binaryFile[2], 
-		vector<edge3_type> &edgedatabuffer, vector<edge_t> &vertexptrbuffer, map_t * edge_maps_large[MAX_GLOBAL_NUM_PEs],
-			HBM_channelAXISW_t * HBM_axichannel[2][MAX_GLOBAL_NUM_PEs], HBM_channelAXISW_t * HBM_axicenter[2][MAX_NUM_FPGAS], unsigned int hbm_channel_wwsize, unsigned int globalparams[1024], universalparams_t universalparams);							
+	long double runapp(string graph_path, std::string binaryFile__[2], 
+		vector<edge3_type> &edgedatabuffer, vector<edge_t> &vertexptrbuffer, HBM_channelAXISW_t * HBM_EDGES[2][MAX_GLOBAL_NUM_PEs], 
+			unsigned int hbm_channel_wwsize, unsigned int globalparams[1024], universalparams_t universalparams);						
 	
 private:
 	utility * utilityobj;

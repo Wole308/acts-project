@@ -1,2 +1,0 @@
-{%for i in context['NUM_VALID_PEs_seq']%}{%if(i>0)%},{%endif%} HBM_channelA{{i}}, HBM_channelB{{i}}{%endfor%}
-

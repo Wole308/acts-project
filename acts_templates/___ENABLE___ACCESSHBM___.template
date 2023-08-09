@@ -2,10 +2,10 @@ void master_insertmany_vec(unsigned int offsets[NUM_VALID_PEs], unsigned int dat
 	#pragma HLS INLINE // FIXME_HARDWARE
 	{%for n in context['NUM_VALID_PEs_seq']%}	
 	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	HBM_channelA{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{v}}];
+	HBM_EDGESA{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{v}}];
 	{%endfor%}
 	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	HBM_channelB{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}];
+	HBM_EDGESB{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}];
 	{%endfor%}	
 	{%endfor%}
 	return;
@@ -14,10 +14,10 @@ void master_retrievemany_vec(unsigned int offsets[NUM_VALID_PEs], unsigned int d
 	#pragma HLS INLINE // FIXME_HARDWARE
 	{%for n in context['NUM_VALID_PEs_seq']%}
 	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	data[{{n}}][{{v}}] = HBM_channelA{{n}}[offsets[{{n}}]].data[{{v}}];
+	data[{{n}}][{{v}}] = HBM_EDGESA{{n}}[offsets[{{n}}]].data[{{v}}];
 	{%endfor%}
 	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_channelB{{n}}[offsets[{{n}}]].data[{{v}}];
+	data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_EDGESB{{n}}[offsets[{{n}}]].data[{{v}}];
 	{%endfor%}
 	{%endfor%}
 	return;
@@ -27,7 +27,7 @@ void master_insertmany_Avec(unsigned int offsets[NUM_VALID_PEs], unsigned int da
 	#pragma HLS INLINE 
 	{%for n in context['NUM_VALID_PEs_seq']%}	
 		{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-		HBM_channelA{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{v}}];	// FIXME
+		HBM_EDGESA{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{v}}];	// FIXME
 		{%endfor%}	
 	{%endfor%}	
 	return;
@@ -36,7 +36,7 @@ void master_insertmany_Bvec(unsigned int offsets[NUM_VALID_PEs], unsigned int da
 	#pragma HLS INLINE 
 	{%for n in context['NUM_VALID_PEs_seq']%}	
 		{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-		HBM_channelB{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}];
+		HBM_EDGESB{{n}}[offsets[{{n}}]].data[{{v}}] = data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}];
 		{%endfor%}	
 	{%endfor%}
 	return;
@@ -45,7 +45,7 @@ void master_retrievemany_Avec(unsigned int offsets[NUM_VALID_PEs], unsigned int 
 	#pragma HLS INLINE
 	{%for n in context['NUM_VALID_PEs_seq']%}
 	{%for v in context['HBM_AXI_PACK_SIZE_seq']%}
-	data[{{n}}][{{v}}] = HBM_channelA{{n}}[offsets[{{n}}]].data[{{v}}];
+	data[{{n}}][{{v}}] = HBM_EDGESA{{n}}[offsets[{{n}}]].data[{{v}}];
 	{%endfor%}
 	{%endfor%}	
 	return;
@@ -54,7 +54,7 @@ void master_retrievemany_Bvec(unsigned int offsets[NUM_VALID_PEs], unsigned int 
 	#pragma HLS INLINE 
 	{%for n in context['NUM_VALID_PEs_seq']%}
 	{%for v in context['HBM_AXI_PACK_SIZE_seq']%} /////////////////
-	data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_channelB{{n}}[offsets[{{n}}]].data[{{v}}];
+	data[{{n}}][{{context['HBM_AXI_PACK_SIZE'] + v}}] = HBM_EDGESB{{n}}[offsets[{{n}}]].data[{{v}}];
 	{%endfor%}	
 	{%endfor%}	
 	return;
@@ -68,10 +68,10 @@ void load_edgemaps(unsigned int index, unsigned int base_offset, map_t edge_map[
 	checkoutofbounds("acts_kernel::ERROR 9601::", base_offset + (index / HBM_AXI_PACK_SIZE), ((1 << 28)/4)/16, index, HBM_CHANNEL_PACK_SIZE, NAp);
 	#endif 
 	{%for n in context['NUM_VALID_PEs_seq']%}
-	edge_map[{{n}}].offset = HBM_channelA{{n}}[base_offset + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)];
+	edge_map[{{n}}].offset = HBM_EDGESA{{n}}[base_offset + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)];
 	{%endfor%}
 	{%for n in context['NUM_VALID_PEs_seq']%}
-	edge_map[{{n}}].size = HBM_channelA{{n}}[base_offset + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)];
+	edge_map[{{n}}].size = HBM_EDGESA{{n}}[base_offset + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)];
 	{%endfor%}	
 	return;
 }
@@ -82,10 +82,10 @@ void save_edgemaps(unsigned int index, unsigned int base_offset, map_t edge_map[
 	checkoutofbounds("acts_kernel::ERROR 9602::", base_offset + (index / HBM_AXI_PACK_SIZE), ((1 << 28)/4)/16, index, HBM_CHANNEL_PACK_SIZE, NAp);
 	#endif 	
 	{%for n in context['NUM_VALID_PEs_seq']%}
-	HBM_channelA{{n}}[base_offset + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)] = edge_map[{{n}}].offset;
+	HBM_EDGESA{{n}}[base_offset + (index / HBM_AXI_PACK_SIZE)].data[(index % HBM_AXI_PACK_SIZE)] = edge_map[{{n}}].offset;
 	{%endfor%}
 	{%for n in context['NUM_VALID_PEs_seq']%}
-	HBM_channelA{{n}}[base_offset + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)] = edge_map[{{n}}].size;
+	HBM_EDGESA{{n}}[base_offset + ((index + 1) / HBM_AXI_PACK_SIZE)].data[((index + 1) % HBM_AXI_PACK_SIZE)] = edge_map[{{n}}].size;
 	{%endfor%}	
 	return;
 }
@@ -93,23 +93,23 @@ void save_edgemaps(unsigned int index, unsigned int base_offset, map_t edge_map[
 map_t load_vupdate_map(unsigned int offset, unsigned int index, {% include '___HBM___PARAMS___.template' %}){
 #pragma HLS INLINE
 	map_t data;
-	data.offset = HBM_channelA0[offset + index].data[0];
-	data.size = HBM_channelA0[offset + index].data[1];
+	data.offset = HBM_EDGESA0[offset + index].data[0];
+	data.size = HBM_EDGESA0[offset + index].data[1];
 	return data; 
 }
 void save_vupdate_map(unsigned int offset, unsigned int index, map_t data, {% include '___HBM___PARAMS___.template' %}){
 #pragma HLS INLINE
 	{%for v in context['8_seq']%} 
-	HBM_channelA0[offset + index].data[{{2*v}}] = data.offset;
-	HBM_channelA0[offset + index].data[{{2*v+1}}] = data.size;
+	HBM_EDGESA0[offset + index].data[{{2*v}}] = data.offset;
+	HBM_EDGESA0[offset + index].data[{{2*v+1}}] = data.size;
 	{%endfor%}	
 	return;
 }
 
 ////////////////////////////////////////////////////////////////
-unsigned int dretrieve_globalparams(unsigned int base_offset__, unsigned int index, HBM_channelAXI_t * HBM_channelA, HBM_channelAXI_t * HBM_channelB, unsigned int inst){
+unsigned int dretrieve_globalparams(unsigned int base_offset__, unsigned int index, HBM_channelAXI_t * HBM_EDGESA, HBM_channelAXI_t * HBM_EDGESB, unsigned int inst){
 	#pragma HLS INLINE 
-	return HBM_channelA[base_offset__ + index].data[0];
+	return HBM_EDGESA[base_offset__ + index].data[0];
 }
 
 void dretrievemany_edges(unsigned int base_offset__, unsigned int offsets[NUM_VALID_PEs], unsigned int t, edge3_vec_dt edges[NUM_VALID_PEs], {% include '___HBM___PARAMS___.template' %}){

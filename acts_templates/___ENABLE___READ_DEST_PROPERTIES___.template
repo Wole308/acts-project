@@ -5,7 +5,7 @@ unsigned int sz = MAXVALID_APPLYPARTITION_VECSIZE; if(action.command == GRAPH_UP
 
 READ_DEST_PROPERTIES_LOOP2B: for(unsigned int t=0; t<sz; t++){
 #pragma HLS PIPELINE II={{context['II_READ_DEST_PROPERTIES_LOOP2B']}}
-	dretrievemany_vdatadram(voffset, t, vprop, {% include '___HBM___ARGS___.template' %});
+	dretrievemany_vdatadram(voffset, t, vprop, {% include '___HBM___ARGS___SRC___.template' %});
 	READ_DEST_PROPERTIES_LOOP2C: for(unsigned int inst=0; inst<NUM_VALID_PEs; inst++){ 
 	#pragma HLS UNROLL
 		for(unsigned int v=0; v<EDGE_PACK_SIZE; v++){ 

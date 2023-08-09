@@ -15,7 +15,7 @@ SAVE_DEST_PROPERTIES_LOOP2: for(unsigned int t=0; t<sz; t++){
 			vprop[inst][v] = URAM_vprop[inst][v][t];
 		}
 	}
-	dinsertmany_vdatadram(voffset, t, vprop, {% include '___HBM___ARGS___.template' %});
+	dinsertmany_vdatadram(voffset, t, vprop, {% include '___HBM___ARGS___SRC___.template' %});
 	
 	update_dramnumclockcycles(_NUMCLOCKCYCLES_, ___CODE___SAVE_DEST_PROPERTIES___, 1);
 }

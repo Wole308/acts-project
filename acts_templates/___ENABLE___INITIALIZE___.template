@@ -5,7 +5,7 @@ unsigned int total_cycles = 0;
 // load global parameters	
 MY_LOOP209: for(unsigned int t=0; t<GLOBALBUFFER_SIZE; t++){
 #pragma HLS PIPELINE II=1
-	globalparams[t] = dretrieve_globalparams(0, t, HBM_channelA0, HBM_channelB0, 0);
+	globalparams[t] = dretrieve_globalparams(0, t, HBM_EDGESA0, HBM_EDGESB0, 0);
 }
 unsigned int __NUM_UPARTITIONS = globalparams[GLOBALPARAMSCODE__PARAM__NUM_UPARTITIONS];
 unsigned int __NUM_APPLYPARTITIONS = globalparams[GLOBALPARAMSCODE__PARAM__NUM_APPLYPARTITIONS]; 
