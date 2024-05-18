@@ -36,21 +36,21 @@ Here you specify the (1) algorithm, (2) number of FPGAs, (3) root vertex id (for
 Thank you for citing our work.
 
 ```bibtex
-@inproceedings{10.1145/3543622.3573180,
-author = {Jaiyeoba, Wole and Elyasi, Nima and Choi, Changho and Skadron, Kevin},
-title = {ACTS: A Near-Memory FPGA Graph Processing Framework},
-year = {2023},
-isbn = {9781450394178},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/3543622.3573180},
-doi = {10.1145/3543622.3573180},
-booktitle = {Proceedings of the 2023 ACM/SIGDA International Symposium on Field Programmable Gate Arrays},
-pages = {79–89},
-numpages = {11},
-keywords = {fpga, graph analytics, high memory bandwidth (hbm)},
-location = {<conf-loc>, <city>Monterey</city>, <state>CA</state>, <country>USA</country>, </conf-loc>},
-series = {FPGA '23}
+  @inproceedings{10.1145/3543622.3573180,
+  author = {Jaiyeoba, Wole and Elyasi, Nima and Choi, Changho and Skadron, Kevin},
+  title = {ACTS: A Near-Memory FPGA Graph Processing Framework},
+  year = {2023},
+  isbn = {9781450394178},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3543622.3573180},
+  doi = {10.1145/3543622.3573180},
+  booktitle = {Proceedings of the 2023 ACM/SIGDA International Symposium on Field Programmable Gate Arrays},
+  pages = {79–89},
+  numpages = {11},
+  keywords = {fpga, graph analytics, high memory bandwidth (hbm)},
+  location = {<conf-loc>, <city>Monterey</city>, <state>CA</state>, <country>USA</country>, </conf-loc>},
+  series = {FPGA '23}
 }
 ```
 
