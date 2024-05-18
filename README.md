@@ -16,16 +16,11 @@ ACTS can be configured to specify a number of parameters such as (1) platform to
 ```	
 
 ## Sythesizing ACTS (using Vitis HLS)
-ACTS is synthesized with Vitis HLS. To synthesize ACTS for the Xilinx FPGA, run the ./evaluate_synthesize.sh
+ACTS is synthesized with Vitis HLS. To synthesize ACTS for the Xilinx FPGA, run the ./evaluate_synthesize.sh, specifying the number of PEs in the second parameter as shown. It would synthesize the required number of PEs for ACTS. When running ACTS across multiple FPGAS (as used in the Swift Project), the number of FPGAs need to be specified when running ACTS (see next section below)
 
-specifying the number of PEs in the second parameter as shown
 ```cpp
-"USAGE: ./host [--xware] [--num_pes] [--run-in-async-mode?]"
-./evaluate_datasets.sh 2 1 1
+./evaluate_synthesize.sh
 ```
-
-The device path (DEVICEPATH) is specified in ./evaluate_synthesize.sh
-The Number of processing elements (PEs) per FPFA is specified in evaluate.sh	
 
 ## Running ACTS on the FPGA 
 To run ACTS using the commands shown below, use the command below
@@ -41,13 +36,21 @@ Here you specify the (1) algorithm, (2) number of FPGAs, (3) root vertex id (for
 Thank you for citing our work.
 
 ```bibtex
-@inproceedings{inproceedings,
+@inproceedings{10.1145/3543622.3573180,
 author = {Jaiyeoba, Wole and Elyasi, Nima and Choi, Changho and Skadron, Kevin},
-year = {2023},
-month = {02},
-pages = {79-89},
 title = {ACTS: A Near-Memory FPGA Graph Processing Framework},
-doi = {10.1145/3543622.3573180}
+year = {2023},
+isbn = {9781450394178},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3543622.3573180},
+doi = {10.1145/3543622.3573180},
+booktitle = {Proceedings of the 2023 ACM/SIGDA International Symposium on Field Programmable Gate Arrays},
+pages = {79–89},
+numpages = {11},
+keywords = {fpga, graph analytics, high memory bandwidth (hbm)},
+location = {<conf-loc>, <city>Monterey</city>, <state>CA</state>, <country>USA</country>, </conf-loc>},
+series = {FPGA '23}
 }
 ```
 
