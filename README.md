@@ -8,7 +8,7 @@ Vitis HLS
 Xilinx FPGA
 
 ## Configuring ACTS
-ACTS can be configured to specify a number of parameters such as (1) platform to run acts: 0 for cpu and 1 for fpga, (2) number of processing elements per FPGA, which should equal the number of processing elements synthesized unto the FPGA as shown above (3) whether ACTS should run in synchronous or asynchronous mode, etc. More examples shown in ./evaluate_run.sh. To configure ACTS environment, go to evaluate_run.sh and specify desired paramaters. 
+ACTS can be configured to specify a number of parameters such as (1) platform to run acts: 0 for cpu and 1 for fpga, (2) number of processing elements per FPGA, which should equal the number of processing elements synthesized unto the FPGA as shown above (3) whether ACTS should run in synchronous or asynchronous mode, etc.  
 
 ```cpp
 "USAGE: ./host [--xware] [--num_pes] [--run-in-async-mode?]"
@@ -16,7 +16,7 @@ ACTS can be configured to specify a number of parameters such as (1) platform to
 ```	
 
 ## Sythesizing ACTS (using Vitis HLS)
-ACTS is synthesized with Vitis HLS. To synthesize ACTS for the Xilinx FPGA, run the ./evaluate_synthesize.sh, specifying the number of PEs in the second parameter as shown. It would synthesize the required number of PEs for ACTS. When running ACTS across multiple FPGAS (as used in the Swift Project), the number of FPGAs need to be specified when running ACTS (see next section below)
+ACTS is synthesized with Vitis HLS for the Xilinx Alveo U280 FPGA. To synthesize ACTS, run the ./evaluate_synthesize.sh, specifying the number of PEs in the second parameter as shown. It would synthesize the required number of PEs for ACTS. When running ACTS across multiple FPGAS (as used in the Swift Project), the number of FPGAs need to be specified when running ACTS (see next section below)
 
 ```cpp
 ./evaluate_synthesize.sh
